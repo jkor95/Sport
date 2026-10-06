@@ -34,14 +34,14 @@ Voer dit eenmalig uit. Controleer de melding op fouten. De migratie maakt vier `
 
 Je kunt ter inspectie ook `supabase/tests/controle.sql` uitvoeren. Dat laat de ingestelde privileges en beleidsregels zien, maar bewijst niet dat alle echte accountstromen werken. De acceptatietests staan verderop.
 
-## 3. Publieke configuratie invullen
+## 3. Publieke configuratie - al ingevuld
 
-Zoek de project-URL en **publishable key**, of de oude **anon/public key**, in de API-instellingen van dit nieuwe Supabase-project. Vul uitsluitend deze twee publieke waarden in `config.js` in:
+Deze versie is al gekoppeld aan jouw Supabase-project. De volgende twee publieke waarden staan al in `config.js`, dus je hoeft ze niet opnieuw in GitHub in te vullen:
 
 ```js
 globalThis.SPORT_CONFIG = {
-  supabaseUrl: 'https://JOUW-PROJECT.supabase.co',
-  supabasePublishableKey: 'JOUW-PUBLISHABLE-OF-ANON-KEY',
+  supabaseUrl: 'https://gcxnxfwmgcrhfgjlqbnn.supabase.co',
+  supabasePublishableKey: 'sb_publishable_ANR7qJwKme0Nx14831sVFQ_DTBj9FdJ',
   appName: 'SportKompas',
   enableAI: false,
   sdkUrl: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js'
@@ -50,7 +50,7 @@ globalThis.SPORT_CONFIG = {
 
 **Gebruik hier nooit `service_role`, `sb_secret_...`, een databasewachtwoord of een OpenAI API-sleutel.** Een verkeerde geheime sleutel die al gepubliceerd is, moet direct bij de provider worden ingetrokken en vernieuwd; alleen het bestand verwijderen is onvoldoende.
 
-Sla het gewijzigde `config.js` op in GitHub. Supabase-sleutels voor JK Works zijn niet nodig. Laat `enableAI` voorlopig op `false` staan.
+Upload `config.js` gewoon samen met de rest van de bestanden naar GitHub. Supabase-sleutels voor JK Works zijn niet nodig. Laat `enableAI` voorlopig op `false` staan.
 
 ## 4. Twee persoonlijke accounts
 

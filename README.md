@@ -4,6 +4,10 @@
 
 Versie 1.0 - 6 oktober 2026. Een aparte app voor GitHub Pages en Supabase, zonder wijzigingen aan JK Works.
 
+## Deze versie is al gekoppeld aan jouw Supabase-project
+
+`config.js` bevat al de publieke project-URL `https://gcxnxfwmgcrhfgjlqbnn.supabase.co` en jouw publishable key. Je hoeft deze twee waarden dus niet meer handmatig in GitHub in te vullen. De service-role key, databasewachtwoorden en andere geheime sleutels zijn niet opgenomen.
+
 ## Eerst bekijken
 
 Open `DEMO.html` in een gewone browser en kies **Bekijk de interactieve demo**. Deze versie werkt zonder account, internet of configuratie. Alle gegevens zijn fictief. De demonstratie bevat bewust een training van 10 km die je als 5 km kunt registreren. Aanpassingen verdwijnen wanneer je de demo opnieuw opent.
