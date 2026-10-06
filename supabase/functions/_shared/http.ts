@@ -43,8 +43,6 @@ export async function authenticate(req:Request):Promise<{id:string;token:string}
   const res=await fetch(env('SUPABASE_URL')+'/auth/v1/user',{headers:{apikey:env('SUPABASE_ANON_KEY'),Authorization:header},signal:AbortSignal.timeout(10000)});
   if(!res.ok)throw new HttpError(401,'Je sessie is verlopen. Log opnieuw in.');
   const user=await res.json();if(!user.id||user.is_anonymous||!/^[a-f0-9-]{36}$/.test(user.id))throw new HttpError(401,'Geen geldig persoonlijk account.');
-  const rows=await adminRest('sport_members?user_id=eq.'+encodeURIComponent(user.id)+'&select=active');
-  if(!rows[0]?.active)throw new HttpError(403,'Dit account heeft geen toegang.');
   return {id:user.id,token};
 }
 export async function ownState(user:{id:string;token:string}):Promise<any> {

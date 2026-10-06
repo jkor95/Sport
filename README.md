@@ -16,7 +16,7 @@ Voor livegebruik: lees **INSTALLATIE.md**. De broncode is geleverd; een GitHub-r
 
 ## Wat zit erin?
 
-- **Eigen account, eigen doel.** Fit blijven, 5 km, 10 km, halve marathon of marathon. Geen gedeeld trainingsdossier. De toegang is beperkt tot door de beheerder toegelaten gebruikers.
+- **Eigen account, eigen doel.** Fit blijven, 5 km, 10 km, halve marathon of marathon. Geen gedeeld trainingsdossier. Elk geldig Supabase Auth-account heeft toegang tot zijn eigen, via RLS afgeschermde sportgegevens.
 - **Vaste sportmomenten.** Weekdag, begintijd, tijdsruimte en sport instellen. De automatische aanpassing verplaatst deze momenten niet. Een afzonderlijke training kun je zelf verplaatsen of vastzetten.
 - **Registreren wat echt lukte.** Afstand, tijd, ervaren zwaarte van 1-10 en een reden zoals tijdgebrek, vermoeidheid of klachten. De planner past komende trainingen aan; gemiste kilometers worden niet alsnog ergens toegevoegd.
 - **Week- en maandagenda, voortgang en uitleg.** Je ziet geplande en werkelijke kilometers en een log van aanpassingen. Andere sporten kunnen als tijdsblokken in de agenda, maar worden niet omgerekend naar hardloopkilometers.

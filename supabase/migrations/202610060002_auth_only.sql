@@ -1,47 +1,13 @@
--- SportKompas v3. Supabase Authentication is the only account/access system.
--- Run in a NEW Supabase project. This migration only creates sport_* objects.
+-- SportKompas v3 update: Supabase Auth is the only access gate.
+-- Run this ONCE if you already ran 202610060001_sportkompas.sql.
 
-create table if not exists public.sport_states (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  data jsonb not null,
-  revision bigint not null default 1 check (revision >= 1),
-  updated_at timestamptz not null default now(),
-  constraint sport_data_size check (octet_length(data::text) <= 2097152),
-  constraint sport_data_shape check (
-    jsonb_typeof(data) = 'object' and data->>'schemaVersion' = '1'
-    and jsonb_typeof(data->'workouts') = 'array'
-    and jsonb_typeof(data->'slots') = 'array'
-    and jsonb_typeof(data->'adjustments') = 'array'
-  )
-);
-create table if not exists public.sport_calendar_tokens (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  token_hash text not null unique check (token_hash ~ '^[a-f0-9]{64}$'),
-  minimal boolean not null default true,
-  created_at timestamptz not null default now()
-);
-create table if not exists public.sport_ai_usage (
-  user_id uuid not null references auth.users(id) on delete cascade,
-  day date not null,
-  calls integer not null default 0,
-  last_used timestamptz not null default now(),
-  primary key(user_id, day)
-);
-
-alter table public.sport_states enable row level security;
-alter table public.sport_calendar_tokens enable row level security;
-alter table public.sport_ai_usage enable row level security;
-
-revoke all on public.sport_states,public.sport_calendar_tokens,public.sport_ai_usage from public,anon,authenticated;
-grant select on public.sport_states to authenticated;
-grant all on public.sport_states,public.sport_calendar_tokens,public.sport_ai_usage to service_role;
-
+-- Every authenticated user may read only their own state.
 drop policy if exists sport_state_read_own on public.sport_states;
-create policy sport_state_read_own on public.sport_states for select to authenticated
+create policy sport_state_read_own on public.sport_states
+for select to authenticated
 using (user_id = (select auth.uid()));
 
--- Writes are only through this narrowly scoped atomic compare-and-swap function.
--- No client-supplied user_id is accepted; auth.uid() determines the owner.
+-- Saving is allowed for every authenticated, non-anonymous Supabase user.
 create or replace function public.sport_save_state(p_data jsonb, p_expected_revision bigint)
 returns table (data jsonb, revision bigint)
 language plpgsql security definer set search_path = ''
@@ -84,6 +50,7 @@ $$;
 revoke all on function public.sport_save_state(jsonb,bigint) from public,anon,authenticated;
 grant execute on function public.sport_save_state(jsonb,bigint) to authenticated;
 
+-- AI quota no longer checks a separate allow-list.
 create or replace function public.sport_take_ai_quota(p_user_id uuid)
 returns boolean language plpgsql security definer set search_path = ''
 as $$
@@ -100,3 +67,6 @@ end;
 $$;
 revoke all on function public.sport_take_ai_quota(uuid) from public,anon,authenticated;
 grant execute on function public.sport_take_ai_quota(uuid) to service_role;
+
+-- The old allow-list is no longer used.
+drop table if exists public.sport_members cascade;

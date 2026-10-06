@@ -12,8 +12,6 @@ Deno.serve(async (req:Request)=>{
     const hash=await sha256(token);
     const links=await adminRest('sport_calendar_tokens?token_hash=eq.'+hash+'&select=user_id,minimal');
     const link=links[0];if(!link)return notFound();
-    const member=await adminRest('sport_members?user_id=eq.'+link.user_id+'&select=active');
-    if(!member[0]?.active)return notFound();
     const rows=await adminRest('sport_states?user_id=eq.'+link.user_id+'&select=data');
     if(!rows[0]?.data)return notFound();
     const ics=SK.calendarText(rows[0].data,{owner:link.user_id,minimal:link.minimal});

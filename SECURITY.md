@@ -2,7 +2,7 @@
 
 ## Bedoeld toegangsmodel
 
-Iedere sporter heeft een eigen Supabase Auth-account. Een actieve rij in `sport_members` is aanvullend vereist. De frontend filtert op gebruiker, maar dat is niet de veiligheidsgrens: RLS en databaseprivileges bepalen server-side welke rijen bereikbaar zijn.
+Iedere sporter heeft een eigen Supabase Auth-account. Er is geen aparte toelatingslijst. De frontend filtert op gebruiker, maar dat is niet de veiligheidsgrens: RLS en databaseprivileges bepalen server-side welke rijen bereikbaar zijn.
 
 De client kan alleen zijn eigen ledenrij en eigen sportstaat lezen. Schrijven kan uitsluitend via `sport_save_state`; deze functie gebruikt `auth.uid()` in plaats van een aangeleverde eigenaar. Een verwachte revisie voorkomt stilzwijgend overschrijven van wijzigingen op een ander apparaat. Er zijn geen directe clientrechten om leden, tokens of quota te wijzigen.
 
@@ -42,7 +42,7 @@ Deze controles zijn nog niet in een echte Supabase-omgeving uitgevoerd. Gebruik 
 
 1. A en B zijn actieve leden, hebben verschillende doelen en eigen ingevulde schema's. Met het access token van A moet `GET /rest/v1/sport_states?select=*` alleen A opleveren. Expliciet filteren op B's user_id moet geen B-rij opleveren. Herhaal andersom. De eigen profielgegevens blijven na herladen intact.
 2. Directe POST/PATCH/DELETE op `sport_states` als A moet geweigerd worden. `sport_save_state` accepteert geen eigenaarparameter en mag uitsluitend A's staat wijzigen. Een tweede opslag met dezelfde oude revisie moet `SPORT_CONFLICT` geven; B moet ongewijzigd blijven.
-3. Zonder gebruikers-JWT mogen `sport_states`, `sport_members` en de schrijf-RPC niet bruikbaar zijn. Een ingelogd maar niet toegelaten account C mag geen eigen staat opslaan of lezen en geen agendalink maken.
+3. Zonder gebruikers-JWT mogen `sport_states` en de schrijf-RPC niet bruikbaar zijn. Een ingelogd account mag alleen zijn eigen staat opslaan/lezen en zijn eigen agendalink maken.
 4. A mag geen leden activeren, tokens uit de tabel lezen of de AI-quotafunctie rechtstreeks uitvoeren. Controleer niet alleen verborgen knoppen, maar ook HTTP-verzoeken naar de database-API.
 5. `calendar-link` en `ai-coach` moeten een ontbrekende/vervalste JWT afwijzen. Een browseraanroep vanaf een andere Origin moet eveneens geweigerd worden. Een correct aangemelde A kan alleen A's link maken/intrekken.
 6. Een ongeldige feedtoken geeft 404. Een geldige feed bevat uitsluitend de gekozen agenda-informatie. Na intrekken, vervangen of deactiveren van het lid geeft de oude link 404; de andere gebruiker blijft werken.

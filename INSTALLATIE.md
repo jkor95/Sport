@@ -56,41 +56,19 @@ Upload `config.js` gewoon samen met de rest van de bestanden naar GitHub. Supaba
 
 ### Authenticatie en URL's
 
-Open **Authentication** in Supabase. Laat aanmelden met e-mailadres en wachtwoord aanstaan. Zet **Allow new users to sign up** uit en laat anoniem aanmelden uit. De app heeft zelf ook geen registratieformulier; de database controleert daarnaast expliciet de ledenlijst.
+Open **Authentication** in Supabase. Laat aanmelden met e-mailadres en wachtwoord aanstaan en laat anoniem aanmelden uit. SportKompas gebruikt vanaf versie 3 alleen Supabase Authentication: er is geen aparte leden- of toelatingslijst meer.
 
-Stel bij **URL Configuration** zowel de **Site URL** als een toegestane **Redirect URL** in op exact je nieuwe websiteadres, inclusief de repositorynaam en de afsluitende slash. Bij een voorbeeldsite:
+Stel bij **URL Configuration** zowel de **Site URL** als een toegestane **Redirect URL** in op exact je nieuwe websiteadres, inclusief de repositorynaam en de afsluitende slash. Bijvoorbeeld:
 
 ```text
-https://JOUW-GITHUBNAAM.github.io/sportkompas/
+https://JOUW-GITHUBNAAM.github.io/SportKompas/
 ```
 
-Gebruik voor deze kleine app geen brede willekeurige redirect-wildcards. Een verkeerd adres kan uitnodigingen of wachtwoordherstel naar de verkeerde app sturen.
+Maak daarna onder **Authentication > Users** voor jezelf en je collega ieder een eigen account, of laat registratie aan als je dat bewust wilt. Ieder geldig Supabase Auth-account kan SportKompas gebruiken, maar RLS zorgt ervoor dat ieder alleen de eigen sportgegevens kan lezen.
 
-### Uitnodigen
+De collega kan **Marathon** kiezen. Jij kunt bijvoorbeeld **Fit blijven** of **10 km** kiezen; er wordt geen marathondoel aan jouw account gekoppeld.
 
-Configureer eerst e-mailbezorging onder **Custom SMTP** voor echte uitnodigingen en wachtwoordherstel. Supabase's standaard testmailer verstuurt volgens de documentatie alleen naar toegelaten teamadressen en is niet bedoeld als productie-mailvoorziening. Maak je collega niet uitsluitend hiervoor databasebeheerder. Gebruik liever je eigen SMTP/mailproviderconfiguratie.
-
-Nodig daarna vanuit **Authentication > Users** jezelf en je collega uit, ieder met een eigen e-mailadres. Vervolgens voeg je deze twee bestaande Auth-gebruikers toe aan de toegelaten ledenlijst. Vervang de onderstaande voorbeeldadressen en voer de query apart uit:
-
-```sql
-insert into public.sport_members(user_id)
-select id from auth.users
-where lower(email) in (
-  lower('JOUW-ECHTE-EMAIL'),
-  lower('EMAIL-VAN-JE-COLLEGA')
-)
-on conflict(user_id) do update set active=true;
-
-select u.email, m.active
-from public.sport_members m
-join auth.users u on u.id = m.user_id;
-```
-
-Controleer dat precies de bedoelde twee accounts actief zijn. Voeg ze toe voordat zij de uitnodigingslink gebruiken. Ieder opent de eigen e-mail en kiest een sterk, uniek wachtwoord van minimaal 12 tekens in de app. Daarna stelt ieder zijn eigen profiel, huidig niveau en vaste momenten in.
-
-De collega kan **Marathon** kiezen. Jij kunt bijvoorbeeld **Fit blijven** of **10 km** kiezen; er wordt geen marathondoel aan jouw account gekoppeld. De demo-invoer wordt niet naar een echt account overgenomen.
-
-Bronnen: [Auth-instellingen](https://supabase.com/docs/guides/auth/general-configuration), [wachtwoordauthenticatie](https://supabase.com/docs/guides/auth/passwords), [SMTP en beperkingen testmailer](https://supabase.com/docs/guides/auth/auth-smtp).
+Als je eerder versie 2 hebt geinstalleerd, voer eerst eenmalig `supabase/migrations/202610060002_auth_only.sql` uit in de Supabase SQL Editor.
 
 ## 5. Doorlopende agendakoppeling activeren
 
@@ -119,7 +97,7 @@ Let op: dit is alleen de **origin**, dus zonder `/sportkompas/` en zonder afslui
 
 De platformvariabelen `SUPABASE_URL`, `SUPABASE_ANON_KEY` en `SUPABASE_SERVICE_ROLE_KEY` worden in de hosted Edge Functions door Supabase aangeboden. Kopieer die niet naar de browser of naar GitHub.
 
-In `supabase/config.toml` staat `verify_jwt = false`. Dat is hier bewust: de openbare feed gebruikt een geheime toegangstoken; de andere functies valideren de gebruikers-JWT zelf via Supabase Auth en controleren actief lidmaatschap. De authenticatiecode in `_shared/http.ts` mag niet worden verwijderd. Een verzoek zonder geldige gebruikerssessie mag geen link kunnen aanmaken.
+In `supabase/config.toml` staat `verify_jwt = false`. Dat is hier bewust: de openbare feed gebruikt een geheime toegangstoken; de andere functies valideren de gebruikers-JWT zelf via Supabase Auth. De authenticatiecode in `_shared/http.ts` mag niet worden verwijderd. Een verzoek zonder geldige gebruikerssessie mag geen link kunnen aanmaken.
 
 Bronnen: [Edge Functions publiceren](https://supabase.com/docs/guides/functions/deploy), [servervariabelen en secrets](https://supabase.com/docs/guides/functions/secrets), [Edge Functions beveiligen](https://supabase.com/docs/guides/functions/auth).
 
@@ -154,7 +132,7 @@ Deze waarden mogen nooit in `config.js`, GitHub of een gedeeld bericht staan. Pu
 supabase functions deploy ai-coach
 ```
 
-Zet pas daarna in `config.js` **enableAI: true**. Test met een onschuldige voorbeeldvraag. De server controleert de ingelogde gebruiker, actief lidmaatschap, toestemming per verzoek en maximaal 10 vragen per UTC-dag met minimaal 10 seconden ertussen.
+Zet pas daarna in `config.js` **enableAI: true**. Test met een onschuldige voorbeeldvraag. De server controleert de ingelogde Supabase-gebruiker, toestemming per verzoek en maximaal 10 vragen per UTC-dag met minimaal 10 seconden ertussen.
 
 Een vraag verstuurt een beperkte samenvatting: doel, ingevulde loopbasis, gepauzeerd ja/nee, maximaal 10 recente trainingen en 6 komende trainingen. Namen, e-mailadressen, vrije notities en klachtredenen worden niet automatisch meegestuurd. Wat iemand zelf in de vraag zet, wordt wel verstuurd. Schrijf daarom geen onnodige persoonlijke of medische details in de vraag.
 
@@ -173,7 +151,6 @@ Installeer de PWA pas daarna via de functie **Zet op beginscherm / App installer
 | Melding / situatie | Controle |
 | --- | --- |
 | Alleen de demo werkt | Controleer beide publieke waarden in `config.js` en open de HTTPS-site. |
-| Dit account heeft geen toegang | Controleer het Auth-account, de juiste project-URL en `sport_members.active`. |
 | Tabellen niet beschikbaar | Is de volledige SQL-migratie in het juiste project uitgevoerd? |
 | Uitnodiging/reset komt niet | Controleer SMTP, afzenderinstellingen, spam, rate limits en Auth-redirect. |
 | Serverfunctie niet ingesteld | Zijn beide agenda-Edge Functions gepubliceerd en staat `APP_ORIGIN` exact goed? |
@@ -184,4 +161,10 @@ Installeer de PWA pas daarna via de functie **Zet op beginscherm / App installer
 
 ## Eigen gegevens en beheer
 
-Exporteer desgewenst je eigen JSON-bestand via de instellingen en bewaar dat prive. Er is nog geen import/herstelknop. Deel geen exports met je collega tenzij dat bewust de bedoeling is. Een beheerder kan toegang intrekken door `sport_members.active` op `false` te zetten. Bij het verwijderen van een Auth-gebruiker worden de gekoppelde sportrecords en tokens via foreign keys verwijderd; reeds gedownloade exports en externe agenda-kopieen verdwijnen daarmee niet.
+Exporteer desgewenst je eigen JSON-bestand via de instellingen en bewaar dat prive. Er is nog geen import/herstelknop. Deel geen exports met je collega tenzij dat bewust de bedoeling is. Bij het verwijderen van een Auth-gebruiker worden de gekoppelde sportrecords en tokens via foreign keys verwijderd; reeds gedownloade exports en externe agenda-kopieen verdwijnen daarmee niet.
+
+## Versie 3: alleen Supabase Authentication
+
+Er is geen aparte `sport_members`-toelatingslijst meer. Ieder geldig persoonlijk account in **Supabase Authentication → Users** kan SportKompas gebruiken. RLS houdt de gegevens per `auth.uid()` gescheiden.
+
+Als versie 2 al in jouw Supabase-project is geinstalleerd, voer dan eenmalig `supabase/migrations/202610060002_auth_only.sql` uit in de SQL Editor. Daarna is de oude `sport_members`-tabel verwijderd en niet meer nodig.

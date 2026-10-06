@@ -20,9 +20,6 @@
   async function checkedUser(){const c=await connect();const {data,error}=await c.auth.getUser();if(error||!data.user)throw new Error('Je sessie is verlopen. Log opnieuw in.');user=data.user;return user;}
   async function load(){
     const c=await connect(),u=await checkedUser();
-    const member=await c.from('sport_members').select('user_id,active').eq('user_id',u.id).maybeSingle();
-    if(member.error)throw new Error('De sporttabellen zijn nog niet beschikbaar, of toegang is geweigerd. Controleer de SQL-installatie.');
-    if(!member.data?.active)throw new Error('Dit account heeft geen toegang tot SportKompas. Laat de beheerder je account toevoegen aan sport_members.');
     const {data,error}=await c.from('sport_states').select('data,revision').eq('user_id',u.id).maybeSingle();
     if(error)throw new Error('Gegevens laden mislukt: '+error.message);
     revision=Number(data?.revision||0);const state=data?.data||SK.freshState();SK.validateState(state);return {state,user:u};
