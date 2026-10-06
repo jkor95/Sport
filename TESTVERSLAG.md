@@ -1,4 +1,4 @@
-# Testverslag - Sport-app v5
+# Testverslag - Sport-app v6
 
 Uitgevoerd op 6 oktober 2026 in een lokale testomgeving.
 

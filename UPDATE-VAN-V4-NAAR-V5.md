@@ -1,4 +1,4 @@
-# Sport-app v5 bijwerken vanaf v4
+# Sport-app v6 bijwerken vanaf v4
 
 1. Vervang de bestanden in je GitHub repository door de inhoud van deze map.
 2. Er is geen nieuwe database-SQL nodig.

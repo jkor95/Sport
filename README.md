@@ -1,4 +1,4 @@
-# Sport-app v5
+# Sport-app v6
 
 Persoonlijke adaptieve sportagenda voor GitHub Pages + Supabase.
 
@@ -65,5 +65,5 @@ Met een ingevulde doeldatum is die datum leidend. De keuzelijst voor vooruit pla
 - 11 weken resterend = 11 weekblokken tot de doeldag.
 - De planner verdeelt deze periode over opbouw, eventuele herstelweek, piek en taper.
 - De AI krijgt exact hetzelfde aantal resterende weken door als de browserplanner.
-- Voor een marathon probeert de planner bij voldoende basis richting een piekduurloop van ongeveer 28-32 km te bouwen.
+- Voor een marathon probeert de planner bij voldoende basis richting een piekduurloop van ongeveer 28-32 km (hard maximum 32 km voor een geplande trainingsloop) te bouwen.
 - Als de huidige basis en resterende tijd dat niet realistisch toelaten, blijft de piek lager en verschijnt een waarschuwing. De app maakt dan geen kunstmatige sprong naar 42,2 km in de trainingen; 42,2 km blijft alleen de ingestelde doeldag.

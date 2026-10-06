@@ -1,4 +1,4 @@
-# Sport-app v5 installeren / bijwerken
+# Sport-app v6 installeren / bijwerken
 
 ## Als v3 al werkt
 

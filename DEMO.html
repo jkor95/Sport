@@ -146,7 +146,7 @@
     const feasibleWeekly=base*Math.pow(1.10,Math.max(0,Math.min(wi,peakIndex)));
     const feasibleLong=longest*Math.pow(1.15,Math.max(0,Math.min(wi,peakIndex)));
     let weekly=Math.min(base+(goalPeakWeekly-base)*buildProgress,feasibleWeekly,90);
-    let longKm=Math.min(longest+(goalPeakLong-longest)*buildProgress,feasibleLong,34);
+    let longKm=Math.min(longest+(goalPeakLong-longest)*buildProgress,feasibleLong,32);
     let phase=buildProgress<.20?'basis':buildProgress<.82?'opbouw':'piek';
     if(ai && wi<=peakIndex){
       const aiWeekly=Number(ai.weeklyKm), aiLong=Number(ai.longKm);
@@ -194,7 +194,7 @@
           if(slot.id===longSlot.id) share=Math.min(.62,Math.max(runs.length===1?1:.38,target.longKm/Math.max(1,budget)));
           else share=(1-Math.min(.62,Math.max(.38,target.longKm/Math.max(1,budget))))/Math.max(1,runs.length-1);
           const desired=slot.id===longSlot.id?target.longKm:budget*share;
-          km=roundKm(Math.min(desired,Math.max(0,(slot.minutes-10)/p.pace)));
+          km=roundKm(Math.min(desired,32,Math.max(0,(slot.minutes-10)/p.pace)));
           minutes=Math.min(slot.minutes,Math.max(15,Math.ceil(km*p.pace+10)));
           kind=slot.id===longSlot.id?'long':'easy';
         }
@@ -212,6 +212,14 @@
     }
     for(const w of state.workouts) if(w.source==='plan'&&w.date>=start&&w.date<=end&&!activeKeys.has(w.slotId+':'+w.date)&&!finalStatuses.has(w.status)&&!w.locked) {
       const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
+    }
+    // Cancel obsolete future goal-day events when goal or target date changes.
+    const currentGoalKey=(p.raceDate&&p.goal!=='fit')?p.goal+':'+p.raceDate:'';
+    for(const w of state.workouts) {
+      if(w.source!=='goal'||w.status==='done'||w.status==='skipped'||w.date<start) continue;
+      if(!currentGoalKey||w.goalKey!==currentGoalKey) {
+        if(w.status!=='cancelled'){w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before:{...eventSnap(w),status:'planned'},after:eventSnap(w)});}
+      }
     }
     // Add one explicit goal-day event when it falls inside the generated horizon.
     const distance=raceDistance(p.goal);
