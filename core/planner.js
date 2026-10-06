@@ -47,6 +47,11 @@
     state.adjustments=state.adjustments.slice(0,200);
   }
   function eventSnap(w) { return {km:w.km,minutes:w.minutes,status:w.status,date:w.date,time:w.time}; }
+  function resetCoachHistory(state) {
+    if(!state || !Array.isArray(state.adjustments)) throw new Error('Onbekend gegevensformaat.');
+    state.adjustments=[];
+    return state;
+  }
   function makeWorkout(x, now = new Date()) {
     const km=Number(x.km||0), minutes=Number(x.minutes||30);
     return {id:uid(),date:x.date,time:x.time||'18:30',sport:x.sport||'run',kind:x.kind||'easy',title:x.title||sports[x.sport||'run'],km,minutes,baseKm:km,baseMinutes:minutes,status:'planned',source:'manual',slotId:null,locked:false,actual:null,sequence:0,updatedAt:now.toISOString(),createdAt:now.toISOString(),...x};
@@ -158,8 +163,16 @@
     if(p.raceDate&&distance&&p.raceDate>=start&&p.raceDate<=end){
       let race=state.workouts.find(w=>w.source==='goal'&&w.goalKey===p.goal+':'+p.raceDate);
       const raceMinutes=Math.max(30,Math.ceil(distance*p.pace));
-      if(!race) { race=makeWorkout({date:p.raceDate,time:'09:00',sport:'run',kind:'race',title:`Doeldag - ${SK.goals[p.goal]}`,km:distance,minutes:raceMinutes,baseKm:distance,baseMinutes:raceMinutes,source:'goal',slotId:null,locked:true,goalKey:p.goal+':'+p.raceDate},now);state.workouts.push(race); }
-      else if(!finalStatuses.has(race.status)){Object.assign(race,{km:distance,baseKm:distance,minutes:raceMinutes,baseMinutes:raceMinutes,title:`Doeldag - ${SK.goals[p.goal]}`,locked:true,status:state.hold?'held':'planned'});}
+      if(!race) {
+        race=makeWorkout({date:p.raceDate,time:'09:00',sport:'run',kind:'race',title:`Doeldag - ${SK.goals[p.goal]}`,km:distance,minutes:raceMinutes,baseKm:distance,baseMinutes:raceMinutes,source:'goal',slotId:null,locked:true,goalKey:p.goal+':'+p.raceDate},now);
+        state.workouts.push(race);
+      } else if(race.status==='cancelled') {
+        const before=eventSnap(race);
+        Object.assign(race,{km:distance,baseKm:distance,minutes:raceMinutes,baseMinutes:raceMinutes,title:`Doeldag - ${SK.goals[p.goal]}`,locked:true,status:state.hold?'held':'planned'});
+        touch(race,at);changes.push({id:race.id,title:race.title,before,after:eventSnap(race)});
+      } else if(!finalStatuses.has(race.status)) {
+        Object.assign(race,{km:distance,baseKm:distance,minutes:raceMinutes,baseMinutes:raceMinutes,title:`Doeldag - ${SK.goals[p.goal]}`,locked:true,status:state.hold?'held':'planned'});
+      }
     }
     state.planStart=start;state.planEnd=end;
     adaptPlan(state,{now,writeAudit:false});
@@ -292,5 +305,5 @@
     if(!p.raceDate&&state.planEnd&&daysBetween(today,state.planEnd)<21) notes.push('Je planning loopt binnenkort af. Bouw in Instellingen opnieuw verder op; afgeronde trainingen blijven bewaard.');
     return notes;
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,touch,targetForWeek,goalWeeks,taperWeeks});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks});
 })(globalThis.SK ||= {});

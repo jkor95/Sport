@@ -1,4 +1,4 @@
-# Sport-app v6
+# Sport-app v7
 
 Persoonlijke adaptieve sportagenda voor GitHub Pages + Supabase.
 
