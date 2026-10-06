@@ -10,7 +10,7 @@ globalThis.Deno={
 };
 globalThis.fetch=async()=>{throw new Error('Unexpected network request during guard test');};
 const origin='https://example.github.io';
-for(const name of ['calendar-link','ai-coach']){
+for(const name of ['calendar-link','ai-coach','ai-plan']){
   await import('../supabase/functions/'+name+'/index.ts');
   let r=await handler(new Request('https://project.supabase.co/functions/v1/'+name,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:'{}'}));
   assert.equal(r.status,401,name+' rejects missing user JWT');

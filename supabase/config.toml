@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.ai-coach]
 verify_jwt = false
+
+[functions.ai-plan]
+verify_jwt = false

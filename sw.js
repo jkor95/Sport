@@ -1,5 +1,5 @@
 /* Only public static app files are cached. Never cache API responses or user data. */
-const CACHE='sportkompas-shell-v1';
+const CACHE='sportkompas-shell-v4';
 const FILES=['./','./index.html','./styles.css','./config.js','./core/dates.js','./core/planner.js','./core/calendar.js','./demo.js','./db.js','./app.js','./manifest.webmanifest','./assets/icon.svg','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('sportkompas-shell-')&&k!==CACHE).map(k=>caches.delete(k))))));

@@ -1,70 +1,58 @@
-# SportKompas
+# SportKompas v4
 
-**Een persoonlijke sportagenda die meebeweegt met wat je werkelijk doet.**
+Persoonlijke adaptieve sportagenda voor GitHub Pages + Supabase.
 
-Versie 1.0 - 6 oktober 2026. Een aparte app voor GitHub Pages en Supabase, zonder wijzigingen aan JK Works.
+## Wat is nieuw in v4
 
-## Deze versie is al gekoppeld aan jouw Supabase-project
+- **Doeldatumgerichte opbouw.** Het schema rekent terug vanaf een 5 km-, 10 km-, halve-marathon- of marathondoel. Lange duurlopen kunnen nu gedurende meerdere weken doorgroeien; de oude 35%-begrenzing is verwijderd. Er zijn basis-, opbouw-, lichtere, piek- en taperweken.
+- **Realistische begrenzing.** Een ambitieuze datum forceert geen enorme sprong vanuit een lage basis. Als de resterende tijd kort is, blijft de berekende piek lager en toont de app een waarschuwing.
+- **Doeldag in de agenda.** Als de doeldatum binnen maximaal 26 weken valt, wordt de horizon automatisch lang genoeg gemaakt om die datum mee te nemen. Op de exacte datum verschijnt een doeldag-event.
+- **Echte AI-modus.** OpenAI kan via de Supabase Edge Function `ai-plan` een weekstrategie voorstellen. Die strategie wordt daarna in SportKompas begrensd op startniveau, beschikbare tijd, grote sprongen en taper. De AI schrijft niet rechtstreeks naar de database.
+- **PDF voor fysio.** In Voortgang staat een knop `PDF voor fysio`. Kies week, maand, kwartaal of jaar. Het rapport bevat geregistreerde activiteiten, duur, hardloopafstand, RPE en gepland versus werkelijk. Trainingsnotities zijn optioneel. Het rapport wordt lokaal opgebouwd en via het browser-afdrukvenster als PDF opgeslagen.
+- **Bestaande accounts en gegevens blijven werken.** De databasevorm is niet gewijzigd; v4 gebruikt dezelfde `sport_states`-opslag en Supabase Authentication als v3.
 
-`config.js` bevat al de publieke project-URL `https://gcxnxfwmgcrhfgjlqbnn.supabase.co` en jouw publishable key. Je hoeft deze twee waarden dus niet meer handmatig in GitHub in te vullen. De service-role key, databasewachtwoorden en andere geheime sleutels zijn niet opgenomen.
+## Jouw Supabase-koppeling
 
-## Eerst bekijken
+`config.js` bevat al:
 
-Open `DEMO.html` in een gewone browser en kies **Bekijk de interactieve demo**. Deze versie werkt zonder account, internet of configuratie. Alle gegevens zijn fictief. De demonstratie bevat bewust een training van 10 km die je als 5 km kunt registreren. Aanpassingen verdwijnen wanneer je de demo opnieuw opent.
+- Project URL: `https://gcxnxfwmgcrhfgjlqbnn.supabase.co`
+- Publishable key: de eerder opgegeven publieke key
 
-Voor livegebruik: lees **INSTALLATIE.md**. De broncode is geleverd; een GitHub-repository, Supabase-project en echte accounts zijn niet namens jou aangemaakt of gepubliceerd.
+Er staat geen `service_role`, databasewachtwoord of OpenAI API-sleutel in GitHub.
 
-## Wat zit erin?
+## Upgraden vanaf v3
 
-- **Eigen account, eigen doel.** Fit blijven, 5 km, 10 km, halve marathon of marathon. Geen gedeeld trainingsdossier. Elk geldig Supabase Auth-account heeft toegang tot zijn eigen, via RLS afgeschermde sportgegevens.
-- **Vaste sportmomenten.** Weekdag, begintijd, tijdsruimte en sport instellen. De automatische aanpassing verplaatst deze momenten niet. Een afzonderlijke training kun je zelf verplaatsen of vastzetten.
-- **Registreren wat echt lukte.** Afstand, tijd, ervaren zwaarte van 1-10 en een reden zoals tijdgebrek, vermoeidheid of klachten. De planner past komende trainingen aan; gemiste kilometers worden niet alsnog ergens toegevoegd.
-- **Week- en maandagenda, voortgang en uitleg.** Je ziet geplande en werkelijke kilometers en een log van aanpassingen. Andere sporten kunnen als tijdsblokken in de agenda, maar worden niet omgerekend naar hardloopkilometers.
-- **Prive-agenda-abonnement.** Een intrekbare geheime URL voor agenda-apps die internetagenda's ondersteunen, plus een losse ICS-export. Een abonnement wordt door de agenda-aanbieder ververst; een bestand is een momentopname.
-- **Mobiel en desktop.** Responsive website met PWA-bestanden, geschikt om na publicatie op het beginscherm te plaatsen.
+Vervang in GitHub de v3-bestanden door de inhoud van deze map. Er is **geen extra SQL-migratie nodig** voor v4 als `202610060001_sportkompas.sql` en `202610060002_auth_only.sql` al zijn uitgevoerd.
 
-## Wat betekent 'adaptief' hier?
+De Service Worker-cache heet nu `sportkompas-shell-v4`, zodat oude appbestanden na herladen worden vervangen.
 
-De planner is in deze versie **regelgestuurd**, niet een groot taalmodel dat zelf trainingen voorschrijft. De regels zijn zichtbaar in `core/planner.js` en lokaal getest. Een voorbeeld: 5 van 10 km vanwege tijdgebrek kan de eerstvolgende vergelijkbare loop binnen twee weken tot 6 km beperken. Bij vermoeidheid of herhaaldelijk inkorten wordt de komende belasting breder verminderd. Dit zijn programmeerkeuzes, geen wetenschappelijk gevalideerde grenzen of persoonlijk trainingsadvies.
+## AI activeren
 
-Bij een registratie van pijn of ziekte wordt de toekomstige sportplanning gepauzeerd, ook als automatisch aanpassen uitstaat. Hervatten gebeurt bewust via de app, niet via een automatisch medisch oordeel.
+De gewone doelgerichte planner en PDF-export werken zonder OpenAI. Alleen de schakelaar **AI-modus** heeft een server-side OpenAI-configuratie nodig.
 
-Een **optionele echte AI-coach** is als Supabase Edge Function meegeleverd. Deze gebruikt na expliciete toestemming een beperkte samenvatting om uitleg te geven. Daarvoor zijn apart een API-sleutel, geschikt model en budget nodig. De AI kan geen trainingen opslaan of wijzigen. Zonder AI blijft de gewone adaptieve planner werken.
+Benodigd in Supabase Edge Functions:
 
-## Grenzen van versie 1
+- deploy `ai-plan`
+- voor de vraagfunctie ook deploy `ai-coach`
+- secret `OPENAI_API_KEY`
+- secret `OPENAI_MODEL`
+- secret `APP_ORIGIN` met exact de HTTPS-oorsprong van je GitHub Pages-site, bijvoorbeeld `https://gebruikersnaam.github.io`
 
-Deze versie is geen compleet, gevalideerd marathontrainingsprogramma en beoordeelt niet of een wedstrijd haalbaar is. Het is een indicatieve basisplanning vanuit een zelf opgegeven huidig niveau, met 1-4 hardloopmomenten per week, maximaal 14 vaste sportblokken en een planhorizon van 12 of 24 weken. Voor helemaal beginnende lopers zonder loopbasis is nog geen wandel/loop-startprogramma ingebouwd. Tempotraining, zones, specifieke wedstrijdblokken en tapercoaching op maat ontbreken.
+De OpenAI-sleutel hoort uitsluitend in Supabase Secrets en nooit in `config.js` of GitHub.
 
-Je voert resultaten zelf in. Garmin, Strava, GPS-tracking en het uitlezen van afspraken uit je prive-agenda zijn niet gekoppeld. Agendasynchronisatie is eenrichtingsverkeer: SportKompas naar je agenda. Verplaatsen in Apple/Google/Outlook past SportKompas niet aan.
+## Veiligheidsmodel
 
-Er is een JSON-export voor eigen archivering, maar geen herstel/importknop. Cloudgegevens worden niet offline opgeslagen; offline bewerken is uitgeschakeld om verborgen conflicten en onversleutelde trainingskopieen te voorkomen. De Supabase-projectbeheerder heeft technisch beheerderstoegang; dit is geen end-to-end-versleuteld systeem.
+Ieder account gebruikt Supabase Authentication. `sport_states.user_id` is gekoppeld aan `auth.uid()` via RLS. De app gebruikt geen aparte `sport_members`-toelatingslijst. AI ontvangt geen naam, e-mail of vrije trainingsnotities voor het maken van een schema; alleen doel, startniveau, vaste hardloopruimte en een beperkte numerieke trainingssamenvatting.
 
-## Bestanden
+SportKompas is trainingssoftware, geen medische beoordeling. Bij pijn of ziekte pauzeert de bestaande planner toekomstige trainingen. Een marathonplan of AI-strategie garandeert niet dat een wedstrijd haalbaar of veilig is.
 
-| Bestand / map | Functie |
-| --- | --- |
-| `index.html`, `styles.css`, `app.js` | De website en gebruikersinterface |
-| `config.js` | Alleen publieke Supabase-projectgegevens |
-| `db.js` | Persoonlijke authenticatie, laden en versiegecontroleerd opslaan |
-| `core/` | Datumlogica, adaptieve planner en ICS-opbouw |
-| `supabase/migrations/` | Tabellen, toegangsregels en beveiligde opslagfunctie |
-| `supabase/functions/` | Prive-agendafeed, linkbeheer en optionele AI-uitleg |
-| `supabase/tests/controle.sql` | Inspectie van grants en RLS; geen volledige penetratietest |
-| `DEMO.html` | Zelfstandig, offline demonstratiebestand |
-| `INSTALLATIE.md` | Publicatie, accounts, agenda en optionele AI |
-| `SECURITY.md` | Beveiligingsmodel en resterende controles |
-| `TESTVERSLAG.md` | Wat lokaal getest is en wat nog live moet |
+## Tests
 
-## Lokaal testen
-
-De website heeft geen bundelstap of npm-afhankelijkheden. Een actuele Node.js-versie vanaf 20 is nodig om de tests te draaien, niet om de website te publiceren.
+Run lokaal:
 
 ```sh
 npm test
-python3 tools/build_preview.py
-python3 -m http.server 8000
+node --experimental-transform-types tools/test_edge_smoke.mjs
 ```
 
-De laatste opdracht start uitsluitend een lokale statische webserver. Zonder eigen Supabase-configuratie werkt alleen de demo. Supabase JS wordt voor echte accounts pas geladen wanneer de app geconfigureerd is. De meegeleverde versie is vastgezet in `config.js`; wijzig die alleen na controle en hertesten.
-
-**Status:** lokale planner- en browsercontroles uitgevoerd. Productie-authenticatie, database-RLS, e-mailbezorging, Edge Functions en refreshgedrag bij agenda-aanbieders moeten na installatie nog end-to-end worden getest.
+Bij oplevering van v4: 37 planner-/kalendertests geslaagd en 12 gesimuleerde Edge Function toegangscontroles geslaagd.

@@ -51,59 +51,96 @@
     const km=Number(x.km||0), minutes=Number(x.minutes||30);
     return {id:uid(),date:x.date,time:x.time||'18:30',sport:x.sport||'run',kind:x.kind||'easy',title:x.title||sports[x.sport||'run'],km,minutes,baseKm:km,baseMinutes:minutes,status:'planned',source:'manual',slotId:null,locked:false,actual:null,sequence:0,updatedAt:now.toISOString(),createdAt:now.toISOString(),...x};
   }
+
+  function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+  function raceDistance(goal){return {fit:0,'5k':5,'10k':10,half:21.1,marathon:42.2}[goal]||0;}
+  function targetForWeek(p, wi, firstWeek) {
+    const weekStart=addDays(firstWeek,wi*7), base=Number(p.baseWeeklyKm), longest=Number(p.longestKm);
+    const ai=(p.aiMode&&p.aiStrategy&&Array.isArray(p.aiStrategy.weeks))?p.aiStrategy.weeks.find(x=>Number(x.index)===wi):null;
+    const left=p.raceDate?Math.ceil(daysBetween(weekStart,p.raceDate)/7):null;
+    const total=p.raceDate?Math.max(1,Math.ceil(daysBetween(firstWeek,p.raceDate)/7)):null;
+    const goalPeakWeekly={fit:base,'5k':Math.max(base,22),'10k':Math.max(base*1.35,30),half:Math.max(base*1.55,38),marathon:Math.max(base*1.9,48)}[p.goal];
+    const goalPeakLong={fit:longest,'5k':Math.max(longest,7),'10k':Math.max(longest,12),half:Math.max(longest,19),marathon:Math.max(longest,30)}[p.goal];
+    const peakIndex=total==null?Math.max(1,(Number(p.horizon)||12)-3):Math.max(1,total-3);
+    const progress=clamp(wi/peakIndex,0,1);
+    // These caps are conservative design guardrails, not medical rules. They prevent an AI or date from forcing a huge jump.
+    const feasibleWeekly=base*Math.pow(1.08,wi);
+    const feasibleLong=longest*Math.pow(1.12,wi);
+    let weekly=Math.min(base+(goalPeakWeekly-base)*progress,feasibleWeekly);
+    let longKm=Math.min(longest+(goalPeakLong-longest)*progress,feasibleLong,34);
+    let phase=progress<.25?'basis':progress<.75?'opbouw':'piek';
+    if(ai){
+      weekly=Math.min(Number(ai.weeklyKm)||weekly,feasibleWeekly,80);
+      longKm=Math.min(Number(ai.longKm)||longKm,feasibleLong,34);
+      phase=String(ai.phase||phase);
+    }
+    // Every fourth build week is lighter. Close to a race, taper wins over the ordinary cutback.
+    if(wi>0&&wi%4===3&&(left==null||left>3)){weekly*=.84;longKm*=.82;phase='herstel';}
+    if(left!=null){
+      if(left===2){weekly=Math.min(weekly,Math.max(base*.8,weekly*.78));longKm=Math.min(longKm,22);phase='taper';}
+      if(left===1){weekly=Math.min(weekly,Math.max(base*.6,weekly*.6));longKm=Math.min(longKm,12);phase='taper';}
+      if(left<=0){weekly=Math.min(weekly,Math.max(base*.45,weekly*.45));longKm=Math.min(longKm,8);phase='taper';}
+    }
+    longKm=Math.min(longKm,Math.max(longest,weekly*.62));
+    return {weekStart,weeklyKm:roundKm(Math.max(1,weekly)),longKm:roundKm(Math.max(1,longKm)),phase,left};
+  }
   function generatePlan(state, {start=isoDay(),weeks=12,now=new Date()} = {}) {
     const p=state.profile; validateProfile(p,state.slots);
     if(!Number.isInteger(weeks)||weeks<1||weeks>26) throw new Error('Kies 1-26 weken.');
+    if(p.raceDate&&p.raceDate>=start){const required=Math.floor(daysBetween(monday(start),p.raceDate)/7)+1;if(required<=26)weeks=Math.max(weeks,required);}
     const end=addDays(monday(start),weeks*7-1), at=now.toISOString();
     const runs=state.slots.filter(s=>s.sport==='run');
     const longSlot=runs.find(s=>s.kind==='long') || [...runs].sort((a,b)=>b.minutes-a.minutes)[0];
-    const longShare=runs.length===1?1:runs.length===2?.55:runs.length===3?.4:.35;
     const oldMap=new Map(state.workouts.filter(w=>w.source==='plan').map(w=>[w.slotId+':'+w.date,w]));
     const activeKeys=new Set(), changes=[]; const firstWeek=monday(start);
     const excluded=new Set(state.excludedOccurrences||[]); let blocked=0;
     for(let day=start;day<=end;day=addDays(day,1)) {
-      const wi=Math.floor(daysBetween(firstWeek,day)/7);
-      // A small transparent heuristic, not a medically validated training formula.
-      // A rest week every fourth week; fit goals stay level. Never build beyond 35% in this horizon.
-      const growth=p.goal==='fit'?1:Math.min(1.35,Math.pow(1.03,wi-Math.floor(wi/4)));
-      let budget=p.baseWeeklyKm*growth*(wi%4===3?.8:1);
-      if(p.raceDate) { const left=daysBetween(day,p.raceDate); if(left<0) budget=p.baseWeeklyKm*.7; else if(left<=6) budget*=.5; else if(left<=13) budget*=.7; }
+      const wi=Math.max(0,Math.floor(daysBetween(firstWeek,day)/7));
+      const target=targetForWeek(p,wi,firstWeek), budget=target.weeklyKm;
       const todays=state.slots.filter(s=>Number(s.day)===dayIndex(day));
       for(const slot of todays) {
         const key=slot.id+':'+day; activeKeys.add(key); if(excluded.has(key)) continue; const existing=oldMap.get(key);
         if(existing && (finalStatuses.has(existing.status)||existing.locked)) continue;
-        // Skip past clock times, but never erase a previously planned workout.
         if(!existing && zonedInstant(day,slot.time,p.timezone)<now) continue;
+        // On the exact goal date the goal event replaces the ordinary run; other sports stay visible.
+        if(p.raceDate===day && slot.sport==='run' && p.goal!=='fit'){ if(existing&&!finalStatuses.has(existing.status)&&!existing.locked){existing.status='cancelled';touch(existing,at);} continue; }
         let km=0,minutes=Number(slot.minutes),kind=slot.kind||'easy';
         if(slot.sport==='run') {
-          const share=slot.id===longSlot.id?longShare:(1-longShare)/(runs.length-1);
-          const goalLong={fit:p.longestKm,'5k':5,'10k':10,half:18,marathon:30}[p.goal];
-          const perRunCap=Math.min(p.longestKm*growth,Math.max(p.longestKm,goalLong));
-          km=roundKm(Math.min(budget*share,perRunCap,Math.max(0,(slot.minutes-10)/p.pace)));
+          let share;
+          if(slot.id===longSlot.id) share=Math.min(.62,Math.max(runs.length===1?1:.38,target.longKm/Math.max(1,budget)));
+          else share=(1-Math.min(.62,Math.max(.38,target.longKm/Math.max(1,budget))))/Math.max(1,runs.length-1);
+          const desired=slot.id===longSlot.id?target.longKm:budget*share;
+          km=roundKm(Math.min(desired,Math.max(0,(slot.minutes-10)/p.pace)));
           minutes=Math.min(slot.minutes,Math.max(15,Math.ceil(km*p.pace+10)));
           kind=slot.id===longSlot.id?'long':'easy';
         }
-        const title=slot.sport==='run'?(kind==='long'?'Rustige duurloop':'Rustig hardlopen'):sports[slot.sport];
+        const title=slot.sport==='run'?(kind==='long'?`Rustige duurloop - ${target.phase}`:`Rustig hardlopen - ${target.phase}`):sports[slot.sport];
         const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
-        if(conflict){
-          blocked++;activeKeys.delete(key);
-          continue;
-        }
+        if(conflict){blocked++;activeKeys.delete(key);continue;}
         if(existing) {
           const before=eventSnap(existing);
-          Object.assign(existing,{time:slot.time,sport:slot.sport,kind,title,baseKm:km,baseMinutes:minutes,km,minutes,adaptation:''});
+          Object.assign(existing,{time:slot.time,sport:slot.sport,kind,title,baseKm:km,baseMinutes:minutes,km,minutes,planPhase:target.phase,adaptation:''});
           if(JSON.stringify(before)!==JSON.stringify(eventSnap(existing))) {touch(existing,at);changes.push({id:existing.id,title,before,after:eventSnap(existing)});}
         } else {
-          const w=makeWorkout({date:day,time:slot.time,sport:slot.sport,kind,title,km,minutes,source:'plan',slotId:slot.id},now); state.workouts.push(w);
+          const w=makeWorkout({date:day,time:slot.time,sport:slot.sport,kind,title,km,minutes,source:'plan',slotId:slot.id,planPhase:target.phase},now); state.workouts.push(w);
         }
       }
     }
     for(const w of state.workouts) if(w.source==='plan'&&w.date>=start&&w.date<=end&&!activeKeys.has(w.slotId+':'+w.date)&&!finalStatuses.has(w.status)&&!w.locked) {
       const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
     }
+    // Add one explicit goal-day event when it falls inside the generated horizon.
+    const distance=raceDistance(p.goal);
+    if(p.raceDate&&distance&&p.raceDate>=start&&p.raceDate<=end){
+      let race=state.workouts.find(w=>w.source==='goal'&&w.goalKey===p.goal+':'+p.raceDate);
+      const raceMinutes=Math.max(30,Math.ceil(distance*p.pace));
+      if(!race) { race=makeWorkout({date:p.raceDate,time:'09:00',sport:'run',kind:'race',title:`Doeldag - ${SK.goals[p.goal]}`,km:distance,minutes:raceMinutes,baseKm:distance,baseMinutes:raceMinutes,source:'goal',slotId:null,locked:true,goalKey:p.goal+':'+p.raceDate},now);state.workouts.push(race); }
+      else if(!finalStatuses.has(race.status)){Object.assign(race,{km:distance,baseKm:distance,minutes:raceMinutes,baseMinutes:raceMinutes,title:`Doeldag - ${SK.goals[p.goal]}`,locked:true,status:state.hold?'held':'planned'});}
+    }
     state.planStart=start;state.planEnd=end;
     adaptPlan(state,{now,writeAudit:false});
-    changeLog(state,'Schema opgebouwd',`${weeks} weken op basis van je eigen startniveau en vaste sportmomenten. ${blocked?blocked+' moment(en) niet ingepland wegens overlap met een handmatige of vastgezette activiteit. ':''}Doeldatum is geen garantie dat de afstand haalbaar is.`,changes,now);
+    const mode=p.aiMode&&p.aiStrategy?'AI-strategie + veiligheidsgrenzen':'doeldatumgerichte planner';
+    changeLog(state,'Schema opgebouwd',`${weeks} weken via ${mode}. De opbouw rekent terug vanaf je doel, bevat lichtere weken en taper, en blijft begrensd door je startniveau en beschikbare trainingstijd. ${blocked?blocked+' moment(en) niet ingepland wegens overlap. ':''}Een doeldatum is geen garantie dat de afstand haalbaar is.`,changes,now);
     state.workouts.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
     return state;
   }
@@ -217,10 +254,19 @@
     const capacity=runs.reduce((a,s)=>a+Math.max(0,(s.minutes-10)/p.pace),0);
     if(capacity<p.baseWeeklyKm*.9)notes.push('Je vaste momenten bieden minder tijd dan je opgegeven hardloopbasis nodig heeft. Het schema wordt ingekort; maak alleen extra ruimte als dat voor jou passend is.');
     if([...days].some(d=>days.has((d+1)%7))) notes.push('Je hebt hardloopdagen direct achter elkaar gekozen. Beoordeel zelf of je genoeg hersteltijd hebt.');
-    if(p.goal==='marathon') notes.push('Marathondoel: dit is een indicatief basisschema, geen gevalideerde marathonbegeleiding of garantie dat de wedstrijd haalbaar is. Laat de opbouw en doeldatum beoordelen door een looptrainer.');
-    if(p.raceDate) {const left=daysBetween(today,p.raceDate);if(left<0) notes.push('Je doeldatum is voorbij. Werk je doel bij.');else if(left<84&&['half','marathon'].includes(p.goal)) notes.push('Je doeldatum ligt binnen 12 weken. De app forceert geen snelle opbouw om die datum te halen.');}
+    if(p.goal==='marathon') notes.push('Marathondoel: de app bouwt nu terug vanaf de doeldatum met piek- en taperweken, maar dit blijft trainingssoftware en geen medische of persoonlijke loopbegeleiding.');
+    if(p.raceDate) {
+      const left=daysBetween(today,p.raceDate);
+      if(left<0) notes.push('Je doeldatum is voorbij. Werk je doel bij.');
+      else if(left<84&&['half','marathon'].includes(p.goal)) notes.push('Je doeldatum ligt binnen 12 weken. Het schema laat wel een opbouw zien, maar begrenst grote sprongen. Daardoor kan de geplande piek lager blijven dan ideaal wanneer je huidige basis nog laag is.');
+      if(p.goal==='marathon'&&left>0){
+        const wi=Math.max(0,Math.floor(left/7)-3), possible=roundKm(Math.min(34,p.longestKm*Math.pow(1.12,Math.max(0,wi))));
+        if(possible<26) notes.push(`Met je huidige langste loop en resterende tijd blijft de berekende piekduurloop waarschijnlijk rond maximaal ${possible} km. Overweeg de doeldatum of het doel met een looptrainer te beoordelen.`);
+      }
+    }
+    if(p.aiMode&&!p.aiStrategy) notes.push('AI-modus staat aan, maar er is nog geen AI-strategie opgeslagen. Maak het AI-schema opnieuw via Coach of sla Instellingen opnieuw op.');
     if(state.planEnd&&daysBetween(today,state.planEnd)<21) notes.push('Je planning loopt binnenkort af. Bouw in Instellingen opnieuw 12 weken op; afgeronde trainingen blijven bewaard.');
     return notes;
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,touch});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,touch,targetForWeek});
 })(globalThis.SK ||= {});
