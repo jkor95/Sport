@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132e29">
+  <meta name="description" content="Jouw sportagenda die meebeweegt. Persoonlijke doelen, vaste sportmomenten en een adaptieve planning.">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>SportKompas - jouw ritme, jouw doel</title>
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="config.js"></script>
+  <script defer src="core/dates.js"></script>
+  <script defer src="core/planner.js"></script>
+  <script defer src="core/calendar.js"></script>
+  <script defer src="demo.js"></script>
+  <script defer src="db.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Naar de inhoud</a>
+  <div id="root"><div class="boot">SportKompas wordt geladen...</div></div>
+  <div id="modal-root"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript>Schakel JavaScript in om SportKompas te gebruiken.</noscript>
+</body>
+</html>

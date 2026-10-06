@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132e29">
+  <meta name="description" content="Jouw sportagenda die meebeweegt. Persoonlijke doelen, vaste sportmomenten en een adaptieve planning.">
+  <meta name="referrer" content="no-referrer">
+  <title>SportKompas - jouw ritme, jouw doel</title>
+  <style>:root{--bg:#f3f5f0;--card:#fff;--ink:#192e2a;--muted:#6f7e75;--line:#e0e7df;--green:#163e32;--lime:#cdf578;--pale:#edf4e6;--orange:#c36c33;--red:#ab3c3c;--shadow:0 8px 30px #152e2208;--radius:20px;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);font-size:15px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg)}button,input,select,textarea{font:inherit}button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}a{color:var(--green)}svg{flex:none;vertical-align:middle}h1,h2,h3,p{margin:0}h1{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1.15}h2{font-size:19px;letter-spacing:-.4px}h3{font-size:16px}p{line-height:1.65}.muted{color:var(--muted)}.small{font-size:12px;line-height:1.6}.tiny{font-size:11px}.eyebrow{font-size:11px;letter-spacing:1.9px;text-transform:uppercase;font-weight:700}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.skip-link{position:absolute;top:-80px;z-index:99;background:white;padding:15px}.skip-link:focus{top:0}:focus-visible{outline:3px solid #76a33b;outline-offset:3px}input,select,textarea{width:100%;background:#fff;border:1px solid #d2ded3;color:var(--ink);padding:12px 13px;border-radius:10px;min-width:0}input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);flex:none}input[readonly]{background:#f4f6f1}label{display:grid;gap:7px;font-size:13px;font-weight:600}textarea{resize:vertical;min-height:90px}.field-help{font-size:11px;line-height:1.5;font-weight:400;color:var(--muted)}fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-weight:700;font-size:15px;margin-bottom:14px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.span2{grid-column:1/-1}.checkline{display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5}.checkline input{margin-top:2px}.form-error{padding:12px 14px;background:#fff0ec;color:#932f26;border-radius:10px;font-size:13px;line-height:1.6;margin-bottom:15px}.form-error:empty{display:none}.btn{border:1px solid var(--line);border-radius:11px;padding:11px 15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#fff;color:var(--ink);font-size:13px;font-weight:650;white-space:nowrap;min-height:42px;transition:background .15s,transform .15s}.btn:hover{background:#f1f6eb}.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}.btn.primary:hover{background:#205640}.btn.lime{background:var(--lime);color:#163b2b;border-color:var(--lime)}.btn.ghost{background:transparent;border-color:transparent}.btn.danger{color:var(--red);border-color:#f0d7d0}.btn.compact{padding:7px 11px;min-height:34px;font-size:12px}.icon-btn{padding:9px;min-width:36px}.button-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.boot{padding:20vh 24px;text-align:center;font-weight:600}.app-shell{display:grid;grid-template-columns:236px 1fr;min-height:100vh}.sidebar{background:#142d27;color:#f0f5ed;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;width:236px;padding:32px 22px;z-index:20}.brand{display:flex;align-items:center;gap:10px;font-size:21px;letter-spacing:-.6px;font-weight:700}.brand-mark{width:35px;height:35px;border-radius:12px;background:var(--lime);display:grid;place-items:center;color:#173e2a}.brand-sub{font-size:10px;color:#90aaa0;letter-spacing:1.3px;margin:10px 0 39px 45px}.nav{display:grid;gap:7px}.nav button{color:#b7cac0;background:transparent;border:0;text-align:left;display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:12px;font-size:13px;font-weight:550}.nav button.active{background:#294b3b;color:var(--lime)}.nav button:hover{background:#234234}.sidebar-bottom{margin-top:auto;padding-top:35px}.personal-note{border:1px solid #355044;border-radius:15px;padding:16px;font-size:12px;color:#a6bcb0;line-height:1.7}.personal-note strong{display:block;color:#dfecdf;margin:10px 0 5px}.sidebar-account{display:flex;gap:10px;align-items:center;margin-top:24px;border-top:1px solid #2c483d;padding-top:20px}.avatar{width:36px;height:36px;border-radius:50%;background:#334f3d;color:#e1f2d3;display:grid;place-items:center;font-size:13px;font-weight:650;flex:none}.account-text{flex:1;min-width:0;font-size:12px;overflow:hidden;text-overflow:ellipsis}.account-text strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sidebar-account button{background:none;border:none;color:#a9bfb1;padding:6px}.content{grid-column:2;min-width:0;padding:0 36px 36px;max-width:1570px;width:100%;margin:auto}.topbar{display:flex;justify-content:space-between;align-items:center;min-height:87px;border-bottom:1px solid var(--line);gap:12px}.breadcrumb{font-size:12px;color:var(--muted)}.breadcrumb b{font-weight:500;color:var(--ink)}.top-actions{display:flex;gap:9px;align-items:center}.sync-state{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}.sync-dot{width:6px;height:6px;border-radius:50%;background:#6c9455}.demo-banner{margin:18px 0 0;padding:9px 14px;border:1px solid #dbe6bc;background:#f0f5df;font-size:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}.demo-banner button{padding:0;border:none;background:none;font-size:12px;text-decoration:underline;color:var(--green)}.page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:30px 0 26px}.page-heading p{font-size:13px;color:var(--muted);margin-top:8px}.date-label{font-size:12px;color:var(--muted)}.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(285px,1fr);gap:22px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:23px;box-shadow:var(--shadow);min-width:0}.card-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px}.card-header p{font-size:12px;margin-top:4px;color:var(--muted)}.stack{display:grid;gap:22px;align-content:start}.hero{background:#173e32;color:#fff;padding:29px 30px;position:relative;overflow:hidden;border:0;min-height:217px}.hero:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #ffffff10;border-radius:50%;right:-65px;top:-65px;box-shadow:0 0 0 40px #ffffff05,0 0 0 85px #ffffff03;pointer-events:none}.hero .eyebrow{color:#bddc99}.hero h2{font-size:27px;line-height:1.2;max-width:340px;margin:16px 0 8px;letter-spacing:-.8px}.hero p{font-size:13px;color:#c1d6c7;max-width:400px}.hero-footer{margin-top:24px;display:flex;align-items:center;gap:16px}.hero-footer .small{color:#b9d0c1}.hero .btn{position:relative;z-index:1}.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:21px}.stat-card{padding:20px;border-radius:15px;border:1px solid var(--line);background:#fff;min-width:0}.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11px}.stat-number{font-size:29px;letter-spacing:-1px;font-weight:700;margin:13px 0 4px}.stat-number small{font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0}.stat-caption{font-size:10px;color:var(--muted)}.progress-line{height:5px;background:#edf0e9;border-radius:8px;overflow:hidden;margin:12px 0 0}.progress-line span{height:100%;display:block;background:#9fc858;border-radius:8px}.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px}.day-chip{border:1px solid transparent;background:#f3f6ef;border-radius:14px;display:grid;justify-items:center;padding:11px 4px;color:var(--muted);gap:7px;font-size:11px}.day-chip strong{font-size:17px;color:var(--ink)}.day-chip.today{background:#e5f0d2;border-color:#afce7d}.day-chip.selected{border-color:#487044}.dots{height:5px;display:flex;gap:3px}.dot{height:5px;width:5px;background:#376b4c;border-radius:50%}.dot.alt{background:#ae9577}.workout-list{display:grid;gap:11px}.workout{display:flex;gap:13px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:14px 15px;min-width:0;background:#fff}.sport-icon{width:41px;height:41px;border-radius:12px;display:grid;place-items:center;background:#eef5e1;color:#457033;flex:none}.sport-icon.strength{background:#f8eee4;color:#b27939}.sport-icon.cycle{background:#e6f0f4;color:#447a90}.sport-icon.walk{background:#f0edf7;color:#8370a3}.workout-info{min-width:0;flex:1}.workout-info strong{display:block;font-size:13px;line-height:1.45}.workout-meta{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}.workout-distance{font-size:18px;font-weight:700;white-space:nowrap}.workout-distance small{font-size:11px;font-weight:400;color:var(--muted)}.workout.done .sport-icon{background:#e7f4ea;color:#3c7d4f}.workout.done .workout-info strong{color:#58725e}.workout.held{background:#fff8f0}.workout.skipped{opacity:.75}.workout .btn{flex:none}.tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:4px 7px;border-radius:6px;background:#f0f4eb;color:#537143;line-height:1.2;white-space:nowrap}.tag.amber{background:#fff0dc;color:#9f641e}.tag.red{background:#ffe9e2;color:#a44132}.tag.muted{background:#f0f2ee;color:#798074}.tag.lime{background:#e6f7c6;color:#45672b}.tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}.list-day-label{font-size:11px;letter-spacing:.3px;color:var(--muted);margin:20px 0 10px;display:flex;justify-content:space-between}.list-day-label:first-child{margin-top:0}.coach-card{background:#f1f6e8}.coach-glyph{width:39px;height:39px;border-radius:12px;background:#dceebe;display:grid;place-items:center;margin-bottom:14px;color:#4e7236}.coach-card h3{margin-bottom:8px;line-height:1.5}.coach-card p{font-size:12px;color:#61745a;line-height:1.75}.coach-card .card-footer{margin-top:17px;padding-top:14px;border-top:1px solid #dce6ce;font-size:11px;color:#7a8a6b}.goal-icon{height:53px;width:53px;border-radius:50%;display:grid;place-items:center;background:#eff4e4;color:#688844}.goal-row{display:flex;gap:15px;align-items:center;margin:4px 0 20px}.goal-row h3{font-size:20px;letter-spacing:-.5px}.goal-row p{font-size:12px;color:var(--muted);margin-top:4px}.key-value{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:11px 0;border-top:1px solid #edf0e8}.key-value span{color:var(--muted)}.empty{padding:26px 15px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7;background:#f7f9f4;border:1px dashed #dfe5d9;border-radius:13px}.notice{padding:15px 18px;background:#f4f7ed;border:1px solid #dfe7ce;border-radius:13px;font-size:12px;line-height:1.8;margin-bottom:16px}.notice.warning{background:#fff5e8;border-color:#ebd9bc;color:#775626}.notice.danger{background:#fff0e9;border-color:#edcec2;color:#95392d}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.toolbar .select-small{width:auto;max-width:190px;padding:9px 12px;font-size:12px}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-left:1px solid var(--line);border-top:1px solid var(--line);border-radius:14px;overflow:hidden}.calendar-label{font-size:11px;font-weight:600;color:var(--muted);text-align:center;padding:11px;background:#f8faf4;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.calendar-cell{min-height:125px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px;background:white;min-width:0}.calendar-cell.outside{background:#f8f9f5}.calendar-cell.today{background:#f1f7e5}.cell-date{font-size:11px;width:24px;height:24px;display:grid;place-items:center;border-radius:8px;margin-bottom:7px}.today .cell-date{background:var(--green);color:#fff}.calendar-event{display:block;border:0;text-align:left;width:100%;padding:6px;border-radius:7px;background:#ecf3e0;color:#395d30;font-size:10px;line-height:1.5;margin-bottom:4px;overflow:hidden;word-break:break-word}.calendar-event.strength{background:#f7eddc;color:#936631}.calendar-event.done{opacity:.7}.calendar-event.held{background:#ffeadd;color:#9c5d33}.calendar-event .time{font-weight:650}.section-row{margin:24px 0 13px;display:flex;align-items:center;justify-content:space-between}.section-row h3{font-size:14px}.settings-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:22px;align-items:start}.slot-row{display:grid;grid-template-columns:90px 1fr 90px 86px 35px;gap:8px;align-items:end;background:#f6f8f2;border-radius:12px;padding:12px;margin-bottom:10px}.slot-row label{font-size:10px}.slot-row input,.slot-row select{font-size:12px;padding:10px 8px;border-radius:8px}.slot-kind{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11px}.audit{padding:18px 0;border-bottom:1px solid var(--line)}.audit:first-child{padding-top:0}.audit:last-child{border-bottom:0}.audit-head{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}.audit-head h3{font-size:14px}.audit p{font-size:12px;color:var(--muted);margin:7px 0}.change{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;background:#f5f7f0;font-size:11px;border-radius:7px;margin-top:5px}.change b{white-space:nowrap}.ai-output{white-space:pre-wrap;font-size:13px;line-height:1.85;background:#f4f7eb;border:1px solid #dce8c9;border-radius:14px;padding:20px;margin-top:18px}.chart-bars{display:flex;align-items:flex-end;gap:12px;height:170px;padding:0 2px;margin:24px 0 30px}.bar-group{flex:1;position:relative;min-width:0;height:100%;display:flex;justify-content:center;align-items:flex-end;gap:5px}.bar{background:#254e37;width:28px;max-width:38%;min-height:2px;border-radius:5px 5px 0 0}.bar.planned{background:#d8e7c1}.bar-label{position:absolute;bottom:-24px;font-size:10px;color:var(--muted);white-space:nowrap}.bar-value{position:absolute;font-size:10px;font-weight:600;transform:translateY(-5px)}.legend{display:flex;gap:17px;font-size:11px;color:var(--muted)}.legend span{display:flex;align-items:center;gap:6px}.legend i{width:8px;height:8px;background:#254e37;border-radius:2px}.legend i.light{background:#d8e7c1}.progress-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:22px}.security-note{font-size:11px;line-height:1.8;color:var(--muted);display:flex;gap:8px;align-items:flex-start}.security-note svg{margin-top:2px}.footer-note{text-align:center;font-size:10px;color:#8a978a;margin-top:30px;line-height:1.7}.modal-overlay{position:fixed;inset:0;z-index:80;background:#0a201b99;backdrop-filter:blur(5px);display:flex;justify-content:center;align-items:center;padding:24px}.modal{background:var(--card);border-radius:22px;padding:27px;width:590px;max-width:100%;max-height:90dvh;overflow:auto;box-shadow:0 25px 90px #06171255}.modal.wide{width:760px}.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:23px}.modal-head h2{font-size:23px;line-height:1.3}.modal-head p{font-size:12px;color:var(--muted);margin-top:6px}.modal .form-grid{gap:16px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:25px}.form-separator{height:1px;background:var(--line);margin:23px 0}.metric-banner{background:#edf4e2;padding:18px;border-radius:14px;display:flex;gap:22px;margin-bottom:21px}.metric-banner strong{font-size:25px;display:block;letter-spacing:-.8px}.metric-banner span{font-size:11px;color:var(--muted)}#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#193c2f;color:#fff;box-shadow:0 8px 30px #12312230;border-radius:12px;padding:13px 20px;z-index:100;font-size:13px;max-width:90%;line-height:1.5;display:none}#toast.visible{display:block}.auth-layout{min-height:100dvh;display:grid;grid-template-columns:1fr 1fr}.auth-story{background:#142f27;color:white;padding:50px clamp(35px,6vw,110px);display:flex;flex-direction:column;position:relative;overflow:hidden}.auth-story h1{font-size:clamp(40px,4.4vw,64px);line-height:1.12;letter-spacing:-2px;max-width:540px;margin-top:90px}.auth-story h1 em{color:var(--lime);font-style:normal}.auth-story>p{color:#abc6b5;font-size:15px;max-width:400px;margin-top:25px}.story-preview{margin-top:42px;border:1px solid #395647;background:#203f32;padding:21px;border-radius:18px;max-width:420px}.preview-strike{color:#819c89;text-decoration:line-through;font-size:16px}.preview-new{font-size:32px;font-weight:700;letter-spacing:-1px;color:var(--lime);margin-left:12px}.story-foot{margin-top:auto;padding-top:45px;font-size:11px;color:#8da996}.auth-form-wrap{display:flex;align-items:center;justify-content:center;padding:50px 32px}.auth-form{width:100%;max-width:365px}.auth-form .eyebrow{color:#91a376;margin-bottom:14px}.auth-form h2{font-size:31px;letter-spacing:-1px;margin-bottom:12px}.auth-form>p{font-size:13px;color:var(--muted);margin-bottom:28px}.auth-form form{display:grid;gap:18px}.auth-form .btn.primary{margin-top:5px;min-height:47px}.auth-bottom{border-top:1px solid var(--line);margin-top:24px;padding-top:23px;text-align:center}.auth-bottom p{font-size:11px;color:var(--muted);margin-top:12px}.mobile-brand{display:none}.week-title{min-width:125px;text-align:center;font-size:13px;font-weight:600}.segmented{display:flex;border:1px solid var(--line);border-radius:10px;background:#edf1e8;padding:3px;gap:2px}.segmented button{border:none;border-radius:7px;padding:7px 12px;background:transparent;color:var(--muted);font-size:12px}.segmented button.active{background:white;color:var(--ink);box-shadow:0 1px 5px #1327110a}.divider{height:1px;background:var(--line);margin:21px 0}.faq{font-size:12px;line-height:1.8;color:var(--muted)}.faq summary{color:var(--ink);cursor:pointer;font-weight:600}.faq p{margin-top:8px}.link-box{margin-top:15px}.link-box .button-row{margin-top:12px}.data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th{color:var(--muted);font-size:10px;text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);font-weight:600}.data-table td{padding:12px 6px;border-bottom:1px solid #edf1e8}.data-table td:last-child{text-align:right}.scroll-x{overflow:auto}.mb{margin-bottom:20px}.mt{margin-top:20px}
+@media(min-width:1600px){.content{padding-left:55px;padding-right:55px}}
+@media(max-width:1200px){.sidebar{width:207px;padding:29px 16px}.app-shell{grid-template-columns:207px 1fr}.content{padding:0 24px 30px}.dashboard-grid{grid-template-columns:minmax(0,1.5fr) minmax(265px,1fr);gap:17px}.card{padding:20px}.hero{padding:25px}.hero h2{font-size:25px}.mini-stats{gap:10px}.stat-card{padding:16px}.settings-grid{grid-template-columns:1fr}.slot-row{grid-template-columns:100px 1fr 110px 100px 40px}}
+@media(max-width:980px){.sidebar{width:80px;align-items:center;padding:25px 10px}.sidebar .brand>span:not(.brand-mark),.sidebar .brand-sub,.nav span,.sidebar-bottom .personal-note,.account-text,.sidebar-account .avatar{display:none}.nav{margin-top:40px}.nav button{padding:14px}.sidebar-account{padding:14px 0;border:0}.app-shell{grid-template-columns:80px 1fr}.dashboard-grid{grid-template-columns:1fr}.dashboard-grid>.stack:last-child{display:grid;grid-template-columns:1fr 1fr}.dashboard-grid>.stack:last-child>.card:first-child{grid-column:1/-1}.hero h2{max-width:500px}.hero p{max-width:500px}.progress-grid{grid-template-columns:1fr}.auth-story{padding:40px}.auth-story h1{margin-top:80px;font-size:45px}}
+@media(max-width:640px){h1{font-size:26px}.app-shell{display:block}.sidebar{inset:auto 0 0;width:100%;height:72px;padding:5px 8px calc(5px + env(safe-area-inset-bottom)/2);background:#fff;border-top:1px solid var(--line);flex-direction:row;justify-content:center}.sidebar>.brand,.sidebar-bottom{display:none}.nav{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin:0;width:100%}.nav button{display:flex;flex-direction:column;gap:5px;padding:9px 3px;color:#80907e;border-radius:10px;font-size:9px}.nav span{display:block;font-size:9px}.nav button.active{background:#edf4e3;color:#294e34}.nav button:hover{background:#f1f5eb}.nav svg{width:19px;height:19px}.content{padding:0 16px 95px}.topbar{min-height:68px;border-bottom:0}.breadcrumb{display:none}.mobile-brand{display:flex;font-size:18px}.mobile-brand .brand-mark{width:29px;height:29px;border-radius:9px}.top-actions{gap:5px}.top-actions>.btn{padding:9px;min-height:37px}.top-actions>.btn>span{display:none}.sync-state{display:none}.page-heading{margin:22px 0 20px;align-items:flex-start}.page-heading p{font-size:12px}.page-heading>.date-label{display:none}.demo-banner{font-size:10px;margin-top:0;padding:8px 10px;align-items:flex-start}.demo-banner button{font-size:10px}.dashboard-grid{gap:17px}.stack{gap:17px}.card{padding:19px;border-radius:17px}.hero{padding:24px;min-height:217px}.hero h2{font-size:26px;max-width:260px}.hero p{font-size:12px;max-width:270px}.hero-footer{gap:13px;margin-top:21px}.hero-footer .small{font-size:10px}.mini-stats{gap:8px;margin-top:14px}.stat-card{padding:13px 11px;border-radius:13px}.stat-top{font-size:9px;align-items:flex-start;gap:3px}.stat-top svg{width:13px;height:13px}.stat-number{font-size:25px;margin-top:12px}.stat-number small{font-size:10px}.stat-caption{font-size:9px;line-height:1.6}.workout{padding:12px;gap:10px;flex-wrap:wrap}.sport-icon{width:35px;height:35px;border-radius:10px}.sport-icon svg{width:18px}.workout-info strong{font-size:12px}.workout-meta{font-size:10px}.workout-distance{font-size:16px}.workout>.btn{font-size:10px;padding:7px 9px;min-height:31px}.workout .tags{gap:3px}.tag{font-size:9px}.dashboard-grid>.stack:last-child{grid-template-columns:1fr}.dashboard-grid>.stack:last-child>.card:first-child{grid-column:auto}.week-strip{gap:5px}.day-chip{padding:9px 2px;border-radius:11px;font-size:10px}.day-chip strong{font-size:16px}.card-header h2{font-size:17px}.card-header .btn{font-size:10px;padding:6px 8px}.form-grid{gap:15px}.form-grid label{font-size:12px}.settings-grid{gap:17px}.slot-row{grid-template-columns:1fr 1.35fr 34px;gap:8px;padding:10px}.slot-row label:nth-child(3){grid-column:1}.slot-row label:nth-child(4){grid-column:2}.slot-row>button{grid-column:3;grid-row:1/3;align-self:center}.slot-kind{grid-column:1/-1}.modal-overlay{padding:12px;align-items:center}.modal{padding:21px;max-height:92dvh;border-radius:19px}.modal-head h2{font-size:21px}.modal .form-grid{gap:14px}.modal .form-grid .span-mobile{grid-column:1/-1}.modal-actions{margin-top:20px}.modal-actions .btn{flex:1}.calendar-grid{grid-template-columns:repeat(7,minmax(0,1fr));border-radius:10px}.calendar-cell{min-height:92px;padding:3px}.calendar-label{font-size:9px;padding:8px 2px}.calendar-event{font-size:8px;padding:4px 3px;line-height:1.4}.calendar-event .time{font-size:8px}.cell-date{font-size:10px;width:21px;height:21px;margin-bottom:3px}.toolbar{gap:8px}.toolbar .button-row{gap:5px}.week-title{font-size:12px;min-width:105px}.segmented button{font-size:11px;padding:6px 9px}.toolbar .btn{padding:8px 10px;font-size:11px}.auth-layout{display:block}.auth-story{padding:25px 28px 30px}.auth-story h1{margin-top:28px;font-size:38px;max-width:320px;letter-spacing:-1.5px}.auth-story>p{font-size:12px;margin-top:14px;max-width:310px}.story-preview,.story-foot{display:none}.auth-form-wrap{padding:35px 28px}.auth-form{max-width:410px}.auth-form h2{font-size:26px}.auth-form>p{margin-bottom:22px}.auth-form .eyebrow{font-size:10px}.auth-bottom{margin-top:21px}.form-grid .narrow-full{grid-column:1/-1}.change{font-size:10px}.page-heading .button-row .btn{font-size:11px;padding:9px 10px}.data-table{font-size:11px}.scroll-x{margin:0 -5px}.notice{font-size:11px;padding:12px 14px}.security-note{font-size:10px}.footer-note{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+.brand-sub{font-size:9px;letter-spacing:1px;margin-left:45px;white-space:nowrap}
+@media(max-width:360px){.mobile-brand{font-size:15px}.top-actions>.btn{padding:7px;min-height:33px}.top-actions{gap:3px}}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Naar de inhoud</a>
+  <div id="root"><div class="boot">SportKompas wordt geladen...</div></div>
+  <div id="modal-root"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript>Schakel JavaScript in om SportKompas te gebruiken.</noscript>
+<script>globalThis.SPORT_PREVIEW=true; globalThis.SPORT_CONFIG={supabaseUrl:'',supabasePublishableKey:'',enableAI:false,appName:'SportKompas'};
+(function (SK) {
+  'use strict';
+  const pad = n => String(n).padStart(2, '0');
+  function isoDay(date = new Date(), zone = 'Europe/Amsterdam') {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date);
+    const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
+    return `${p.year}-${p.month}-${p.day}`;
+  }
+  function addDays(day, n) {
+    const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10);
+  }
+  function dayIndex(day) { return (new Date(day + 'T12:00:00Z').getUTCDay() + 6) % 7; }
+  function monday(day) { return addDays(day, -dayIndex(day)); }
+  function daysBetween(a, b) { return Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000); }
+  function dateLabel(day, opts = {}) { return new Intl.DateTimeFormat('nl-NL', { timeZone: 'UTC', day: 'numeric', month: 'short', ...opts }).format(new Date(day + 'T12:00:00Z')); }
+  function clockMinutes(time) { const [h,m] = time.split(':').map(Number); return h*60+m; }
+  function localClock(date = new Date(), zone = 'Europe/Amsterdam') { return new Intl.DateTimeFormat('en-GB', {timeZone:zone,hour:'2-digit',minute:'2-digit',hour12:false}).format(date); }
+  function zonedInstant(day, time, zone = 'Europe/Amsterdam') {
+    const [y, mo, d] = day.split('-').map(Number), [h, mi] = time.split(':').map(Number);
+    const target = Date.UTC(y, mo-1, d, h, mi); let candidate = target;
+    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: zone, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23' });
+    const parts = n => Object.fromEntries(fmt.formatToParts(new Date(n)).map(p => [p.type, p.value]));
+    for (let i=0; i<4; i++) { const p=parts(candidate); const asUTC=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second); const shift=target-asUTC; if(!shift) break; candidate+=shift; }
+    const check=parts(candidate);
+    if (`${check.year}-${check.month}-${check.day}` !== day || `${check.hour}:${check.minute}` !== time) throw new Error('Dit tijdstip bestaat niet door de overgang naar zomertijd. Kies een andere tijd.');
+    return new Date(candidate);
+  }
+  function uid() {
+    if(crypto.randomUUID) return crypto.randomUUID();
+    const bytes=crypto.getRandomValues(new Uint8Array(16)); bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+    const h=[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('');
+    return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+  }
+  function roundKm(n) { return Math.round(Math.max(0, n) * 10) / 10; }
+  function clone(x) { return structuredClone(x); }
+  const sports = { run:'Hardlopen', strength:'Krachttraining', cycle:'Fietsen', walk:'Wandelen', padel:'Padel', windsurf:'Windsurfen', other:'Overig' };
+  const goals = { fit:'Fit blijven', '5k':'5 km opbouwen', '10k':'10 km opbouwen', half:'Halve marathon', marathon:'Marathon' };
+  Object.assign(SK, {pad,isoDay,addDays,dayIndex,monday,daysBetween,dateLabel,clockMinutes,localClock,zonedInstant,uid,roundKm,clone,sports,goals});
+})(globalThis.SK ||= {});
+
+(function (SK) {
+  'use strict';
+  const {isoDay, addDays, dayIndex, monday, daysBetween, uid, roundKm, clone, sports, zonedInstant} = SK;
+  const validStatuses = new Set(['planned','done','skipped','cancelled','held']);
+  const finalStatuses = new Set(['done','skipped','cancelled']);
+  function freshState() {
+    return {schemaVersion:1, profile:null, slots:[], workouts:[], adjustments:[], excludedOccurrences:[], hold:false, holdSince:null, lastResume:null};
+  }
+  function validateProfile(p, slots) {
+    if (!p || !String(p.name || '').trim()) throw new Error('Vul je voornaam in.');
+    if (!SK.goals[p.goal]) throw new Error('Kies een geldig doel.');
+    if (!(+p.baseWeeklyKm >= 1 && +p.baseWeeklyKm <= 150)) throw new Error('Vul je werkelijke gemiddelde hardloopkilometers per week in (1-150).');
+    if (!(+p.longestKm >= 1 && +p.longestKm <= +p.baseWeeklyKm)) throw new Error('Je recente langste loop moet tussen 1 km en je weektotaal liggen.');
+    if (!(+p.pace >= 3 && +p.pace <= 15)) throw new Error('Vul een rustig tempo in tussen 3 en 15 min/km.');
+    if (p.timezone !== 'Europe/Amsterdam') throw new Error('Deze versie gebruikt Europe/Amsterdam.');
+    if (!slots.length || slots.length > 14) throw new Error('Kies 1-14 vaste sportmomenten.');
+    const runs = slots.filter(s=>s.sport==='run');
+    if (runs.length < 1 || runs.length > 4) throw new Error('Deze eerste versie ondersteunt 1-4 hardloopmomenten per week.');
+    if (runs.filter(s=>s.kind==='long').length > 1) throw new Error('Kies maximaal een lange duurloop per week.');
+    const seen = new Set();
+    for(const s of slots) {
+      if (seen.has(s.id)) throw new Error('Een vast sportmoment staat dubbel.'); seen.add(s.id);
+      if (!Number.isInteger(+s.day) || +s.day < 0 || +s.day > 6 || !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time) || !(+s.minutes>=15 && +s.minutes<=300) || !sports[s.sport]) throw new Error('Controleer dag, begintijd, sport en tijdsduur van je vaste momenten.');
+      if (SK.clockMinutes(s.time)+Number(s.minutes)>1440) throw new Error('Laat een training voor middernacht eindigen.');
+      for(const t of slots) if(t.id!==s.id && +t.day===+s.day && overlap(s,t)) throw new Error('Twee vaste sportmomenten overlappen elkaar.');
+    }
+    if(p.raceDate && !/^\d{4}-\d{2}-\d{2}$/.test(p.raceDate)) throw new Error('Ongeldige doeldatum.');
+  }
+  function overlap(a,b) { return SK.clockMinutes(a.time) < SK.clockMinutes(b.time)+Number(b.minutes) && SK.clockMinutes(b.time)<SK.clockMinutes(a.time)+Number(a.minutes); }
+  function validateState(s) {
+    if(!s || s.schemaVersion!==1 || !Array.isArray(s.workouts) || !Array.isArray(s.slots) || !Array.isArray(s.adjustments)) throw new Error('Onbekend gegevensformaat.');
+    if(s.profile) validateProfile(s.profile,s.slots);
+    if(s.workouts.length>3000) throw new Error('Maximaal 3000 trainingen per account in deze versie. Exporteer eerst je historie.');
+    const ids = new Set();
+    for(const w of s.workouts) {
+      if(ids.has(w.id) || !/^[A-Za-z0-9_-]{1,80}$/.test(w.id||'')) throw new Error('Dubbele training in gegevens.'); ids.add(w.id);
+      if(!validStatuses.has(w.status) || !sports[w.sport] || !/^\d{4}-\d{2}-\d{2}$/.test(w.date)) throw new Error('Ongeldige training.');
+      if(!Number.isFinite(w.km) || w.km<0 || w.km>300 || !Number.isFinite(w.minutes) || w.minutes<0 || w.minutes>1440) throw new Error('Ongeldige afstand of tijdsduur.');
+      if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(w.time)) throw new Error('Ongeldige begintijd.');
+      if(w.actual && (!Number.isFinite(w.actual.km)||w.actual.km<0||!Number.isFinite(w.actual.minutes)||w.actual.minutes<0||!Number.isInteger(w.actual.rpe)||w.actual.rpe<1||w.actual.rpe>10)) throw new Error('Ongeldige registratie.');
+    }
+    return true;
+  }
+  function touch(w, at) { w.sequence=(w.sequence||0)+1; w.updatedAt=at; }
+  function changeLog(state, title, detail, changes, now) {
+    state.adjustments.unshift({id:uid(),at:now.toISOString(),title,detail,changes});
+    state.adjustments=state.adjustments.slice(0,200);
+  }
+  function eventSnap(w) { return {km:w.km,minutes:w.minutes,status:w.status,date:w.date,time:w.time}; }
+  function makeWorkout(x, now = new Date()) {
+    const km=Number(x.km||0), minutes=Number(x.minutes||30);
+    return {id:uid(),date:x.date,time:x.time||'18:30',sport:x.sport||'run',kind:x.kind||'easy',title:x.title||sports[x.sport||'run'],km,minutes,baseKm:km,baseMinutes:minutes,status:'planned',source:'manual',slotId:null,locked:false,actual:null,sequence:0,updatedAt:now.toISOString(),createdAt:now.toISOString(),...x};
+  }
+  function generatePlan(state, {start=isoDay(),weeks=12,now=new Date()} = {}) {
+    const p=state.profile; validateProfile(p,state.slots);
+    if(!Number.isInteger(weeks)||weeks<1||weeks>26) throw new Error('Kies 1-26 weken.');
+    const end=addDays(monday(start),weeks*7-1), at=now.toISOString();
+    const runs=state.slots.filter(s=>s.sport==='run');
+    const longSlot=runs.find(s=>s.kind==='long') || [...runs].sort((a,b)=>b.minutes-a.minutes)[0];
+    const longShare=runs.length===1?1:runs.length===2?.55:runs.length===3?.4:.35;
+    const oldMap=new Map(state.workouts.filter(w=>w.source==='plan').map(w=>[w.slotId+':'+w.date,w]));
+    const activeKeys=new Set(), changes=[]; const firstWeek=monday(start);
+    const excluded=new Set(state.excludedOccurrences||[]); let blocked=0;
+    for(let day=start;day<=end;day=addDays(day,1)) {
+      const wi=Math.floor(daysBetween(firstWeek,day)/7);
+      // A small transparent heuristic, not a medically validated training formula.
+      // A rest week every fourth week; fit goals stay level. Never build beyond 35% in this horizon.
+      const growth=p.goal==='fit'?1:Math.min(1.35,Math.pow(1.03,wi-Math.floor(wi/4)));
+      let budget=p.baseWeeklyKm*growth*(wi%4===3?.8:1);
+      if(p.raceDate) { const left=daysBetween(day,p.raceDate); if(left<0) budget=p.baseWeeklyKm*.7; else if(left<=6) budget*=.5; else if(left<=13) budget*=.7; }
+      const todays=state.slots.filter(s=>Number(s.day)===dayIndex(day));
+      for(const slot of todays) {
+        const key=slot.id+':'+day; activeKeys.add(key); if(excluded.has(key)) continue; const existing=oldMap.get(key);
+        if(existing && (finalStatuses.has(existing.status)||existing.locked)) continue;
+        // Skip past clock times, but never erase a previously planned workout.
+        if(!existing && zonedInstant(day,slot.time,p.timezone)<now) continue;
+        let km=0,minutes=Number(slot.minutes),kind=slot.kind||'easy';
+        if(slot.sport==='run') {
+          const share=slot.id===longSlot.id?longShare:(1-longShare)/(runs.length-1);
+          const goalLong={fit:p.longestKm,'5k':5,'10k':10,half:18,marathon:30}[p.goal];
+          const perRunCap=Math.min(p.longestKm*growth,Math.max(p.longestKm,goalLong));
+          km=roundKm(Math.min(budget*share,perRunCap,Math.max(0,(slot.minutes-10)/p.pace)));
+          minutes=Math.min(slot.minutes,Math.max(15,Math.ceil(km*p.pace+10)));
+          kind=slot.id===longSlot.id?'long':'easy';
+        }
+        const title=slot.sport==='run'?(kind==='long'?'Rustige duurloop':'Rustig hardlopen'):sports[slot.sport];
+        const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
+        if(conflict){
+          blocked++;activeKeys.delete(key);
+          continue;
+        }
+        if(existing) {
+          const before=eventSnap(existing);
+          Object.assign(existing,{time:slot.time,sport:slot.sport,kind,title,baseKm:km,baseMinutes:minutes,km,minutes,adaptation:''});
+          if(JSON.stringify(before)!==JSON.stringify(eventSnap(existing))) {touch(existing,at);changes.push({id:existing.id,title,before,after:eventSnap(existing)});}
+        } else {
+          const w=makeWorkout({date:day,time:slot.time,sport:slot.sport,kind,title,km,minutes,source:'plan',slotId:slot.id},now); state.workouts.push(w);
+        }
+      }
+    }
+    for(const w of state.workouts) if(w.source==='plan'&&w.date>=start&&w.date<=end&&!activeKeys.has(w.slotId+':'+w.date)&&!finalStatuses.has(w.status)&&!w.locked) {
+      const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
+    }
+    state.planStart=start;state.planEnd=end;
+    adaptPlan(state,{now,writeAudit:false});
+    changeLog(state,'Schema opgebouwd',`${weeks} weken op basis van je eigen startniveau en vaste sportmomenten. ${blocked?blocked+' moment(en) niet ingepland wegens overlap met een handmatige of vastgezette activiteit. ':''}Doeldatum is geen garantie dat de afstand haalbaar is.`,changes,now);
+    state.workouts.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+    return state;
+  }
+  function adaptPlan(state, {now=new Date(),writeAudit=true,trigger=null}={}) {
+    const today=isoDay(now,state.profile?.timezone), until=addDays(today,14), changes=[];
+    const recent=state.workouts.filter(w=>(w.status==='done'||w.status==='skipped')&&w.actual&&w.date>=addDays(today,-14)&&w.date<=today&&(!state.lastResume||w.actual.loggedAt>state.lastResume)).sort((a,b)=>b.date.localeCompare(a.date)||b.actual.loggedAt.localeCompare(a.actual.loggedAt));
+    const runs=recent.filter(w=>w.sport==='run');
+    const shortRuns=runs.filter(w=>w.actual.plannedKm>0 && w.actual.km/w.actual.plannedKm<.75);
+    const fatigued=recent.some(w=>w.actual.reason==='fatigue'||w.actual.rpe>=8);
+    const repeated=shortRuns.length>=2;
+    const missedPast=state.workouts.filter(w=>w.status==='planned'&&w.sport==='run'&&w.date<today&&w.date>=addDays(today,-14));
+    // A missing log is unknown, not a completed workout. Hold volume rather than infer success.
+    const unlogged=missedPast.length>=2;
+    for(const w of state.workouts) {
+      if(finalStatuses.has(w.status)||w.date<today) continue;
+      if(zonedInstant(w.date,w.time,state.profile.timezone)<now) continue;
+      const before=eventSnap(w);
+      if(state.hold) {
+        w.status='held';w.adaptation='Planning gepauzeerd. Hervat alleen bewust via Coach.';
+      } else if(w.locked) {
+        // Fixed means the whole manually locked session. Safety holds always override it.
+        if(w.status==='held') w.status='planned';
+        w.adaptation=(fatigued||repeated)?'Vastgezet: niet aangepast. Controleer zelf of deze training nog passend is.':'';
+      } else {
+        if(w.status==='held') w.status='planned';
+        w.km=w.baseKm;w.minutes=w.baseMinutes;w.adaptation='';
+        if(w.sport==='run') {
+          let factor=1; const reasons=[];
+          if((fatigued||repeated)&&w.date<=until) {factor=.8;reasons.push(fatigued?'Lichtere periode na hoge inspanning of vermoeidheid.':'Meerdere korte of gemiste trainingen: opbouw tijdelijk lager.');}
+          if(unlogged) {factor=Math.min(factor,.9);reasons.push('Meerdere eerdere trainingen zijn niet afgevinkt; geen extra opbouw.');}
+          let km=w.baseKm*factor;
+          for(const r of shortRuns) {
+            const left=daysBetween(r.date,w.date);
+            const sameSlot=r.slotId&&w.slotId===r.slotId;
+            const comparable=sameSlot||(!r.slotId&&r.kind===w.kind);
+            if(comparable&&left>0&&left<=14&&r.actual.km>0) {
+              km=Math.min(km,r.actual.km*(r.actual.reason==='time'||r.actual.reason==='weather'?1.2:1.1));
+              reasons.push(`Vorige vergelijkbare loop: ${r.actual.km} van ${r.actual.plannedKm} km. Geen inhaalkilometers.`);
+            }
+          }
+          w.km=roundKm(km);
+          if(w.km<w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.ceil(w.km*state.profile.pace+10)));
+          w.adaptation=[...new Set(reasons)].join(' ');
+        } else if(fatigued&&w.date<=addDays(today,7)) {
+          w.adaptation='Er is hoge inspanning gemeld. Beoordeel deze andere sport zelf; hardloopkilometers zijn niet uitwisselbaar met deze sport.';
+        }
+      }
+      if(JSON.stringify(before)!==JSON.stringify(eventSnap(w))) {touch(w,now.toISOString());changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});}
+    }
+    if(writeAudit) {
+      let detail=state.hold?'Alle toekomstige trainingen zijn gepauzeerd. Pijn of ziekte wordt niet met extra trainingen gecompenseerd.':changes.length?`${changes.length} training(en) aangepast. Vaste dagen en begintijden blijven staan. Gemiste kilometers worden niet op andere trainingen gestapeld.`:'Geen afstand aangepast. Vaste momenten blijven staan; er worden geen gemiste kilometers ingehaald.';
+      if(trigger) detail=`${trigger} ${detail}`;
+      changeLog(state,state.hold?'Herstel eerst':'Schema opnieuw beoordeeld',detail,changes,now);
+    }
+    return changes;
+  }
+  function logWorkout(state,id,actual,{now=new Date()}={}) {
+    const w=state.workouts.find(x=>x.id===id);if(!w) throw new Error('Training niet gevonden.');
+    if(w.date>isoDay(now,state.profile.timezone)) throw new Error('Een toekomstige training kun je nog niet afronden.');
+    if(w.status==='cancelled') throw new Error('Deze training is verwijderd.');
+    const km=Number(actual.km),minutes=Number(actual.minutes),rpe=Number(actual.rpe);
+    if(!Number.isFinite(km)||km<0||km>300||!Number.isFinite(minutes)||minutes<0||minutes>1440||!Number.isInteger(rpe)||rpe<1||rpe>10) throw new Error('Controleer afstand, minuten en inspanning (1-10).');
+    if(km>0&&minutes<=0) throw new Error('Vul de werkelijke tijdsduur in.');
+    if(!['normal','time','fatigue','weather','pain','illness','other','missed'].includes(actual.reason)) throw new Error('Kies een reden.');
+    const old=w.actual;
+    w.actual={km,minutes,rpe,reason:actual.reason,notes:String(actual.notes||'').slice(0,1000),plannedKm:old?.plannedKm??w.km,plannedMinutes:old?.plannedMinutes??w.minutes,loggedAt:now.toISOString()};
+    w.status=km===0&&minutes===0?'skipped':'done';touch(w,now.toISOString());
+    if(actual.reason==='pain'||actual.reason==='illness') {state.hold=true;state.holdSince=now.toISOString();}
+    const trigger=w.sport==='run'?`${w.actual.km} van ${w.actual.plannedKm} km geregistreerd.`:`${w.actual.minutes} minuten ${sports[w.sport].toLowerCase()} geregistreerd.`;
+    if(state.profile.autoAdapt||state.hold) adaptPlan(state,{now,trigger});
+    else changeLog(state,'Training opgeslagen','Automatisch aanpassen staat uit. Beoordeel je schema via Coach.',[],now);
+    return state;
+  }
+  function checkMove(state,w) {
+    zonedInstant(w.date,w.time,state.profile.timezone);
+    if(SK.clockMinutes(w.time)+w.minutes>1440) throw new Error('Kies een eindtijd voor middernacht.');
+    for(const t of state.workouts) if(t.id!==w.id&&t.date===w.date&&['planned','held','done'].includes(t.status)&&overlap(t,w)) throw new Error('Dit moment overlapt met een andere sportactiviteit. Kies een andere tijd.');
+  }
+  function editWorkout(state,id,patch,{now=new Date()}={}) {
+    const w=state.workouts.find(x=>x.id===id);if(!w||!['planned','held'].includes(w.status)) throw new Error('Deze training kan niet meer worden verplaatst.');
+    const before=eventSnap(w), next={...w,...patch};checkMove(state,next);
+    if(w.date!==next.date||w.time!==next.time) {
+      if(w.source==='plan'&&w.slotId){state.excludedOccurrences=[...new Set([...(state.excludedOccurrences||[]),w.slotId+':'+w.date])];}
+      next.source='manual';next.slotId=null;
+    }
+    Object.assign(w,next,{baseKm:next.km,baseMinutes:next.minutes});touch(w,now.toISOString());
+    changeLog(state,'Training gewijzigd','Handmatige wijziging. Datum en tijd worden niet vanzelf teruggezet.',[{id,title:w.title,before,after:eventSnap(w)}],now);
+    return state;
+  }
+  function cancelWorkout(state,id,{now=new Date()}={}) {
+    const w=state.workouts.find(x=>x.id===id);if(!w||finalStatuses.has(w.status)) throw new Error('Alleen een geplande training kan worden verwijderd.');
+    const before=eventSnap(w);w.status='cancelled';touch(w,now.toISOString());
+    changeLog(state,'Training verwijderd','De agendakoppeling krijgt een annulering met hetzelfde afspraak-ID.',[{id,title:w.title,before,after:eventSnap(w)}],now);
+    return state;
+  }
+  function resumePlan(state,weekly,longest,{now=new Date()}={}) {
+    const p={...state.profile,baseWeeklyKm:Number(weekly),longestKm:Number(longest)};validateProfile(p,state.slots);
+    state.profile=p;state.hold=false;state.holdSince=null;state.lastResume=now.toISOString();
+    for(const w of state.workouts) if(w.status==='held') {w.status='planned';touch(w,now.toISOString());}
+    generatePlan(state,{now,start:isoDay(now),weeks:12});
+    changeLog(state,'Bewust hervat','Opnieuw opgebouwd vanaf het door jou bevestigde startniveau.',[],now);return state;
+  }
+  function warnings(state,now=new Date()) {
+    const notes=[];if(!state.profile) return notes;
+    if(state.hold) notes.push('Je planning staat gepauzeerd. Er worden geen nieuwe actieve trainingen ingepland totdat je bewust hervat.');
+    const p=state.profile,today=isoDay(now);
+    const pending=state.workouts.filter(w=>w.status==='planned'&&w.date<today);
+    if(pending.length) notes.push(`${pending.length} eerdere training(en) nog niet geregistreerd. Vul de werkelijke uitvoering in; de app kan deze niet raden.`);
+    const runs=state.slots.filter(s=>s.sport==='run');
+    const days=new Set(runs.map(s=>Number(s.day)));
+    const capacity=runs.reduce((a,s)=>a+Math.max(0,(s.minutes-10)/p.pace),0);
+    if(capacity<p.baseWeeklyKm*.9)notes.push('Je vaste momenten bieden minder tijd dan je opgegeven hardloopbasis nodig heeft. Het schema wordt ingekort; maak alleen extra ruimte als dat voor jou passend is.');
+    if([...days].some(d=>days.has((d+1)%7))) notes.push('Je hebt hardloopdagen direct achter elkaar gekozen. Beoordeel zelf of je genoeg hersteltijd hebt.');
+    if(p.goal==='marathon') notes.push('Marathondoel: dit is een indicatief basisschema, geen gevalideerde marathonbegeleiding of garantie dat de wedstrijd haalbaar is. Laat de opbouw en doeldatum beoordelen door een looptrainer.');
+    if(p.raceDate) {const left=daysBetween(today,p.raceDate);if(left<0) notes.push('Je doeldatum is voorbij. Werk je doel bij.');else if(left<84&&['half','marathon'].includes(p.goal)) notes.push('Je doeldatum ligt binnen 12 weken. De app forceert geen snelle opbouw om die datum te halen.');}
+    if(state.planEnd&&daysBetween(today,state.planEnd)<21) notes.push('Je planning loopt binnenkort af. Bouw in Instellingen opnieuw 12 weken op; afgeronde trainingen blijven bewaard.');
+    return notes;
+  }
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,touch});
+})(globalThis.SK ||= {});
+
+(function(SK) {
+  'use strict';
+  const escapeICS=s=>String(s||'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r/g,'');
+  const stamp=d=>new Date(d).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+  function foldLine(line) {
+    let out='',part='',bytes=0;
+    for(const char of line) {const n=new TextEncoder().encode(char).length;if(bytes+n>75){out+=part+'\r\n';part=' ';bytes=1;}part+=char;bytes+=n;}
+    return out+part;
+  }
+  function calendarText(state,{owner='sportkompas',minimal=true,now=new Date()}={}) {
+    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SportKompas//Sportagenda 1.0//NL','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:SportKompas','X-WR-TIMEZONE:Europe/Amsterdam','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
+    for(const w of state.workouts) {
+      // Keep cancellations for 180 days to let calendar clients remove known events.
+      if(w.date<SK.addDays(SK.isoDay(now),-180)) continue;
+      const start=SK.zonedInstant(w.date,w.time,state.profile?.timezone||'Europe/Amsterdam');
+      const end=new Date(+start+Math.max(1,w.minutes)*60000);
+      const cancelled=['cancelled','held','skipped'].includes(w.status);
+      const summary=minimal?'Sporttraining':`${w.title}${w.sport==='run'?` - ${w.km} km`:''}`;
+      lines.push('BEGIN:VEVENT',`UID:${w.id}.${owner}@sportkompas`, `DTSTAMP:${stamp(w.updatedAt||now)}`,`LAST-MODIFIED:${stamp(w.updatedAt||now)}`,`SEQUENCE:${w.sequence||0}`,`DTSTART:${stamp(start)}`,`DTEND:${stamp(end)}`,`SUMMARY:${escapeICS(summary)}`,`DESCRIPTION:${escapeICS('Bekijk en wijzig deze training in SportKompas. Dit is een alleen-lezen agenda-abonnement.')}`,`STATUS:${cancelled?'CANCELLED':'CONFIRMED'}`,'CLASS:PRIVATE',`TRANSP:${cancelled?'TRANSPARENT':'OPAQUE'}`,'END:VEVENT');
+    }
+    lines.push('END:VCALENDAR');return lines.map(foldLine).join('\r\n')+'\r\n';
+  }
+  Object.assign(SK,{escapeICS,calendarText,foldLine});
+})(globalThis.SK ||= {});
+
+(function(SK){
+  SK.demoState=function(now=new Date()) {
+    const s=SK.freshState(),today=SK.isoDay(now),m=SK.monday(today);
+    s.profile={name:'Jeremy (demo)',goal:'fit',baseWeeklyKm:22,longestKm:10,pace:6.5,timezone:'Europe/Amsterdam',raceDate:'',autoAdapt:true};
+    s.slots=[{id:'tue',day:1,time:'18:30',minutes:75,sport:'run',kind:'easy'},{id:'thu',day:3,time:'18:30',minutes:75,sport:'run',kind:'easy'},{id:'sat',day:5,time:'10:00',minutes:60,sport:'strength',kind:'easy'},{id:'sun',day:6,time:'09:30',minutes:100,sport:'run',kind:'long'}];
+    SK.generatePlan(s,{now,start:today,weeks:12});
+    // Entirely fictional history, not data retrieved from a watch or account.
+    for(let week=4;week>=1;week--) for(const [offset,km] of [[1,5],[3,6],[6,9]]) {
+      const date=SK.addDays(m,-7*week+offset),w=SK.makeWorkout({date,time:'18:30',sport:'run',kind:offset===6?'long':'easy',title:offset===6?'Rustige duurloop':'Rustig hardlopen',km,minutes:Math.round(km*6.5),status:'done'},now);
+      w.actual={km,minutes:w.minutes,rpe:5,reason:'normal',notes:'Fictieve voorbeeldtraining',plannedKm:km,plannedMinutes:w.minutes,loggedAt:date+'T19:00:00Z'};s.workouts.push(w);
+    }
+    // A demo card for the exact 10 -> 5 km scenario, ready to record today.
+    s.workouts.push(SK.makeWorkout({date:today,time:'07:00',sport:'run',kind:'long',title:'Probeer: 10 km wordt 5 km',km:10,minutes:75,slotId:null},now));
+    s.adjustments=[];SK.changeLog(s,'Welkom in de demo','Alle afstanden, sportmomenten en resultaten zijn fictief. Registreer vandaag 5 van de geplande 10 km en bekijk wat er verandert.',[],now);
+    return s;
+  };
+})(globalThis.SK ||= {});
+
+(function(SK){
+  'use strict';
+  let client,connecting,revision=0,user=null;
+  const configured=()=>!!(SPORT_CONFIG.supabaseUrl&&SPORT_CONFIG.supabasePublishableKey);
+  async function connect(){
+    if(client)return client;if(connecting)return connecting;
+    if(!configured())throw new Error('Vul eerst de twee publieke Supabase-gegevens in config.js in. De demo werkt al zonder koppeling.');
+    const url=new URL(SPORT_CONFIG.supabaseUrl);
+    if(url.protocol!=='https:')throw new Error('Gebruik de HTTPS-project-URL van Supabase.');
+    const key=SPORT_CONFIG.supabasePublishableKey;
+    if(key.startsWith('sb_secret_'))throw new Error('Stop: dit is een geheime Supabase-sleutel. Verwijder en roteer deze. Gebruik alleen de publishable/anon-sleutel.');
+    try { const payload=JSON.parse(atob(key.split('.')[1]||''));if(payload.role==='service_role')throw new Error('PRIVATE_KEY'); }catch(e){if(e.message==='PRIVATE_KEY')throw new Error('Stop: service_role mag nooit in de browser. Verwijder en roteer deze sleutel.');}
+    connecting=(async()=>{
+      if(!globalThis.supabase)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=SPORT_CONFIG.sdkUrl;script.crossOrigin='anonymous';script.onload=resolve;script.onerror=()=>reject(new Error('De beveiligde inlogbibliotheek kon niet worden geladen. Controleer je verbinding.'));document.head.appendChild(script);});
+      client=globalThis.supabase.createClient(SPORT_CONFIG.supabaseUrl,key,{auth:{storage:sessionStorage,storageKey:'sportkompas-auth-'+location.pathname,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+      return client;
+    })();
+    try{return await connecting;}catch(e){connecting=null;throw e;}
+  }
+  async function checkedUser(){const c=await connect();const {data,error}=await c.auth.getUser();if(error||!data.user)throw new Error('Je sessie is verlopen. Log opnieuw in.');user=data.user;return user;}
+  async function load(){
+    const c=await connect(),u=await checkedUser();
+    const member=await c.from('sport_members').select('user_id,active').eq('user_id',u.id).maybeSingle();
+    if(member.error)throw new Error('De sporttabellen zijn nog niet beschikbaar, of toegang is geweigerd. Controleer de SQL-installatie.');
+    if(!member.data?.active)throw new Error('Dit account heeft geen toegang tot SportKompas. Laat de beheerder je account toevoegen aan sport_members.');
+    const {data,error}=await c.from('sport_states').select('data,revision').eq('user_id',u.id).maybeSingle();
+    if(error)throw new Error('Gegevens laden mislukt: '+error.message);
+    revision=Number(data?.revision||0);const state=data?.data||SK.freshState();SK.validateState(state);return {state,user:u};
+  }
+  async function save(state){
+    if(!navigator.onLine)throw new Error('Je bent offline. De wijziging is niet opgeslagen. Maak opnieuw verbinding en probeer nogmaals.');
+    SK.validateState(state);const c=await connect();
+    const {data,error}=await c.rpc('sport_save_state',{p_data:state,p_expected_revision:revision});
+    if(error){if(error.code==='40001'||error.message?.includes('SPORT_CONFLICT')){const e=new Error('Je schema is op een ander apparaat gewijzigd. De nieuwste versie is geladen. Controleer je invoer en sla opnieuw op.');e.code='CONFLICT';throw e;}throw new Error('Opslaan mislukt: '+error.message);}
+    const row=Array.isArray(data)?data[0]:data;revision=Number(row.revision);return row.data;
+  }
+  async function login(email,password){const c=await connect();const {error}=await c.auth.signInWithPassword({email,password});if(error)throw new Error('Inloggen is niet gelukt. Controleer je e-mailadres en wachtwoord.');return load();}
+  async function logout(){if(client)await client.auth.signOut({scope:'local'});revision=0;user=null;}
+  async function recover(email){const c=await connect();const {error}=await c.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw new Error('De aanvraag kon niet worden verstuurd. Probeer het later opnieuw.');}
+  async function password(password){if(password.length<12)throw new Error('Kies een wachtwoord van minimaal 12 tekens.');const c=await connect();const {error}=await c.auth.updateUser({password});if(error)throw new Error('Wachtwoord instellen mislukt: '+error.message);}
+  async function invoke(name,body){const c=await connect();const {data,error}=await c.functions.invoke(name,{body});if(error){let detail;try{detail=await error.context.json();}catch{}throw new Error(detail?.error||'Deze serverfunctie is nog niet ingesteld of kon niet worden bereikt. Controleer de installatiehandleiding.');}return data;}
+  Object.assign(SK,{DB:{configured,connect,load,save,login,logout,recover,password,invoke,get user(){return user;}}});
+})(globalThis.SK ||= {});
+
+(function(SK){
+  'use strict';
+  const {isoDay,addDays,monday,daysBetween,dateLabel,clone,uid,sports,goals}=SK;
+  const root=document.getElementById('root'),modalRoot=document.getElementById('modal-root');
+  let state=null,demo=false,view='overview',busy=false,anchor=isoDay(),selectedDay=isoDay();
+  let calendarMode=innerWidth<640?'week':'month',syncLabel='Opgeslagen',modalLocked=false,focusBefore=null,shareUrl='',lastFocusSync=0;
+  let recovery=/type=(recovery|invite)/.test(location.hash),toastTimer;
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const num=n=>new Intl.NumberFormat('nl-NL',{maximumFractionDigits:1}).format(n||0);
+  const icons={
+    compass:'<circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5Z"/>',
+    grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 5h2m4 0h2"/>',
+    spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4m-2-2h4"/>',
+    chart:'<path d="M4 3v17h17M8 15l4-5 4 2 5-7"/>',
+    settings:'<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/>',
+    run:'<circle cx="15" cy="4" r="2"/><path d="m12 9 3 4 4 1M7 10l4-2 3 1-4 7-5 4m5-4 5 1 1 4"/>',
+    strength:'<path d="M7 8v8m10-8v8M7 12h10M4 6v12m16-12v12M2 10v4m20-4v4"/>',
+    cycle:'<circle cx="5" cy="16" r="4"/><circle cx="19" cy="16" r="4"/><path d="m5 16 5-9 5 9H5m5-9 8 1 1 8M8 5h4m3-3h3l1 5"/>',
+    walk:'<circle cx="13" cy="4" r="2"/><path d="m10 10 2-3 3 4 4 1m-7-5-2 8-3 6m3-6 5 2 1 5M7 13l3-3"/>',
+    target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    shield:'<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z"/><path d="m8 12 3 3 5-6"/>',
+    cloud:'<path d="M7 18a5 5 0 1 1 1-10 6 6 0 0 1 11 2 4 4 0 0 1 0 8M12 11v10m-3-3 3 3 3-3"/>',
+    share:'<path d="M12 16V3m-5 5 5-5 5 5M5 13v7h14v-7"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',
+    left:'<path d="m15 6-6 6 6 6"/>',right:'<path d="m9 6 6 6-6 6"/>',
+    check:'<path d="m5 12 4 4L19 6"/>', close:'<path d="m6 6 12 12M18 6 6 18"/>',
+    lock:'<rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+    logout:'<path d="M9 4H4v16h5m6-13 5 5-5 5M9 12h11"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    trash:'<path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/>',
+    refresh:'<path d="M20 7v5h-5M4 17v-5h5M5 8a7 7 0 0 1 12-3l3 3M4 16l3 3a7 7 0 0 0 12-3"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/>'
+  };
+  const icon=(name,size=20)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.run}</svg>`;
+  const btn=(label,action,extra='',className='')=>`<button type="button" class="btn ${className}" data-action="${action}" ${extra}>${label}</button>`;
+  const brand=mobile=>`<div class="brand ${mobile?'mobile-brand':''}"><span class="brand-mark">${icon('compass',24)}</span><span>SportKompas</span></div>`;
+  const days=['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'];
+  const shortDays=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+  const opts=(obj,value)=>Object.entries(obj).map(([k,v])=>`<option value="${esc(k)}" ${k===String(value)?'selected':''}>${esc(v)}</option>`).join('');
+  function toast(text){clearTimeout(toastTimer);const el=document.getElementById('toast');el.textContent=text;el.classList.add('visible');toastTimer=setTimeout(()=>el.classList.remove('visible'),5500);}
+  function showError(form,text){if(!form.isConnected){toast(text);return;}const el=form.querySelector('.form-error');if(el){el.textContent=text;el.scrollIntoView({block:'nearest'});}else toast(text);}
+  function showModal(title,subtitle,content,{wide=false,locked=false}={}){
+    focusBefore=document.activeElement;modalLocked=locked;
+    modalRoot.innerHTML=`<div class="modal-overlay"><section class="modal ${wide?'wide':''}" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><h2 id="modal-title">${esc(title)}</h2><p>${esc(subtitle)}</p></div>${locked?'':btn(icon('close'),'close-modal','aria-label="Sluiten"','ghost icon-btn')}</div>${content}</section></div>`;
+    document.body.style.overflow='hidden';setTimeout(()=>modalRoot.querySelector('input:not([type=checkbox]),select,button')?.focus(),20);
+  }
+  function closeModal(){if(busy)return;modalRoot.innerHTML='';document.body.style.overflow='';modalLocked=false;focusBefore?.focus();}
+  async function commit(candidate,message='Opgeslagen'){
+    SK.validateState(candidate);
+    if(demo){state=candidate;syncLabel='Alleen demo';}
+    else {try{state=await SK.DB.save(candidate);syncLabel='Opgeslagen';}catch(e){if(e.code==='CONFLICT'){const data=await SK.DB.load();state=data.state;render();}throw e;}}
+    render();if(message)toast(message);
+  }
+  function renderAuth(){
+    state=null;shareUrl='';
+    root.innerHTML=`<div class="auth-layout"><section class="auth-story">${brand(false)}<h1>Jouw ritme.<br>Jouw doel.<br><em>Een plan dat<br>meebeweegt.</em></h1><p>Niet elke training gaat zoals gepland. Je agenda mag zich aanpassen aan jou. Niet andersom.</p><div class="story-preview"><div class="eyebrow" style="color:#b8d49f">Je hebt toch bewogen</div><div style="margin:13px 0"><span class="preview-strike">10 km gepland</span><span class="preview-new">5 km gelopen</span></div><p class="small" style="color:#b6cdbb">Registreer wat lukte. De planner bekijkt de komende trainingen opnieuw, zonder inhaalschuld.</p></div><div class="story-foot">Persoonlijk account &nbsp; / &nbsp; Jouw vaste momenten &nbsp; / &nbsp; Jouw tempo</div></section><main class="auth-form-wrap" id="main"><div class="auth-form"><div class="eyebrow">Welkom bij jouw sportagenda</div><h2>Goed je te zien.</h2><p>Log in op je eigen account. Je schema, resultaten en doelen zijn alleen van jou.</p><form id="login-form"><div class="form-error" role="alert"></div><label>E-mailadres<input name="email" type="email" autocomplete="username" placeholder="naam@voorbeeld.nl" required></label><label>Wachtwoord<input name="password" type="password" autocomplete="current-password" placeholder="Jouw persoonlijke wachtwoord" required></label><button class="btn primary" type="submit">Inloggen ${icon('arrow',17)}</button></form><div class="button-row" style="justify-content:center;margin-top:12px">${btn('Wachtwoord vergeten?','recover','','ghost compact')}</div>${SK.DB.configured()?'':`<div class="notice small mt">De app is nog niet gekoppeld aan Supabase. Vul de publieke projectgegevens in <strong>config.js</strong> in. De demo werkt direct.</div>`}<div class="auth-bottom">${btn('Bekijk de interactieve demo '+icon('arrow',16),'start-demo','','ghost')}<p>Fictieve gegevens. Geen account nodig voor de demo.</p></div><div class="security-note mt">${icon('shield',16)}<span>Alleen uitgenodigde accounts. Geen openbare registratie. Op een gedeelde computer: log uit als je klaar bent.</span></div></div></main></div>`;
+  }
+  function shell(){
+    const nav=[['overview','grid','Overzicht'],['calendar','calendar','Agenda'],['coach','spark','Coach'],['progress','chart','Voortgang'],['settings','settings','Instellingen']];
+    const name=state.profile?.name||'Mijn account', initials=name.slice(0,1).toUpperCase();
+    return `<div class="app-shell"><aside class="sidebar">${brand(false)}<div class="brand-sub">JOUW RITME, JOUW DOEL</div><nav class="nav" aria-label="Hoofdnavigatie">${nav.map(([v,i,t])=>`<button data-action="nav" data-view="${v}" class="${view===v?'active':''}" ${view===v?'aria-current="page"':''} title="${t}">${icon(i)}<span>${t}</span></button>`).join('')}</nav><div class="sidebar-bottom"><div class="personal-note">${icon('shield',20)}<strong>Jouw eigen koers</strong>Geen gedeelde doelen. Geen vergelijking. Alleen jouw planning en voortgang.</div><div class="sidebar-account"><div class="avatar">${esc(initials)}</div><div class="account-text"><strong>${esc(name)}</strong><span class="tiny" style="color:#93ad9c">${demo?'Demo-account':'Persoonlijk account'}</span></div><button title="Uitloggen" aria-label="Uitloggen" data-action="logout">${icon('logout',18)}</button></div></div></aside><div class="content"><header class="topbar"><div class="breadcrumb">Mijn sportomgeving &nbsp; / &nbsp; <b>${nav.find(n=>n[0]===view)?.[2]||'Overzicht'}</b></div>${brand(true)}<div class="top-actions"><div class="sync-state"><i class="sync-dot"></i>${esc(demo?'Demogegevens':navigator.onLine?syncLabel:'Offline - niet opslaan')}</div>${btn(icon('refresh',17),'sync','title="Synchroniseren" aria-label="Synchroniseren"','icon-btn')}${btn(icon('share',16)+'<span>Agenda koppelen</span>','share','title="Agenda koppelen" aria-label="Agenda koppelen"')}${btn(icon('logout',16),'logout','aria-label="Uitloggen" title="Uitloggen"','icon-btn')}</div></header>${demo?'<div class="demo-banner"><span><strong>Interactieve demo.</strong> Alle trainingen en afstanden zijn fictieve voorbeelden.</span><button data-action="reset-demo">Demo herstellen</button></div>':''}<main id="main">${page()}</main><footer class="footer-note">SportKompas v1.0 &nbsp; &middot; &nbsp; Automatische planner, geen medisch advies &nbsp; &middot; &nbsp; Europe/Amsterdam</footer></div></div>`;
+  }
+  function render(){if(!state){renderAuth();return;}if(!state.profile)view='settings';root.innerHTML=shell();}
+  function page(){return view==='calendar'?calendarPage():view==='coach'?coachPage():view==='progress'?progressPage():view==='settings'?settingsPage():overviewPage();}
+  function heading(title,sub,actions=''){return `<div class="page-heading"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>${actions||`<div class="date-label">${dateLabel(isoDay(),{weekday:'long'})}</div>`}</div>`;}
+  function upcoming(){return state.workouts.filter(w=>['planned','held'].includes(w.status)&&w.date>=isoDay()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));}
+  function weeklyStats(){const m=monday(isoDay()),end=addDays(m,6);const ws=state.workouts.filter(w=>w.date>=m&&w.date<=end&&w.status!=='cancelled');return {planned:ws.filter(w=>w.sport==='run').reduce((a,w)=>a+(w.actual?.plannedKm??w.km),0),actual:ws.filter(w=>w.sport==='run').reduce((a,w)=>a+(w.actual?.km||0),0),minutes:ws.reduce((a,w)=>a+(w.actual?.minutes||0),0),done:ws.filter(w=>w.status==='done').length,total:ws.length};}
+  function tags(w){let out='';if(w.status==='done')out+='<span class="tag">Afgerond</span>';if(w.status==='skipped')out+='<span class="tag muted">Overgeslagen</span>';if(w.status==='held')out+='<span class="tag red">Gepauzeerd</span>';if(w.adaptation&&w.km<w.baseKm)out+='<span class="tag lime">Aangepast</span>';if(w.locked)out+=`<span class="tag amber">${icon('lock',10)} Vastgezet</span>`;else if(w.source==='plan')out+='<span class="tag muted">Vast moment</span>';if(w.status==='planned'&&w.date<isoDay())out+='<span class="tag amber">Nog invullen</span>';return out?`<div class="tags">${out}</div>`:'';}
+  function workoutCard(w,{date=true}={}){
+    const actual=w.actual&&['done','skipped'].includes(w.status),km=actual?w.actual.km:w.km,min=actual?w.actual.minutes:w.minutes;
+    const action=w.date<=isoDay()&&w.status!=='cancelled'?'log':'detail';
+    return `<div class="workout ${esc(w.status)}"><div class="sport-icon ${esc(w.sport)}">${icon(w.status==='done'?'check':w.sport,21)}</div><div class="workout-info"><strong>${esc(w.title)}</strong><div class="workout-meta">${date?esc(dateLabel(w.date,{weekday:'short'}))+' &middot; ':''}${esc(w.time)} &middot; ${num(min)} min</div>${tags(w)}</div><div class="workout-distance">${num(w.sport==='run'?km:min)} <small>${w.sport==='run'?'km':'min'}</small></div>${btn(actual?'Bekijken':action==='log'?'Invullen':icon('right',16),action,`data-id="${esc(w.id)}" aria-label="${action==='log'?'Training registreren':'Training bekijken'}"`,'compact')}</div>`;
+  }
+  function weekStrip(){const m=monday(isoDay());return `<div class="week-strip">${Array.from({length:7},(_,i)=>{const day=addDays(m,i),ws=state.workouts.filter(w=>w.date===day&&w.status!=='cancelled');return `<button class="day-chip ${day===isoDay()?'today':''} ${selectedDay===day?'selected':''}" data-action="day" data-date="${day}" aria-label="${esc(dateLabel(day,{weekday:'long'}))}"><span>${shortDays[i]}</span><strong>${+day.slice(-2)}</strong><span class="dots">${ws.slice(0,3).map(w=>`<i class="dot ${w.sport!=='run'?'alt':''}"></i>`).join('')}</span></button>`;}).join('')}</div>`;}
+  function overviewPage(){
+    if(!state.profile)return settingsPage();const p=state.profile,next=upcoming()[0],stats=weeklyStats();const ws=state.workouts.filter(w=>w.date===selectedDay&&w.status!=='cancelled').sort((a,b)=>a.time.localeCompare(b.time));const last=state.adjustments[0],warnings=SK.warnings(state);
+    return heading(`Jouw ritme, ${p.name.replace(' (demo)','')}.`,'Een goed plan beweegt mee met het echte leven.')+`${state.hold?'<div class="notice danger">Je planning staat gepauzeerd. Bekijk Coach voordat je weer opbouwt.</div>':''}<div class="dashboard-grid"><div class="stack"><div><section class="card hero"><div class="eyebrow">${state.hold?'Even pas op de plaats':next?'Jouw volgende stap':'Ruimte voor beweging'}</div><h2>${state.hold?'Herstel gaat voor.':next?esc(next.title):'Maak ruimte voor je doel.'}</h2><p>${state.hold?'Geen inhaalkilometers. Hervat je planning bewust wanneer dat weer passend is.':next?`${esc(dateLabel(next.date,{weekday:'long'}))} om ${esc(next.time)} &middot; ${num(next.sport==='run'?next.km:next.minutes)} ${next.sport==='run'?'km':'min'} &middot; ${next.sport==='run'?'rustig tempo':esc(sports[next.sport])}`:'Je eigen vaste momenten en startniveau vormen de basis.'}</p><div class="hero-footer">${state.hold?btn('Bekijk je planning '+icon('arrow',16),'nav','data-view="coach"','lime'):next?btn(next.date<=isoDay()?'Training invullen '+icon('arrow',16):'Bekijk training '+icon('arrow',16),next.date<=isoDay()?'log':'detail',`data-id="${esc(next.id)}"`,'lime'):btn('Plan je week '+icon('arrow',16),'nav','data-view="settings"','lime')}<span class="small">${p.autoAdapt?'Automatisch aanpassen staat aan':'Handmatig beoordelen staat aan'}</span></div></section><div class="mini-stats"><div class="stat-card"><div class="stat-top">Deze week gelopen ${icon('run',16)}</div><div class="stat-number">${num(stats.actual)} <small>km</small></div><div class="stat-caption">${num(stats.planned)} km gepland</div><div class="progress-line"><span style="width:${Math.min(100,stats.planned?stats.actual/stats.planned*100:0)}%"></span></div></div><div class="stat-card"><div class="stat-top">Trainingen ${icon('check',16)}</div><div class="stat-number">${stats.done} <small>/ ${stats.total}</small></div><div class="stat-caption">afgerond deze week</div></div><div class="stat-card"><div class="stat-top">Bewogen ${icon('clock',16)}</div><div class="stat-number">${num(stats.minutes)} <small>min</small></div><div class="stat-caption">alle geregistreerde sporten</div></div></div></div><section class="card"><div class="card-header"><div><h2>Jouw week</h2><p>${dateLabel(monday(isoDay()))} - ${dateLabel(addDays(monday(isoDay()),6))}</p></div>${btn('Hele agenda '+icon('arrow',14),'nav','data-view="calendar"','ghost compact')}</div>${weekStrip()}<div class="section-row"><h3>${selectedDay===isoDay()?'Vandaag':dateLabel(selectedDay,{weekday:'long'})}</h3>${btn(icon('plus',15)+' Activiteit','add-workout',`data-date="${selectedDay}"`,'ghost compact')}</div><div class="workout-list">${ws.length?ws.map(w=>workoutCard(w,{date:false})).join(''):'<div class="empty">Geen sportmoment gepland.<br>Je hoeft niet elke vrije dag op te vullen.</div>'}</div></section><section class="card"><div class="card-header"><h2>Daarna op de planning</h2><span class="tag muted">Komende dagen</span></div><div class="workout-list">${upcoming().filter(w=>w.date>isoDay()).slice(0,3).map(w=>workoutCard(w)).join('')||'<div class="empty">Stel je vaste sportmomenten in.</div>'}</div></section></div><div class="stack"><section class="card coach-card"><div class="coach-glyph">${icon('spark',23)}</div><div class="eyebrow" style="color:#708850;margin-bottom:10px">De planner denkt mee</div><h3>${esc(last?.title||'Niet meer doen. Passend doen.')}</h3><p>${esc(last?.detail||'Vul na je training in wat je werkelijk hebt gedaan. De planner kijkt naar afstand, inspanning en de reden van een afwijking.')}</p>${btn('Bekijk aanpassingen '+icon('arrow',14),'nav','data-view="coach"','ghost compact mt')}<div class="card-footer">Vaste regels &middot; automatische beoordeling na registratie</div></section><section class="card"><div class="card-header"><h2>Jouw doel</h2>${icon('target',20)}</div><div class="goal-row"><div class="goal-icon">${icon('target',28)}</div><div><h3>${esc(goals[p.goal])}</h3><p>${p.raceDate?dateLabel(p.raceDate,{year:'numeric'}):'Op jouw eigen tempo'}</p></div></div><div class="key-value"><span>Huidige basis</span><strong>${num(p.baseWeeklyKm)} km/week</strong></div><div class="key-value"><span>Vaste sportmomenten</span><strong>${state.slots.length} per week</strong></div><div class="key-value"><span>Doeldatum</span><strong>${p.raceDate?`${daysBetween(isoDay(),p.raceDate)} dagen`:'Geen einddatum'}</strong></div>${btn('Mijn doel aanpassen','nav','data-view="settings"','ghost compact mt')}</section><section class="card"><div class="card-header"><h2>Goed om te weten</h2>${icon('info',18)}</div><p class="small muted">${warnings.length?esc(warnings[0]):'Een kortere training is informatie, geen mislukking. Vul ook in waarom je minder deed: tijdgebrek is iets anders dan zware benen.'}</p><div class="divider"></div><div class="security-note">${icon('shield',17)}<span>Je collega heeft een eigen account, een eigen doel en een volledig eigen planning.</span></div></section></div></div>`;
+  }
+  function calendarPage(){
+    const first=anchor.slice(0,7)+'-01';let start,end,title;
+    if(calendarMode==='month'){start=monday(first);end=addDays(start,41);title=dateLabel(first,{month:'long',year:'numeric',day:undefined});}else{start=monday(anchor);end=addDays(start,6);title=`${dateLabel(start)} - ${dateLabel(end)}`;}
+    const ws=state.workouts.filter(w=>w.date>=start&&w.date<=end&&w.status!=='cancelled').sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+    let content='';
+    if(calendarMode==='month')content=`<div class="calendar-grid">${shortDays.map(d=>`<div class="calendar-label">${d}</div>`).join('')}${Array.from({length:42},(_,i)=>{const day=addDays(start,i);return `<div class="calendar-cell ${day===isoDay()?'today':''} ${day.slice(0,7)!==first.slice(0,7)?'outside':''}"><span class="cell-date">${+day.slice(-2)}</span>${ws.filter(w=>w.date===day).map(w=>`<button class="calendar-event ${esc(w.sport)} ${esc(w.status)}" data-action="detail" data-id="${esc(w.id)}"><span class="time">${esc(w.time)}${w.status==='done'?' &#10003;':''}</span><br>${esc(sports[w.sport])}${w.sport==='run'?` ${num(w.actual?.km??w.km)} km`:''}${w.status==='held'?'<br>Gepauzeerd':''}</button>`).join('')}</div>`;}).join('')}</div>`;
+    else content=Array.from({length:7},(_,i)=>{const day=addDays(start,i),list=ws.filter(w=>w.date===day);return `<div class="list-day-label"><span>${esc(dateLabel(day,{weekday:'long'}))}${day===isoDay()?' &middot; vandaag':''}</span>${btn(icon('plus',13),'add-workout',`data-date="${day}" aria-label="Activiteit toevoegen op ${day}"`,'ghost compact')}</div><div class="workout-list">${list.length?list.map(w=>workoutCard(w,{date:false})).join(''):'<p class="small muted" style="padding:5px 0 10px">Vrij / herstel</p>'}</div>`;}).join('');
+    return heading('Jouw sportagenda.','Vaste momenten. Ruimte om aan te passen.',btn(icon('plus',16)+' Activiteit','add-workout','','primary'))+`<section class="card"><div class="toolbar"><div class="button-row">${btn(icon('left',16),'cal-prev','aria-label="Vorige periode"','icon-btn')}<div class="week-title">${esc(title)}</div>${btn(icon('right',16),'cal-next','aria-label="Volgende periode"','icon-btn')}${btn('Vandaag','cal-today','','ghost compact')}</div><div class="segmented"><button class="${calendarMode==='week'?'active':''}" data-action="cal-mode" data-mode="week">Week</button><button class="${calendarMode==='month'?'active':''}" data-action="cal-mode" data-mode="month">Maand</button></div></div>${content}</section><div class="notice mt">Wijzig trainingen in SportKompas. Het agenda-abonnement neemt deze wijzigingen over zodra je agenda-app ververst. Bestaande priveafspraken worden in deze versie niet ingelezen.</div>`;
+  }
+  function coachPage(){
+    const warnings=SK.warnings(state),last=state.adjustments;
+    return heading('Een plan dat meebeweegt.','Automatische planningsregels, met optionele AI-uitleg.')+`${warnings.map(x=>`<div class="notice ${state.hold?'danger':'warning'}">${esc(x)}</div>`).join('')}<div class="settings-grid"><div class="stack"><section class="card coach-card"><div class="card-header"><div><h2>${state.hold?'Je planning staat op pauze':'Jij beweegt. Je schema beweegt mee.'}</h2><p>Automatisch na het registreren van een activiteit</p></div>${icon('spark',27)}</div><p>De planner kijkt naar werkelijk gelopen kilometers, je ervaren inspanning en waarom je afweek. Dagen en begintijden van vaste sportmomenten blijven staan. Een gemiste 5 km wordt nooit zomaar bij je volgende training opgeteld.</p><div class="button-row mt">${state.hold?btn('Planning bewust hervatten','resume','','primary'):btn('Schema nu opnieuw beoordelen','recalculate','','primary')}</div></section><section class="card"><div class="card-header"><h2>Wat is er aangepast?</h2><span class="tag muted">${last.length} beoordelingen</span></div>${last.length?last.slice(0,20).map(a=>`<article class="audit"><div class="audit-head"><h3>${esc(a.title)}</h3><span class="tiny muted">${esc(new Date(a.at).toLocaleString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))}</span></div><p>${esc(a.detail)}</p>${a.changes.slice(0,8).map(c=>`<div class="change"><span>${esc(c.title)} &middot; ${esc(dateLabel(c.after.date))}</span><b>${c.after.status==='held'?'Gepauzeerd':c.after.status==='cancelled'?'Verwijderd':`${num(c.before.km)} &rarr; ${num(c.after.km)} km`}</b></div>`).join('')}${a.changes.length>8?`<p class="tiny">En ${a.changes.length-8} andere wijzigingen; zichtbaar in je agenda.</p>`:''}</article>`).join(''):'<div class="empty">Vul een training in om je eerste beoordeling te zien.</div>'}</section></div><div class="stack"><section class="card"><div class="card-header"><div><h2>Vraag het aan AI</h2><p>${demo?'Demo: geen externe AI-aanroepen':SPORT_CONFIG.enableAI?'Optionele uitleg via OpenAI':'Nog niet aangesloten'}</p></div>${icon('spark',20)}</div><p class="small muted mb">AI kan je planning toelichten, maar wijzigt deze niet zelfstandig. De automatische planner hierboven werkt ook zonder AI-abonnement of API-sleutel.</p><form id="coach-form"><div class="form-error" role="alert"></div><label>Je vraag<textarea name="question" maxlength="1200" placeholder="Waarom is mijn volgende duurloop korter?" required></textarea></label><label class="checkline small mt"><input name="consent" type="checkbox" required><span>Mijn vraag en een beperkte samenvatting van mijn trainingen mogen voor deze vraag naar OpenAI. Naam, e-mail en trainingsnotities worden niet meegestuurd. Zet zelf geen gevoelige persoonsgegevens in je vraag.</span></label><button class="btn primary mt" type="submit" ${!demo&&!SPORT_CONFIG.enableAI?'disabled':''}>Vraag versturen ${icon('arrow',16)}</button></form><div id="ai-answer"></div></section><section class="card"><h3>Zo werkt deze versie</h3><p class="small muted mt">Het automatische schema gebruikt controleerbare regels, geen taalmodel. De 3% opbouw en lichtere weken zijn ontwerpkeuzes, geen bewezen veiligheidsgrens. Het model kent je lichaam, blessurehistorie en herstel niet.</p><div class="divider"></div><p class="small muted">Hardlopen wordt in kilometers gepland. Andere sporten zijn als tijdsblokken toegevoegd en tellen mee in je sportminuten, maar worden niet omgezet naar hardloopkilometers.</p><div class="divider"></div><p class="small muted">Voor een marathon is beoordeling door een looptrainer verstandig. De app belooft niet dat een gekozen datum of afstand haalbaar is.</p></section></div></div>`;
+  }
+  function progressPage(){
+    const today=isoDay(),m=monday(today),weeks=Array.from({length:8},(_,i)=>{const start=addDays(m,-7*(7-i)),end=addDays(start,6),ws=state.workouts.filter(w=>w.sport==='run'&&w.date>=start&&w.date<=end&&w.status!=='cancelled');return {start,actual:ws.reduce((a,w)=>a+(w.actual?.km||0),0),planned:ws.reduce((a,w)=>a+(w.actual?.plannedKm??w.km),0)};});
+    const max=Math.max(1,...weeks.flatMap(w=>[w.actual,w.planned]));const done=state.workouts.filter(w=>w.actual&&w.status==='done').sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+    const runs=done.filter(w=>w.sport==='run');const allKm=runs.reduce((a,w)=>a+w.actual.km,0),minutes=done.reduce((a,w)=>a+w.actual.minutes,0);
+    return heading('Kijk wat je al hebt gedaan.','Werkelijke trainingen, niet alleen goede voornemens.')+`<div class="progress-grid"><section class="card"><div class="card-header"><div><h2>Hardlopen per week</h2><p>De afgelopen acht kalenderweken</p></div>${icon('chart',22)}</div><div class="chart-bars" role="img" aria-label="Geplande en werkelijk gelopen kilometers per week">${weeks.map(w=>`<div class="bar-group"><div class="bar planned" style="height:${w.planned/max*100}%" title="Gepland: ${num(w.planned)} km"></div><div class="bar" style="height:${w.actual/max*100}%" title="Gelopen: ${num(w.actual)} km"></div><span class="bar-label">${esc(dateLabel(w.start))}</span></div>`).join('')}</div><div class="legend"><span><i class="light"></i>Gepland</span><span><i></i>Gelopen</span></div><details class="faq mt"><summary>Getallen als tabel bekijken</summary><table class="data-table"><thead><tr><th>Week vanaf</th><th>Gepland</th><th>Gelopen</th></tr></thead><tbody>${weeks.map(w=>`<tr><td>${dateLabel(w.start)}</td><td>${num(w.planned)} km</td><td>${num(w.actual)} km</td></tr>`).join('')}</tbody></table></details></section><section class="card"><div class="card-header"><h2>Jouw totaal</h2><span class="tag muted">Alle registraties</span></div><div class="stat-number">${num(allKm)} <small>km hardgelopen</small></div><div class="key-value"><span>Afgeronde activiteiten</span><strong>${done.length}</strong></div><div class="key-value"><span>Sportminuten</span><strong>${num(minutes)}</strong></div><div class="key-value"><span>Langste gelopen afstand</span><strong>${num(Math.max(0,...runs.map(w=>w.actual.km)))} km</strong></div>${btn('Mijn gegevens exporteren','export-json','','ghost compact mt')}</section></div><section class="card mt"><div class="card-header"><h2>Trainingshistorie</h2><span class="tag muted">Laatste 40 activiteiten</span></div><div class="workout-list">${done.length?done.slice(0,40).map(w=>workoutCard(w)).join(''):'<div class="empty">Je eerste afgeronde training verschijnt hier.</div>'}</div></section>`;
+  }
+  function slotRow(s){return `<div class="slot-row" data-slot-id="${esc(s.id)}"><label>Dag<select name="day">${opts(Object.fromEntries(days.map((x,i)=>[i,x])),s.day)}</select></label><label>Sport<select name="sport">${opts(sports,s.sport)}</select></label><label>Begintijd<input name="time" type="time" value="${esc(s.time)}" required></label><label>Max. minuten<input name="minutes" type="number" min="15" max="300" value="${Number(s.minutes)}" required></label>${btn(icon('trash',16),'remove-slot','aria-label="Sportmoment verwijderen"','ghost icon-btn')}<label class="slot-kind"><input type="checkbox" name="long" ${s.kind==='long'?'checked':''}> Lange duurloop (alleen voor hardlopen)</label></div>`;}
+  function settingsPage(){
+    const p=state.profile||{name:'',goal:'fit',baseWeeklyKm:'',longestKm:'',pace:6.5,raceDate:'',autoAdapt:true,horizon:12};
+    const slots=state.profile?state.slots:[{id:uid(),day:1,time:'18:30',sport:'run',minutes:60,kind:'easy'},{id:uid(),day:3,time:'18:30',sport:'run',minutes:60,kind:'easy'},{id:uid(),day:6,time:'09:30',sport:'run',minutes:90,kind:'long'}];
+    return heading(state.profile?'Jouw doel. Jouw spelregels.':'Begin bij waar je nu staat.',state.profile?'Een collega kan dezelfde app gebruiken, met een volledig eigen plan.':'Vul je eigen startniveau in. Voorbeeldmomenten zijn nog geen persoonlijk advies.')+`<div class="settings-grid"><section class="card"><form id="profile-form"><div class="form-error" role="alert"></div><fieldset><legend>Persoonlijk doel</legend><div class="form-grid"><label>Voornaam<input name="name" maxlength="40" value="${esc(p.name)}" placeholder="Jouw voornaam" required></label><label>Mijn doel<select name="goal">${opts(goals,p.goal)}</select></label><label>Doeldatum (optioneel)<input name="raceDate" type="date" value="${esc(p.raceDate)}"><span class="field-help">Een datum forceert geen onhaalbare inhaalslag.</span></label><label>Rustig tempo (minuten per km)<input name="pace" type="number" min="3" max="15" step="0.1" value="${p.pace}" required><span class="field-help">6,5 betekent 6 minuten 30 seconden per km.</span></label><label>Gemiddeld hardlopen per week<input name="baseWeeklyKm" type="number" min="1" max="150" step="0.1" value="${p.baseWeeklyKm}" placeholder="Bijvoorbeeld 18" required><span class="field-help">Je werkelijke gemiddelde van de laatste 4 weken, niet je gewenste aantal.</span></label><label>Recent langste rustige loop (km)<input name="longestKm" type="number" min="1" max="150" step="0.1" value="${p.longestKm}" placeholder="Bijvoorbeeld 7" required><span class="field-help">Een afstand die je recent daadwerkelijk kon lopen.</span></label><label>Vooruit plannen<select name="horizon"><option value="12" ${p.horizon!==24?'selected':''}>12 weken</option><option value="24" ${p.horizon===24?'selected':''}>24 weken</option></select></label><label>Tijdzone<input readonly value="Europe/Amsterdam"><span class="field-help">Zomer- en wintertijd worden meegenomen.</span></label></div></fieldset><div class="form-separator"></div><fieldset><legend>Je vaste sportmomenten</legend><p class="small muted mb">Dit zijn beschikbare momenten. De afstand wordt begrensd door je niveau en beschikbare minuten. Er blijft 10 minuten ruimte rond een hardlooptraining.</p><div id="slot-rows">${slots.map(slotRow).join('')}</div>${btn(icon('plus',15)+' Sportmoment toevoegen','add-slot','','ghost compact')}</fieldset><div class="form-separator"></div><label class="checkline"><input name="autoAdapt" type="checkbox" ${p.autoAdapt?'checked':''}><span>Schema automatisch beoordelen na iedere registratie.<span class="field-help" style="display:block">Bij pijn of ziekte pauzeert de planning altijd, ook als dit uit staat.</span></span></label><div class="notice mt">Opslaan bouwt toekomstige, niet-vastgezette plantrainingen opnieuw op. Historie, handmatige activiteiten en vastgezette trainingen blijven bewaard. Dit schema is bedoeld als indicatieve basisopbouw, niet als wedstrijdgarantie.</div><button type="submit" class="btn primary">${state.profile?'Instellingen opslaan en schema opbouwen':'Mijn eerste schema maken'} ${icon('arrow',16)}</button></form></section><div class="stack"><section class="card"><div class="card-header"><h2>Jij bent de maatstaf.</h2>${icon('target',23)}</div><p class="small muted">Je hoeft geen marathon te willen lopen. Kies fit blijven, een kortere afstand of een langeafstandendoel. Je collega kiest onafhankelijk een eigen doel en eigen sportmomenten.</p><div class="divider"></div><p class="small muted">Vul nooit een hoger startniveau in om een ambitieus doel sneller in het schema te krijgen. Voor volledig beginnende lopers zonder huidige hardloopbasis bevat deze versie nog geen wandel-hardloopprogramma.</p></section><section class="card"><div class="card-header"><h2>Account en privacy</h2>${icon('shield',21)}</div><p class="small muted">${demo?'Je zit in de fictieve demo. Geen gegevens worden naar Supabase verstuurd.':'Je eigen sportgegevens worden opgeslagen in Supabase. Andere toegelaten gebruikers kunnen je planning niet ophalen via de normale app of database-API.'}</p><div class="button-row mt">${btn('Gegevens exporteren','export-json','','compact')}${btn('Uitloggen','logout','','compact')}</div><div class="divider"></div><p class="small muted">De projectbeheerder kan via Supabase beheerrechten gegevens inzien. Er is geen end-to-endversleuteling. Alleen de publieke appbestanden komen op GitHub, geen sportgegevens of wachtwoorden.</p></section><section class="card"><h3>Wat wordt niet automatisch ingelezen?</h3><p class="small muted mt">Deze versie haalt geen activiteiten uit Garmin of Strava op. Vul een gelopen training zelf in. Ook andere afspraken uit je priveagenda worden nog niet als bezette tijden ingelezen.</p></section></div></div>`;
+  }
+  function detailModal(id){
+    const w=state.workouts.find(x=>x.id===id);if(!w)return;const actual=w.actual;
+    showModal(w.title,`${dateLabel(w.date,{weekday:'long',year:'numeric'})} om ${w.time}`,`<div class="metric-banner"><div><strong>${num(w.km)} ${w.sport==='run'?'km':''}</strong><span>${w.sport==='run'?'gepland':'Afstand niet gebruikt'}</span></div><div><strong>${num(w.minutes)} min</strong><span>geplande tijdsduur</span></div></div>${tags(w)}${actual?`<div class="notice mt"><strong>Geregistreerd:</strong> ${num(actual.km)} km / ${num(actual.minutes)} minuten. Inspanning ${actual.rpe}/10.${actual.notes?'<br>'+esc(actual.notes):''}</div>`:''}${w.adaptation?`<div class="notice mt">${esc(w.adaptation)}</div>`:''}<p class="small muted mt">${w.kind==='long'?'Rustige duurloop. Afstand is ondergeschikt aan hoe het gaat; forceer de planning niet.':w.sport==='run'?'Rustig hardlopen. Deze basisversie plant geen snelle interval- of wedstrijdtrainingen.':'Dit sportmoment blijft een tijdsblok; prestaties worden niet omgerekend naar hardloopkilometers.'}</p><div class="modal-actions">${['planned','held'].includes(w.status)?btn('Aanpassen','edit',`data-id="${id}"`,''):''}${w.date<=isoDay()&&w.status!=='cancelled'?btn(actual?'Registratie wijzigen':'Training registreren','log',`data-id="${id}"`,'primary'):''}</div>`);
+  }
+  function logModal(id){
+    const w=state.workouts.find(x=>x.id===id);if(!w)return;const a=w.actual;
+    if(w.date>isoDay()){detailModal(id);return;}
+    showModal('Wat heb je echt gedaan?',`${w.title} - ${dateLabel(w.date,{weekday:'long'})}`,`<div class="metric-banner"><div><strong>${num(a?.plannedKm??w.km)} km</strong><span>oorspronkelijk gepland</span></div><div><strong>${num(a?.plannedMinutes??w.minutes)} min</strong><span>geplande tijdsduur</span></div></div><form id="workout-log" data-id="${id}"><div class="form-error" role="alert"></div><div class="form-grid"><label>Werkelijke afstand (km)<input name="km" type="number" min="0" max="300" step="0.1" value="${a?.km??w.km}" required><span class="field-help">Bij kracht of padel kun je 0 invullen.</span></label><label>Werkelijke duur (minuten)<input name="minutes" type="number" min="0" max="1440" step="1" value="${a?.minutes??w.minutes}" required></label><label>Hoe zwaar voelde het?<select name="rpe">${opts({'1':'1 - zeer licht','2':'2 - heel licht','3':'3 - licht','4':'4 - ontspannen','5':'5 - gemiddeld','6':'6 - stevig','7':'7 - zwaar','8':'8 - erg zwaar','9':'9 - bijna maximaal','10':'10 - maximaal'},a?.rpe??5)}</select></label><label>Reden / hoe ging het?<select name="reason">${opts({normal:'Volgens plan / voelde goed',time:'Minder tijd beschikbaar',fatigue:'Vermoeid / te zwaar',weather:'Weer of omstandigheden',pain:'Pijn of blessure',illness:'Ziek / niet fit',missed:'Training gemist',other:'Andere reden'},a?.reason??'normal')}</select></label><label class="span2">Notitie (optioneel)<textarea name="notes" maxlength="1000" placeholder="Bijvoorbeeld: moest eerder terug voor een afspraak.">${esc(a?.notes||'')}</textarea></label></div><p class="small muted mt">Niet gesport? Vul 0 km en 0 minuten in. De planner maakt geen inhaalschuld. Bij pijn of ziekte worden toekomstige trainingen gepauzeerd.</p><div class="modal-actions">${btn('Annuleren','close-modal')}<button type="submit" class="btn primary">Opslaan en ${state.profile.autoAdapt?'schema beoordelen':'registreren'}</button></div></form>`);
+  }
+  function workoutForm(w,isNew){
+    showModal(isNew?'Activiteit toevoegen':'Training aanpassen','Dit verandert alleen deze activiteit, niet je wekelijkse vaste momenten.',`<form id="${isNew?'workout-add':'workout-edit'}" ${isNew?'':`data-id="${w.id}"`}><div class="form-error" role="alert"></div><div class="form-grid"><label class="span2">Naam<input name="title" maxlength="80" value="${esc(w.title||'')}" required></label><label>Sport<select name="sport">${opts(sports,w.sport||'run')}</select></label><label>Datum<input name="date" type="date" value="${esc(w.date)}" required></label><label>Begintijd<input name="time" type="time" value="${esc(w.time||'18:30')}" required></label><label>Duur (minuten)<input name="minutes" type="number" min="15" max="300" value="${w.minutes||45}" required></label><label>Afstand (km)<input name="km" type="number" min="0" max="100" step="0.1" value="${w.km||0}" required></label><label>Soort loop<select name="kind">${opts({easy:'Rustig / gewone activiteit',long:'Lange duurloop'},w.kind||'easy')}</select></label><label class="checkline span2"><input name="locked" type="checkbox" ${w.locked?'checked':''}><span>Deze hele training vastzetten, ook de afstand.<span class="field-help" style="display:block">Normaal blijven alleen datum en tijd vast. Een veiligheidspauze geldt ook voor vastgezette trainingen.</span></span></label></div><div class="modal-actions">${isNew?'':btn('Verwijderen','cancel-workout',`data-id="${w.id}"`,'danger')}${btn('Annuleren','close-modal')}<button type="submit" class="btn primary">${isNew?'Activiteit toevoegen':'Wijziging opslaan'}</button></div></form>`);
+  }
+  function shareModal(){
+    showModal('Je sportagenda, ook in je eigen agenda.','Een prive-abonnement voor Apple Agenda, Google Agenda of Outlook.',`<div class="notice">Dit is een koppeling in <strong>een richting</strong>: SportKompas &rarr; je agenda. Wijzigingen verschijnen na verversen door je agenda-app, niet gegarandeerd direct. Een agenda-afspraak wijzigen stuurt niets terug naar SportKompas.</div><label class="checkline"><input id="share-minimal" type="checkbox" checked><span>Minimale informatie delen: alleen "Sporttraining" en datum/tijd.<span class="field-help" style="display:block">Zonder dit vinkje worden sportnaam en geplande afstand zichtbaar. Nooit je notities, inspanning, e-mail of klachtreden.</span></span></label><div class="button-row mt">${btn(icon('lock',15)+' Nieuwe privelink maken','create-share',demo?'disabled':'','primary')}${btn('Bestaande link intrekken','revoke-share',demo?'disabled':'','danger')}</div><p class="small muted mt">Een nieuwe link vervangt de vorige. Iedereen met de link kan deze beperkte agenda lezen. Behandel de link als een wachtwoord. Kopieer hem nu: de server bewaart alleen een hash.</p>${demo?'<div class="notice mt">In de demo kun je een agenda-bestand downloaden. Het live abonnement werkt pas na installatie van de Supabase-functies.</div>':''}<div id="share-result">${shareUrl?linkHTML(shareUrl):''}</div><div class="divider"></div><details class="faq"><summary>Toevoegen aan mijn agenda</summary><p><strong>iPhone / iPad:</strong> Agenda &rarr; Agenda\'s &rarr; Voeg agenda toe &rarr; Voeg agenda-abonnement toe. Plak de link en kies je account.</p><p><strong>Google Agenda:</strong> op een computer bij Andere agenda\'s op + klikken &rarr; Via URL. Plak de HTTPS-link.</p><p><strong>Outlook:</strong> Agenda toevoegen &rarr; Abonneren via internet. Plak de HTTPS-link.</p><p>Je agenda-app bepaalt het verversmoment. Een ingetrokken link stopt toekomstige toegang, maar wist eerder gekopieerde informatie niet.</p></details><div class="divider"></div><div class="button-row">${btn('Los .ics-bestand downloaden','export-ics','','compact')}</div><p class="small muted mt">Een los bestand is een momentopname. Het synchroniseert daarna niet.</p>`);
+  }
+  function linkHTML(url){return `<div class="link-box"><label>Persoonlijke agenda-URL<input id="feed-url" readonly value="${esc(url)}"></label><div class="button-row">${btn('Kopieer link','copy-share','','primary compact')}<a class="btn compact" href="${esc(url.replace(/^https:/,'webcal:'))}">Open als agenda-abonnement</a></div></div>`;}
+  function download(text,type,name){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  function openRecover(){showModal('Wachtwoord herstellen','Gebruik je eigen e-mailadres. Je krijgt een link als het account bestaat.',`<form id="recover-form"><div class="form-error" role="alert"></div><label>E-mailadres<input name="email" type="email" autocomplete="username" required></label><div class="modal-actions">${btn('Annuleren','close-modal')}<button type="submit" class="btn primary">Herstellink sturen</button></div></form>`);}
+  function openPassword(){showModal('Stel je wachtwoord in','Kies een sterk, uniek wachtwoord voor dit persoonlijke account.',`<form id="password-form"><div class="form-error" role="alert"></div><label>Nieuw wachtwoord<input name="password" type="password" minlength="12" autocomplete="new-password" required></label><label class="mt">Herhaal wachtwoord<input name="confirm" type="password" minlength="12" autocomplete="new-password" required></label><div class="modal-actions"><button type="submit" class="btn primary">Wachtwoord opslaan</button></div></form>`,{locked:true});}
+  async function sync(silent=false){if(demo){if(!silent)toast('Dit is een lokale demo; er is niets naar Supabase verstuurd.');return;}if(!state||busy)return;try{const data=await SK.DB.load();state=data.state;syncLabel='Gesynchroniseerd';render();if(!silent)toast('Je nieuwste gegevens zijn geladen.');}catch(e){if(/sessie|geen toegang/.test(e.message)){await SK.DB.logout();state=null;renderAuth();}if(!silent)toast(e.message);}}
+  async function handleAction(el){
+    const action=el.dataset.action,id=el.dataset.id;
+    if(busy&&action!=='copy-share')return;
+    if(action==='close-modal'){closeModal();return;}
+    if(action==='start-demo'){demo=true;state=SK.demoState();view='overview';anchor=selectedDay=isoDay();render();return;}
+    if(action==='reset-demo'){if(confirm('Fictieve demo terugzetten? Je wijzigingen in deze demo verdwijnen.')){state=SK.demoState();render();}return;}
+    if(action==='recover'){openRecover();return;}
+    if(action==='logout'){if(!demo)await SK.DB.logout();demo=false;state=null;shareUrl='';closeModal();renderAuth();return;}
+    if(!state)return;
+    if(action==='nav'){view=el.dataset.view;render();scrollTo(0,0);return;}
+    if(action==='sync'){await sync();return;}
+    if(action==='day'){selectedDay=el.dataset.date;render();return;}
+    if(action==='detail'){detailModal(id);return;}
+    if(action==='log'){logModal(id);return;}
+    if(action==='edit'){const w=state.workouts.find(x=>x.id===id);if(w)workoutForm(w,false);return;}
+    if(action==='add-workout'){workoutForm({date:el.dataset.date||isoDay(),title:'Extra sportmoment',sport:'run',time:'18:30',minutes:45,km:5},true);return;}
+    if(action==='add-slot'){document.getElementById('slot-rows')?.insertAdjacentHTML('beforeend',slotRow({id:uid(),day:0,time:'18:30',minutes:45,sport:'strength',kind:'easy'}));return;}
+    if(action==='remove-slot'){el.closest('.slot-row').remove();return;}
+    if(action==='share'){if(!state.profile){toast('Maak eerst je persoonlijke schema.');return;}shareModal();return;}
+    if(action==='create-share'){
+      if(demo)return;el.disabled=true;
+      try{const data=await SK.DB.invoke('calendar-link',{action:'create',minimal:document.getElementById('share-minimal').checked});const u=new URL(data.url);if(u.origin!==new URL(SPORT_CONFIG.supabaseUrl).origin)throw new Error('Onverwachte agenda-URL.');shareUrl=data.url;document.getElementById('share-result').innerHTML=linkHTML(shareUrl);toast('Privelink gemaakt. Een eventuele oude link is ongeldig.');}finally{el.disabled=false;}return;
+    }
+    if(action==='revoke-share'){if(demo)return;if(!confirm('De bestaande agenda-link intrekken? Je agenda kan daarmee daarna niet meer verversen.'))return;await SK.DB.invoke('calendar-link',{action:'revoke'});shareUrl='';document.getElementById('share-result').innerHTML='';toast('De agendalink is ingetrokken.');return;}
+    if(action==='copy-share'){try{await navigator.clipboard.writeText(shareUrl);toast('Agendalink gekopieerd.');}catch{document.getElementById('feed-url')?.select();toast('Selecteer en kopieer de link met je kopieerfunctie.');}return;}
+    if(action==='export-ics'){download(SK.calendarText(state,{owner:demo?'demo':SK.DB.user?.id,minimal:document.getElementById('share-minimal')?.checked??true}),'text/calendar;charset=utf-8','sportkompas-agenda.ics');toast('Momentopname gedownload; dit bestand synchroniseert niet.');return;}
+    if(action==='export-json'){download(JSON.stringify({exportedAt:new Date().toISOString(),state},null,2),'application/json','sportkompas-backup-'+isoDay()+'.json');toast('Persoonlijke gegevens gedownload. Bewaar dit bestand veilig.');return;}
+    if(action==='cal-mode'){calendarMode=el.dataset.mode;render();return;}
+    if(action==='cal-today'){anchor=isoDay();render();return;}
+    if(action==='cal-prev'||action==='cal-next'){const delta=action==='cal-prev'?-1:1;if(calendarMode==='week')anchor=addDays(anchor,delta*7);else{const d=new Date(anchor.slice(0,7)+'-01T12:00:00Z');d.setUTCMonth(d.getUTCMonth()+delta);anchor=d.toISOString().slice(0,10);}render();return;}
+    if(action==='recalculate'){const c=clone(state);SK.adaptPlan(c);await commit(c,'Schema opnieuw beoordeeld.');return;}
+    if(action==='resume'){showModal('Bewust opnieuw beginnen','Bevestig zelf een passend huidig startniveau. De app kan herstel niet medisch beoordelen.',`<form id="resume-form"><div class="form-error" role="alert"></div><div class="notice warning">Hervat niet om gemiste kilometers in te halen. Bespreek aanhoudende klachten met een deskundige.</div><div class="form-grid"><label>Passend weektotaal (km)<input name="weekly" type="number" min="1" max="150" step="0.1" placeholder="Jouw huidige basis" required></label><label>Passende langste loop (km)<input name="longest" type="number" min="1" max="150" step="0.1" placeholder="Jouw huidige niveau" required></label></div><label class="checkline mt"><input type="checkbox" required><span>Ik beoordeel zelf of hervatten passend is en bevestig dit startniveau.</span></label><div class="modal-actions">${btn('Op pauze blijven','close-modal')}<button type="submit" class="btn primary">Hervatten en opnieuw plannen</button></div></form>`);return;}
+    if(action==='cancel-workout'){if(!confirm('Deze geplande activiteit verwijderen? De agendakoppeling krijgt een annulering.'))return;const c=clone(state);SK.cancelWorkout(c,id);await commit(c,'Activiteit verwijderd.');closeModal();return;}
+  }
+  document.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(el){event.preventDefault();handleAction(el).catch(e=>toast(e.message));}else if(event.target.classList.contains('modal-overlay')&&!modalLocked)closeModal();});
+  document.addEventListener('keydown',event=>{if(!modalRoot.firstChild)return;if(event.key==='Escape'&&!modalLocked)closeModal();if(event.key==='Tab'){const nodes=[...modalRoot.querySelectorAll('button:not(:disabled),a,input:not(:disabled),select:not(:disabled),textarea:not(:disabled)')].filter(x=>x.offsetParent!==null);const first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}});
+  document.addEventListener('submit',async event=>{
+    event.preventDefault();if(busy)return;const form=event.target,fd=new FormData(form);busy=true;const submit=form.querySelector('[type=submit]');if(submit)submit.disabled=true;
+    let shouldClose=false;
+    try{
+      if(form.id==='login-form'){const result=await SK.DB.login(String(fd.get('email')).trim(),String(fd.get('password')));demo=false;state=result.state;view=state.profile?'overview':'settings';render();}
+      else if(form.id==='profile-form'){
+        const slots=[...form.querySelectorAll('.slot-row')].map(row=>({id:row.dataset.slotId,day:Number(row.querySelector('[name=day]').value),sport:row.querySelector('[name=sport]').value,time:row.querySelector('[name=time]').value,minutes:Number(row.querySelector('[name=minutes]').value),kind:row.querySelector('[name=long]').checked?'long':'easy'}));
+        const p={name:String(fd.get('name')).trim(),goal:fd.get('goal'),raceDate:fd.get('raceDate')||'',baseWeeklyKm:Number(fd.get('baseWeeklyKm')),longestKm:Number(fd.get('longestKm')),pace:Number(fd.get('pace')),autoAdapt:fd.get('autoAdapt')==='on',timezone:'Europe/Amsterdam',horizon:Number(fd.get('horizon'))};
+        SK.validateProfile(p,slots);if(p.raceDate&&p.raceDate<isoDay())throw new Error('Kies een toekomstige doeldatum of laat deze leeg.');
+        const first=!state.profile,c=clone(state);c.profile=p;c.slots=slots;SK.generatePlan(c,{weeks:p.horizon});await commit(c,'Je persoonlijke schema is opgeslagen.');if(first){view='overview';render();scrollTo(0,0);}
+      }
+      else if(form.id==='workout-log'){const c=clone(state);SK.logWorkout(c,form.dataset.id,{km:Number(fd.get('km')),minutes:Number(fd.get('minutes')),rpe:Number(fd.get('rpe')),reason:fd.get('reason'),notes:fd.get('notes')});await commit(c,c.hold?'Training opgeslagen. De planning staat op pauze.':'Training opgeslagen. Bekijk de aanpassingen bij Coach.');shouldClose=true;}
+      else if(form.id==='workout-add'||form.id==='workout-edit'){
+        const c=clone(state),patch={title:String(fd.get('title')).trim(),date:fd.get('date'),time:fd.get('time'),sport:fd.get('sport'),kind:fd.get('kind'),minutes:Number(fd.get('minutes')),km:Number(fd.get('km')),locked:fd.get('locked')==='on'};
+        if(!patch.title)throw new Error('Vul een naam in.');
+        if(form.id==='workout-add'){const w=SK.makeWorkout(patch);SK.checkMove(c,w);if(c.hold)w.status='held';c.workouts.push(w);SK.changeLog(c,'Activiteit toegevoegd','Handmatig sportmoment toegevoegd; niet meegerekend als nieuwe hardloopbasis.',[],new Date());}
+        else SK.editWorkout(c,form.dataset.id,patch);
+        await commit(c,'Activiteit opgeslagen.');shouldClose=true;
+      }
+      else if(form.id==='recover-form'){await SK.DB.recover(String(fd.get('email')).trim());toast('Als dit account bestaat, ontvang je een herstellink.');shouldClose=true;}
+      else if(form.id==='password-form'){if(fd.get('password')!==fd.get('confirm'))throw new Error('De wachtwoorden zijn niet hetzelfde.');await SK.DB.password(String(fd.get('password')));recovery=false;history.replaceState(null,'',location.pathname);const result=await SK.DB.load();demo=false;state=result.state;view=state.profile?'overview':'settings';render();toast('Je wachtwoord is ingesteld.');shouldClose=true;}
+      else if(form.id==='resume-form'){const c=clone(state);SK.resumePlan(c,fd.get('weekly'),fd.get('longest'));await commit(c,'Je planning is opnieuw opgebouwd.');shouldClose=true;}
+      else if(form.id==='coach-form'){
+        const question=String(fd.get('question')||'').trim();if(!question||question.length>1200||fd.get('consent')!=='on')throw new Error('Vul een vraag in en geef toestemming voor deze AI-aanroep.');
+        let answer;
+        if(demo)answer='Dit is een lokale demonstratie, geen antwoord van een taalmodel.\n\nDe automatische planner gebruikt je geregistreerde afstand, inspanning en reden. Bij 5 van 10 km door tijdgebrek kan een komende vergelijkbare loop worden teruggebracht, zonder de ontbrekende 5 km elders toe te voegen. De precieze wijzigingen staan links in het overzicht.\n\nVoor echte AI-uitleg moet de beheerder de optionele ai-coach-functie activeren. Dat is niet nodig voor het automatisch aanpassen van je schema.';
+        else{if(!SPORT_CONFIG.enableAI)throw new Error('De AI-koppeling is nog niet geactiveerd.');const result=await SK.DB.invoke('ai-coach',{question,consent:true});answer=result.answer;}
+        const box=document.getElementById('ai-answer');box.className='ai-output';box.textContent=answer;
+      }
+    }catch(e){showError(form,e.message);}
+    finally{busy=false;if(submit?.isConnected)submit.disabled=false;if(shouldClose)closeModal();}
+  });
+  async function boot(){
+    renderAuth();
+    if(SK.DB.configured())try{
+      const c=await SK.DB.connect();c.auth.onAuthStateChange((event)=>{
+        if(event==='PASSWORD_RECOVERY'){recovery=true;setTimeout(openPassword,0);}
+        if(event==='SIGNED_OUT'&&!demo){state=null;shareUrl='';modalRoot.innerHTML='';document.body.style.overflow='';renderAuth();}
+      });
+      const {data}=await c.auth.getSession();
+      if(data.session){if(recovery)openPassword();else{const result=await SK.DB.load();state=result.state;view=state.profile?'overview':'settings';render();}}
+    }catch(e){toast(e.message);}
+    if('serviceWorker'in navigator&&['https:','http:'].includes(location.protocol)&&!globalThis.SPORT_PREVIEW)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state&&!demo&&!busy&&!modalRoot.firstChild&&Date.now()-lastFocusSync>30000){lastFocusSync=Date.now();sync(true);}});
+  window.addEventListener('offline',()=>{if(state){syncLabel='Offline';render();toast('Offline. Gegevens kunnen pas met verbinding worden opgeslagen.');}});
+  window.addEventListener('online',()=>{if(state&&!demo&&!modalRoot.firstChild)sync(true);});
+  boot();
+})(globalThis.SK ||= {});
+</script></body>
+</html>
