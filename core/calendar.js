@@ -15,7 +15,7 @@
       const start=SK.zonedInstant(w.date,w.time,state.profile?.timezone||'Europe/Amsterdam');
       const end=new Date(+start+Math.max(1,w.minutes)*60000);
       const cancelled=['cancelled','held','skipped'].includes(w.status);
-      const summary=minimal?'Sporttraining':`${w.title}${w.sport==='run'?` - ${w.km} km`:''}`;
+      const summary=minimal?'Sporttraining':`${w.title}${w.sport==='run'?` - ${Number(w.km||0).toFixed(2).replace('.',',')} km`:''}`;
       lines.push('BEGIN:VEVENT',`UID:${w.id}.${owner}@sportkompas`, `DTSTAMP:${stamp(w.updatedAt||now)}`,`LAST-MODIFIED:${stamp(w.updatedAt||now)}`,`SEQUENCE:${w.sequence||0}`,`DTSTART:${stamp(start)}`,`DTEND:${stamp(end)}`,`SUMMARY:${escapeICS(summary)}`,`DESCRIPTION:${escapeICS('Bekijk en wijzig deze training in MijnLoop. Dit is een alleen-lezen agenda-abonnement.')}`,`STATUS:${cancelled?'CANCELLED':'CONFIRMED'}`,'CLASS:PRIVATE',`TRANSP:${cancelled?'TRANSPARENT':'OPAQUE'}`,'END:VEVENT');
     }
     lines.push('END:VCALENDAR');return lines.map(foldLine).join('\r\n')+'\r\n';

@@ -1,4 +1,4 @@
-# MijnLoop v29
+# MijnLoop v28
 
 MijnLoop gebruikt een eigen eenvoudige gebruikersnaam/wachtwoord-login en synchroniseert accounts en sportdata centraal via Supabase. Supabase Auth wordt niet gebruikt.
 
@@ -15,14 +15,17 @@ De bestaande beheerfuncties blijven behouden: accounts inzien/bewerken, wachtwoo
 ## Synchronisatie
 Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner zelf blijft lokaal berekend.
 
-## v29
+## v28
 - beheerlogin samengevoegd met de normale login;
 - zichtbare beheerlink verwijderd van login en account/privacy;
 - adminrol wordt automatisch herkend;
 - beheerderslogout wist ook de normale beheerderssessie;
 - directe beheerpagina zonder beheerderssessie gaat terug naar de normale login;
-- activiteiten ondersteunen nu afstanden op twee decimalen;
-- werkelijke duur kan als mm:ss worden ingevoerd, bijvoorbeeld 29:44;
-- gemiddeld hardlooptempo wordt tijdens invoer automatisch berekend;
-- exacte duur en tempo blijven zichtbaar in historie en details;
-- service-worker cache verhoogd naar v29.
+- service-worker cache verhoogd naar v28.
+
+
+## v30 - uniforme afstand, duur en tempo
+- Kilometers worden overal tot twee decimalen verwerkt en als twee decimalen weergegeven.
+- Duur wordt overal als MM:SS weergegeven; kloktijden blijven HH:MM.
+- Toekomstige hardlooptrainingen tonen afstand, aanbevolen duur en gemiddeld gepland tempo per kilometer.
+- Jouw totaal toont sporttijd als MM:SS in plaats van decimale minuten.

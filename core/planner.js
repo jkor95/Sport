@@ -2,6 +2,8 @@
   'use strict';
   const {isoDay, addDays, dayIndex, monday, daysBetween, uid, roundKm, clone, sports, zonedInstant} = SK;
   const validStatuses = new Set(['planned','done','skipped','cancelled','held']);
+  const kmText=n=>Number(Math.max(0,Number(n)||0)).toFixed(2).replace('.',',');
+  const durationText=minutes=>{const sec=Math.max(0,Math.round((Number(minutes)||0)*60));return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;};
   const finalStatuses = new Set(['done','skipped','cancelled']);
   const notificationDefaults = Object.freeze({enabled:true,appBadge:true,systemNotifications:true,upcoming:true,upcomingHours:4,pending:true,pendingDelayMinutes:30});
   function freshState() {
@@ -234,7 +236,7 @@
     let choice=bank[preferred];
     if(choice.need>km){const fitting=bank.filter(x=>x.need<=km);choice=fitting.length?fitting.at(-1):bank[0];}
     const faster=p.goal==='fit'?25:p.goal==='marathon'?40:p.goal==='half'?45:55, lo=Math.max(180,easySec-faster-15),hi=Math.max(lo+5,easySec-faster+5);
-    return {summary:choice.s,detail:`12-15 min rustig inlopen, ${choice.d}, daarna rustig uitlopen tot ongeveer ${roundKm(km)} km totaal. Richttempo snelle stukken ongeveer ${paceText(lo/60)}-${paceText(hi/60)}/km als dat gecontroleerd voelt.`,effort:phase==='piek'?'RPE 7-8/10 - stevig maar controleerbaar':'RPE 7/10 - controle houden'};
+    return {summary:choice.s,detail:`12-15 min rustig inlopen, ${choice.d}, daarna rustig uitlopen tot ongeveer ${kmText(roundKm(km))} km totaal. Richttempo snelle stukken ongeveer ${paceText(lo/60)}-${paceText(hi/60)}/km als dat gecontroleerd voelt.`,effort:phase==='piek'?'RPE 7-8/10 - stevig maar controleerbaar':'RPE 7/10 - controle houden'};
   }
   function runAllocations(p,runs,target,wi){
     const out=new Map(), normalized=runs.map(s=>({...s,kind:normalizeKind(s.kind)}));
@@ -399,7 +401,7 @@
             if(comparable&&left>0&&left<=14&&r.actual.km>0) {
               const forgiving=['time','weather'].includes(r.actual.reason)?1.20:1.08;
               km=Math.min(km,r.actual.km*forgiving);
-              reasons.push(`Vorige vergelijkbare loop: ${r.actual.km} van ${r.actual.plannedKm} km. Geen inhaalkilometers.`);
+              reasons.push(`Vorige vergelijkbare loop: ${kmText(r.actual.km)} van ${kmText(r.actual.plannedKm)} km. Geen inhaalkilometers.`);
             }
           }
           const strongest=strongRuns.find(r=>{const left=daysBetween(r.date,w.date);return left>0&&left<=10&&(r.slotId&&w.slotId===r.slotId||normalizeKind(r.kind)===normalizeKind(w.kind));});
@@ -434,7 +436,7 @@
     w.actual={km,minutes,rpe,reason:actual.reason,notes:String(actual.notes||'').slice(0,1000),plannedKm:old?.plannedKm??w.km,plannedMinutes:old?.plannedMinutes??w.minutes,loggedAt:now.toISOString(),...(w.external?{needsReview:false}:{})};
     w.status=km===0&&minutes===0?'skipped':'done';touch(w,now.toISOString());
     if(actual.reason==='pain'||actual.reason==='illness') {state.hold=true;state.holdSince=now.toISOString();}
-    const trigger=w.sport==='run'?`${w.actual.km} van ${w.actual.plannedKm} km geregistreerd.`:`${w.actual.minutes} minuten ${sports[w.sport].toLowerCase()} geregistreerd.`;
+    const trigger=w.sport==='run'?`${kmText(w.actual.km)} van ${kmText(w.actual.plannedKm)} km geregistreerd.`:`${durationText(w.actual.minutes)} ${sports[w.sport].toLowerCase()} geregistreerd.`;
     if(state.profile.autoAdapt||state.hold) adaptPlan(state,{now,trigger});
     else changeLog(state,'Training opgeslagen','Automatisch aanpassen staat uit. Beoordeel je schema via Coach.',[],now);
     return state;
@@ -493,7 +495,7 @@
       if(p.goal!=='fit'&&left>0){
         const total=clamp(weeks,4,52), model=OFFLINE_MODELS[p.goal][total], peakIndex=Math.max(0,...model.map((w,i)=>w.phase==='piek'?i:0));
         const possible=targetForWeek(p,peakIndex,monday(today),total), desired=peakLongTarget(p);
-        if(possible.longKm<desired-1) notes.push(`Met je huidige langste loop en ${weeks} weken tot je doel komt de veilige voorgerekende piekduurloop rond ${possible.longKm} km uit in plaats van ${desired} km. De app bouwt wel maximaal op binnen dit venster, maar forceert geen onrealistische sprong.`);
+        if(possible.longKm<desired-1) notes.push(`Met je huidige langste loop en ${weeks} weken tot je doel komt de veilige voorgerekende piekduurloop rond ${kmText(possible.longKm)} km uit in plaats van ${kmText(desired)} km. De app bouwt wel maximaal op binnen dit venster, maar forceert geen onrealistische sprong.`);
       }
     }
     if(planMode(p)==='fixed'&&state.planEnd&&daysBetween(today,state.planEnd)<21) notes.push('Je planning loopt binnenkort af. Bouw in Instellingen opnieuw verder op; afgeronde trainingen blijven bewaard.');
@@ -522,7 +524,7 @@
       if(!w||w.status!=='planned')continue;
       const start=workoutStartInstant(w),startMs=start.getTime(),duration=Math.max(0,Number(w.minutes)||0)*60000,endMs=startMs+duration;
       if(pref.upcoming&&startMs>nowMs&&startMs-nowMs<=pref.upcomingHours*3600000){
-        items.push({key:`upcoming:${w.id}:${w.date}:${w.time}`,category:'upcoming',workoutId:w.id,date:w.date,time:w.time,title:'Training komt eraan',body:`${w.title} om ${w.time}${w.sport==='run'&&w.km?` · ${roundKm(w.km)} km`:''}.`,sortAt:startMs});
+        items.push({key:`upcoming:${w.id}:${w.date}:${w.time}`,category:'upcoming',workoutId:w.id,date:w.date,time:w.time,title:'Training komt eraan',body:`${w.title} om ${w.time}${w.sport==='run'&&w.km?` · ${kmText(roundKm(w.km))} km`:''}.`,sortAt:startMs});
       }
       if(pref.pending&&endMs+pref.pendingDelayMinutes*60000<=nowMs&&nowMs-endMs<=7*86400000){
         items.push({key:`pending:${w.id}:${w.date}:${w.time}`,category:'pending',workoutId:w.id,date:w.date,time:w.time,title:'Training nog invullen',body:`${w.title} stond gepland op ${w.date} om ${w.time}. Vul in wat je werkelijk hebt gedaan.`,sortAt:endMs});
