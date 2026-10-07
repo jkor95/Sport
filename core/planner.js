@@ -26,10 +26,9 @@
     const seen = new Set();
     for(const s of slots) {
       if (seen.has(s.id)) throw new Error('Een vast sportmoment staat dubbel.'); seen.add(s.id);
-      if (!Number.isInteger(+s.day) || +s.day < 0 || +s.day > 6 || !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time) || !(+s.minutes>=15 && +s.minutes<=300) || !sports[s.sport]) throw new Error('Controleer dag, begintijd, sport en tijdsduur van je vaste momenten.');
+      if (!Number.isInteger(+s.day) || +s.day < 0 || +s.day > 6 || !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time) || !sports[s.sport]) throw new Error('Controleer dag, begintijd en sport van je vaste momenten.');
       if (s.sport==='run' && !['easy','short','long','interval'].includes(s.kind||'short')) throw new Error('Kies voor iedere hardloopdag kort, lang of interval.');
-      if (SK.clockMinutes(s.time)+Number(s.minutes)>1440) throw new Error('Laat een training voor middernacht eindigen.');
-      for(const t of slots) if(t.id!==s.id && +t.day===+s.day && overlap(s,t)) throw new Error('Twee vaste sportmomenten overlappen elkaar.');
+      for(const t of slots) if(t.id!==s.id && +t.day===+s.day && t.time===s.time) throw new Error('Twee vaste sportmomenten hebben exact dezelfde begintijd.');
     }
     if(p.raceDate && !/^\d{4}-\d{2}-\d{2}$/.test(p.raceDate)) throw new Error('Ongeldige doeldatum.');
   }
@@ -79,8 +78,9 @@
   }
   function taperWeeks(goal,total) {
     if(total<=2) return 0;
-    if(goal==='marathon') return total>=6?2:1;
-    if(goal==='half'||goal==='10k'||goal==='5k') return 1;
+    if(goal==='marathon') return total>=8?3:(total>=6?2:1);
+    if(goal==='half') return total>=8?2:1;
+    if(goal==='10k'||goal==='5k') return 1;
     return 0;
   }
   const OFFLINE_MODEL_CACHE={};
@@ -130,39 +130,67 @@
       marathon:Math.max(longest,32)
     }[p.goal]||longest);
   }
+  function maxLongBuildStep(goal){
+    return {fit:1,'5k':1,'10k':1.5,half:2,marathon:3}[goal]||1;
+  }
+  function longRunTargetForModel(p,total,modelIndex){
+    const longest=Number(p.longestKm), modelSet=OFFLINE_MODELS[p.goal]?.[total]||buildOfflineModel(p.goal,total);
+    const taperStart=modelSet.findIndex(x=>x.phase==='taper'), peakIndex=taperStart<0?total-1:Math.max(0,taperStart-1);
+    const buildWeeks=modelSet.slice(0,peakIndex+1).filter(x=>!x.recovery);
+    const buildSteps=Math.max(0,buildWeeks.length-1);
+    const desiredPeak=peakLongTarget(p), achievablePeak=Math.min(desiredPeak,longest+buildSteps*maxLongBuildStep(p.goal),32);
+    if(modelIndex>peakIndex){
+      const n=modelIndex-peakIndex, taperFactors=p.goal==='marathon'?[.62,.40,.22]:p.goal==='half'?[.55,.30]:[.45];
+      const factor=taperFactors[Math.min(n-1,taperFactors.length-1)]||.30;
+      return {km:Math.max(3,achievablePeak*factor),peakKm:achievablePeak,peakIndex};
+    }
+    const before=buildWeeks.filter(x=>x.index<=modelIndex).length;
+    const progress=buildSteps<=0?1:clamp((before-1)/buildSteps,0,1);
+    let km=longest+(achievablePeak-longest)*progress;
+    const current=modelSet[modelIndex];
+    if(current?.recovery){
+      const prevBuild=buildWeeks.filter(x=>x.index<modelIndex).at(-1);
+      if(prevBuild){
+        const prevBefore=buildWeeks.filter(x=>x.index<=prevBuild.index).length;
+        const prevProgress=buildSteps<=0?1:clamp((prevBefore-1)/buildSteps,0,1);
+        const prevKm=longest+(achievablePeak-longest)*prevProgress;
+        km=Math.max(Math.min(longest,prevKm),prevKm*.78);
+      }
+    }
+    return {km:Math.min(32,km),peakKm:achievablePeak,peakIndex};
+  }
   function targetForWeek(p, wi, firstWeek, planWeeks=null) {
     const weekStart=addDays(firstWeek,wi*7), base=Number(p.baseWeeklyKm), longest=Number(p.longestKm);
     const mode=planMode(p), toGoal=p.raceDate?Math.ceil(daysBetween(weekStart,p.raceDate)/7):null;
-    let total=clamp(Number(planWeeks)||Number(p.horizon)||12,4,52), modelIndex=clamp(wi,0,total-1), preGoalBase=false;
+    const requested=Math.max(1,Number(planWeeks)||Number(p.horizon)||12);
+    let total=clamp(requested,4,52), modelIndex=clamp(wi,0,total-1), preGoalBase=false;
     if(mode==='goal'&&p.raceDate){
-      const initial=Math.max(1,Math.ceil(daysBetween(firstWeek,p.raceDate)/7));
-      if(initial>52){
+      const initialFromWeek=Math.max(1,Math.ceil(daysBetween(firstWeek,p.raceDate)/7));
+      if(initialFromWeek>52){
         if(toGoal>52){preGoalBase=true;total=52;modelIndex=0;}
         else {total=52;modelIndex=clamp(52-Math.max(1,toGoal),0,51);}
       } else {
-        total=clamp(initial,4,52);
-        const skipped=Math.max(0,4-initial);
+        total=clamp(requested,4,52);
+        const skipped=Math.max(0,4-requested);
         modelIndex=clamp(wi+skipped,0,total-1);
       }
     }
     if(preGoalBase){
       const gentle=clamp(1+wi*.004,1,1.12);
-      return {weekStart,weeklyKm:roundKm(base*gentle),longKm:roundKm(Math.min(32,longest*gentle)),phase:'basis',left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total};
+      return {weekStart,weeklyKm:roundKm(base*gentle),longKm:roundKm(Math.min(32,longest*gentle)),phase:'basis',left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total,peakLongKm:peakLongTarget(p)};
     }
     const model=OFFLINE_MODELS[p.goal]?.[total]?.[modelIndex]||buildOfflineModel(p.goal,total)[modelIndex];
-    const peakWeekly=peakWeeklyTarget(p), peakLong=peakLongTarget(p);
+    const peakWeekly=peakWeeklyTarget(p), longTarget=longRunTargetForModel(p,total,modelIndex);
     const buildStep=Math.max(0,modelIndex-Math.floor(modelIndex/4));
     const feasibleWeekly=Math.min(90,base*Math.pow(1.08,buildStep));
-    const feasibleLong=Math.min(32,longest*Math.pow(1.11,buildStep));
     let weekly=Math.min(base+(peakWeekly-base)*model.progress,feasibleWeekly,90);
-    let longKm=Math.min(longest+(peakLong-longest)*model.progress,feasibleLong,32);
-    weekly*=model.load; longKm*=model.longLoad;
-    if(model.phase==='taper'){
-      weekly=Math.max(base*.55,weekly);
-      longKm=Math.max(Math.min(longest,10),longKm);
-    }
-    longKm=Math.min(32,longKm,Math.max(longest,weekly*.68));
-    return {weekStart,weeklyKm:roundKm(Math.max(1,weekly)),longKm:roundKm(Math.max(1,longKm)),phase:model.phase,left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total};
+    let longKm=longTarget.km;
+    weekly*=model.load;
+    if(model.phase==='taper') weekly=Math.max(base*.55,weekly);
+    const requiredWeekly=longKm/0.62;
+    weekly=Math.max(weekly,Math.min(peakWeekly,requiredWeekly));
+    longKm=Math.min(32,longKm,Math.max(3,weekly*.64));
+    return {weekStart,weeklyKm:roundKm(Math.max(1,weekly)),longKm:roundKm(Math.max(1,longKm)),phase:model.phase,left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total,peakLongKm:roundKm(longTarget.peakKm),peakIndex:longTarget.peakIndex};
   }
   function paceText(pace){
     const sec=Math.max(180,Math.round(Number(pace)*60)),m=Math.floor(sec/60),s=String(sec%60).padStart(2,'0');return `${m}:${s}`;
@@ -191,11 +219,17 @@
     let remaining=target.weeklyKm;
     const intervalReserve=interval?Math.min(remaining,cap(interval),Math.max(3,Math.min(target.weeklyKm*.24,10))):0;
     const shortReserve=shorts.length?Math.min(remaining*.18,shorts.length*3):0;
-    if(long){const maxForLong=Math.max(0,remaining-intervalReserve-shortReserve),km=roundKm(Math.min(32,target.longKm,cap(long),Math.max(maxForLong,target.weeklyKm*.35)));out.set(long.id,{km,kind:'long'});remaining=Math.max(0,remaining-km);}
+    if(long){
+      const maxForLong=Math.max(0,remaining-intervalReserve-shortReserve), km=roundKm(Math.min(32,target.longKm,Math.max(maxForLong,target.weeklyKm*.35)));
+      out.set(long.id,{km,kind:'long',dynamicDuration:true});remaining=Math.max(0,remaining-km);
+    }
     if(interval){const km=roundKm(Math.min(intervalReserve,remaining,cap(interval)));out.set(interval.id,{km,kind:'interval',interval:intervalPrescription(p,target,wi,km)});remaining=Math.max(0,remaining-km);}
     const other=shorts.length?shorts:normalized.filter(s=>!out.has(s.id));
     if(other.length){for(let i=0;i<other.length;i++){const s=other[i],left=other.length-i,desired=remaining/left,km=roundKm(Math.min(desired,cap(s),32));out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);}}
-    if(normalized.length===1){const s=normalized[0],kind=normalizeKind(s.kind),km=roundKm(Math.min(target.weeklyKm,cap(s),kind==='long'?32:target.weeklyKm));out.set(s.id,{km,kind,interval:kind==='interval'?intervalPrescription(p,target,wi,km):null});}
+    if(normalized.length===1){
+      const s=normalized[0],kind=normalizeKind(s.kind),km=roundKm(kind==='long'?Math.min(32,target.longKm):Math.min(target.weeklyKm,cap(s)));
+      out.set(s.id,{km,kind,dynamicDuration:kind==='long',interval:kind==='interval'?intervalPrescription(p,target,wi,km):null});
+    }
     return out;
   }
   function generatePlan(state, {start=isoDay(),weeks=12,now=new Date()} = {}) {
@@ -220,10 +254,10 @@
         if(existing && (finalStatuses.has(existing.status)||existing.locked)) continue;
         if(!existing && zonedInstant(day,slot.time,p.timezone)<now) continue;
         if(goalAware&&p.raceDate===day && slot.sport==='run' && p.goal!=='fit'){ if(existing&&!finalStatuses.has(existing.status)&&!existing.locked){existing.status='cancelled';touch(existing,at);} continue; }
-        let km=0,minutes=Number(slot.minutes),kind=normalizeKind(slot.kind),interval=null;
+        let km=0,minutes=Math.max(15,Number(slot.minutes)||60),kind=normalizeKind(slot.kind),interval=null;
         if(slot.sport==='run') {
           const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
-          minutes=Math.min(slot.minutes,Math.max(15,Math.ceil(km*p.pace+10)));
+          minutes=Math.max(15,Math.ceil(km*p.pace+10));
         }
         const title=slot.sport==='run'?(kind==='long'?`Lange duurloop - ${target.phase}`:kind==='interval'?`Interval - ${interval?.summary||'kwaliteit'}`:`Korte rustige loop - ${target.phase}`):sports[slot.sport];
         const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
@@ -376,8 +410,8 @@
     const pending=state.workouts.filter(w=>w.status==='planned'&&w.date<today);
     if(pending.length) notes.push(`${pending.length} eerdere training(en) nog niet geregistreerd. Vul de werkelijke uitvoering in; de app kan deze niet raden.`);
     const runs=state.slots.filter(s=>s.sport==='run'), days=new Set(runs.map(s=>Number(s.day)));
-    const capacity=runs.reduce((a,s)=>a+Math.max(0,(s.minutes-10)/p.pace),0);
-    if(capacity<p.baseWeeklyKm*.9)notes.push('Je vaste momenten bieden minder tijd dan je opgegeven hardloopbasis nodig heeft. Het schema wordt ingekort; maak alleen extra ruimte als dat voor jou passend is.');
+    const capacity=runs.reduce((a,s)=>a+(normalizeKind(s.kind)==='long'?32:Math.max(0,(s.minutes-10)/p.pace)),0);
+    if(capacity<p.baseWeeklyKm*.9)notes.push('Je vaste korte/intervalmomenten plus maximaal 32 km op je lange dag bieden minder ruimte dan je opgegeven hardloopbasis. Het schema kan daardoor worden ingekort.');
     if([...days].some(d=>days.has((d+1)%7))) notes.push('Je hebt hardloopdagen direct achter elkaar gekozen. Beoordeel zelf of je genoeg hersteltijd hebt.');
     if(runs.length>=2&&!runs.some(s=>normalizeKind(s.kind)==='long')) notes.push('Je hebt meerdere hardloopdagen maar geen lange afstandsdag gekozen. Voor 10 km, halve marathon en marathon is een rustige langere loop meestal nuttig.');
     if(runs.some(s=>normalizeKind(s.kind)==='interval')&&runs.length<2) notes.push('Je enige hardloopdag staat als interval. Voor de meeste doelen is ook rustige duurtraining nodig; overweeg een extra rustige dag.');
@@ -387,10 +421,10 @@
       if(left<0) notes.push('Je doeldatum is voorbij. Werk je doel bij.');
       else if(weeks>52) notes.push(`Je doel ligt ongeveer ${weeks} weken weg. De app plant maximaal 52 weken vooruit en blijft daarvoor eerst in een rustige basisfase.`);
       else if(left>0&&left<28) notes.push('Je hebt minder dan 4 weken tot je doeldatum. De app gebruikt het conservatieve einde van het 4-wekenmodel en forceert geen inhaalsprong.');
-      if(p.goal==='marathon'&&left>0){
-        const total=clamp(weeks,4,52), model=OFFLINE_MODELS.marathon[total], peakIndex=Math.max(0,...model.map((w,i)=>w.phase==='piek'?i:0));
-        const possible=targetForWeek(p,peakIndex,monday(today),total).longKm;
-        if(possible<26) notes.push(`Met je huidige basis komt de voorgerekende piekduurloop in dit venster rond maximaal ${possible} km uit. De app laat je doeldag staan, maar maakt de voorbereiding niet kunstmatig zwaarder.`);
+      if(p.goal!=='fit'&&left>0){
+        const total=clamp(weeks,4,52), model=OFFLINE_MODELS[p.goal][total], peakIndex=Math.max(0,...model.map((w,i)=>w.phase==='piek'?i:0));
+        const possible=targetForWeek(p,peakIndex,monday(today),total), desired=peakLongTarget(p);
+        if(possible.longKm<desired-1) notes.push(`Met je huidige langste loop en ${weeks} weken tot je doel komt de veilige voorgerekende piekduurloop rond ${possible.longKm} km uit in plaats van ${desired} km. De app bouwt wel maximaal op binnen dit venster, maar forceert geen onrealistische sprong.`);
       }
     }
     if(planMode(p)==='fixed'&&state.planEnd&&daysBetween(today,state.planEnd)<21) notes.push('Je planning loopt binnenkort af. Bouw in Instellingen opnieuw verder op; afgeronde trainingen blijven bewaard.');
@@ -485,5 +519,5 @@
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(Number(w.external?.movingSeconds)||w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
     return {records,longest:longest?{km:longest.actual.km,date:longest.date,workoutId:longest.id}:null,fastest:fastest?{paceSeconds:Math.round(fastest.paceSeconds),date:fastest.workout.date,workoutId:fastest.workout.id}:null};
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,mergeExternalRuns,confirmImportedWorkout,personalRecords,notificationDefaults,notificationSettings,attentionItems});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,mergeExternalRuns,confirmImportedWorkout,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel});
 })(globalThis.SK ||= {});

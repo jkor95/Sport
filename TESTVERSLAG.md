@@ -1,9 +1,10 @@
-# Testverslag MijnLoop v14
+# Testverslag MijnLoop v16
 
-- 62/62 Node planner-/import-/meldingstests geslaagd.
-- Meldingsdefaults getest.
-- Aankomende training binnen gekozen voorlooptijd getest.
-- Openstaande registratie na training getest.
-- Uitgeschakelde categorieen tellen niet mee voor de aandachtsteller.
-- Bestaande 4-52-wekenplanner, adaptatie, marathonlimiet, PR- en Strava/Garmin-importtests blijven groen.
-- `app.js`, `core/planner.js` en `sw.js` syntax gecontroleerd.
+- Volledige regressietest van planner, kalender, Strava/PR en meldingen.
+- Exact 4-52 weken en doeldatumvensters getest.
+- Vaste sportmomenten zonder zichtbaar duur- of eindtijdveld getest.
+- Hardloopslots zonder `minutes` worden geaccepteerd; trainingsduur wordt automatisch uit afstand en tempo berekend.
+- Meerdere momenten op dezelfde dag zijn mogelijk zolang de begintijd niet exact gelijk is.
+- Marathonpiek maximaal 32 km en taper voor doeldag blijven intact.
+
+**Resultaat:** 66/66 tests geslaagd.
