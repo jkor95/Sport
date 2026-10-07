@@ -1,6 +1,11 @@
-# MijnLoop v21 — lokale accounts + aparte beheerderspagina
+# MijnLoop v23 — lokale accounts + aparte beheerderspagina
 
-MijnLoop v21 gebruikt **geen Supabase Auth** meer. De login, accountlijst en sportgegevens worden lokaal in de browser opgeslagen.
+MijnLoop v23 gebruikt **geen Supabase Auth** meer. De login, accountlijst en sportgegevens worden lokaal in de browser opgeslagen.
+### Gebruikersbeheer
+
+Op `admin.html` heeft ieder account nu de acties **Inzien**, **Bewerken**, **Wachtwoord resetten**, **Blokkeren/Activeren** en **Verwijderen**. Inzien toont accountgegevens plus een samenvatting van doel, tempo, vaste sportmomenten en trainingsstatus. Bewerken wijzigt naam, gebruikersnaam, rol en accountstatus zonder trainingsgegevens te wissen.
+
+
 ## Eenvoudige lokale inlog
 
 - Gebruikersnamen mogen kort zijn en hebben geen vaste tekenregel meer. Ook één teken is toegestaan.
@@ -49,17 +54,17 @@ Doe dit vóór je de oude GitHub-versie vervangt als je bestaande sportgegevens 
 
 1. Log in op de oude MijnLoop-versie.
 2. Ga naar **Voortgang → Mijn gegevens exporteren**.
-3. Installeer v21 en maak je lokale account aan via `admin.html`.
-4. Log in op MijnLoop v21.
+3. Installeer v23 en maak je lokale account aan via `admin.html`.
+4. Log in op MijnLoop v23.
 5. Ga naar **Instellingen → Account en privacy → Backup importeren** en selecteer je oude persoonlijke JSON-export.
 
-De oude gegevens blijven anders nog wel in je bestaande Supabase-project staan, maar v21 gebruikt die Supabase-login niet meer automatisch.
+De oude gegevens blijven anders nog wel in je bestaande Supabase-project staan, maar v23 gebruikt die Supabase-login niet meer automatisch.
 
 ## Strava / Garmin
 
 Strava is optioneel. De normale MijnLoop-login blijft volledig lokaal.
 
-Voor automatische Garmin/Strava-import gebruikt v21 een aparte Supabase Edge Function als OAuth-bridge. Die gebruikt **geen Supabase Auth** en kent je MijnLoop-wachtwoord niet.
+Voor automatische Garmin/Strava-import gebruikt v23 een aparte Supabase Edge Function als OAuth-bridge. Die gebruikt **geen Supabase Auth** en kent je MijnLoop-wachtwoord niet.
 
 Eenmalig nodig:
 1. Voer `supabase/migrations/202610070001_local_strava.sql` uit in Supabase SQL Editor.
@@ -97,3 +102,7 @@ De lokale login is bedoeld als praktische toegangsscheiding op een eigen of vert
 - `standby-ai/` — niet actief; alleen bewaard voor eventueel later gebruik
 
 AI wordt nergens door de actieve app aangeroepen.
+
+
+## Lokale login
+Gebruikersnamen en wachtwoorden hebben geen minimale lengte. Alleen leeg is niet toegestaan. Speciale tekens zijn niet verplicht. Tijdelijke wachtwoorden bevatten alleen letters en cijfers.
