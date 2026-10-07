@@ -1,4 +1,4 @@
-// MijnLoop v26: eigen MijnLoop-login, centrale synchronisatie via Supabase.
+// MijnLoop v28: eigen MijnLoop-login, centrale synchronisatie via Supabase.
 // Deze publishable key mag in de browser staan. Zet hier NOOIT een service_role of secret.
 globalThis.SPORT_CONFIG = {
   supabaseUrl: 'https://gcxnxfwmgcrhfgjlqbnn.supabase.co',

@@ -34,12 +34,11 @@
   }
   function hasUsers(){return hasUsersCache;}
   function currentUser(){return read(localStorage,USER_SESSION,null)?.user||null;}
-  function currentAdmin(){return read(sessionStorage,ADMIN_SESSION,null)?.user||null;}
+  function currentAdmin(){const admin=read(sessionStorage,ADMIN_SESSION,null);if(admin?.user?.role==='admin')return admin.user;const userSession=read(localStorage,USER_SESSION,null);if(userSession?.user?.role==='admin'){write(sessionStorage,ADMIN_SESSION,userSession);return userSession.user;}return null;}
   async function bootstrapAdmin({username,password,displayName=''}){username=validateUsername(username);password=validatePassword(password);const r=await api('bootstrap',{username,password,displayName});hasUsersCache=true;return r.user;}
-  async function login(username,password){username=validateUsername(username);password=validatePassword(password);const r=await api('login',{username,password});write(localStorage,USER_SESSION,r);return r.user;}
+  async function login(username,password){username=validateUsername(username);password=validatePassword(password);const r=await api('login',{username,password});write(localStorage,USER_SESSION,r);if(r?.user?.role==='admin')write(sessionStorage,ADMIN_SESSION,r);else sessionStorage.removeItem(ADMIN_SESSION);return r.user;}
   async function logout(){try{await api('logout');}catch{}localStorage.removeItem(USER_SESSION);}
-  async function adminLogin(username,password){username=validateUsername(username);password=validatePassword(password);const r=await api('admin-login',{username,password});write(sessionStorage,ADMIN_SESSION,r);return r.user;}
-  async function adminLogout(){try{await api('logout',{},true);}catch{}sessionStorage.removeItem(ADMIN_SESSION);}
+  async function adminLogout(){try{await api('logout',{},true);}catch{}sessionStorage.removeItem(ADMIN_SESSION);const userSession=read(localStorage,USER_SESSION,null);if(userSession?.user?.role==='admin')localStorage.removeItem(USER_SESSION);}
   async function listUsers(){const r=await api('admin-list',{},true);return r.users||[];}
   async function adminState(userId){const r=await api('admin-state',{userId},true);return r.state||null;}
   async function createUser({username,password,displayName='',role='user'}){username=validateUsername(username);password=validatePassword(password);const r=await api('admin-create',{username,password,displayName,role},true);hasUsersCache=true;return r.user;}
@@ -50,5 +49,5 @@
   async function loadState(){return api('load');}
   async function saveState(state,revision){return api('save',{state,revision});}
   function generatePassword(length=6){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',bytes=crypto.getRandomValues(new Uint8Array(length));return [...bytes].map(b=>alphabet[b%alphabet.length]).join('');}
-  global.MijnLoopLocalAuth={connect,hasUsers,bootstrapAdmin,login,logout,currentUser,adminLogin,adminLogout,currentAdmin,listUsers,adminState,createUser,updateUser,setPassword,deleteUser,changeOwnPassword,loadState,saveState,generatePassword};
+  global.MijnLoopLocalAuth={connect,hasUsers,bootstrapAdmin,login,logout,currentUser,adminLogout,currentAdmin,listUsers,adminState,createUser,updateUser,setPassword,deleteUser,changeOwnPassword,loadState,saveState,generatePassword};
 })(globalThis);

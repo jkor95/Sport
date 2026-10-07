@@ -1,43 +1,24 @@
-# MijnLoop v27 - beheeractiviteit en centrale synchronisatie
+# MijnLoop v28
 
-MijnLoop gebruikt nog steeds zijn eigen eenvoudige gebruikersnaam/wachtwoord-login en de losse `admin.html` beheerpagina. Supabase Auth wordt **niet** gebruikt.
+MijnLoop gebruikt een eigen eenvoudige gebruikersnaam/wachtwoord-login en synchroniseert accounts en sportdata centraal via Supabase. Supabase Auth wordt niet gebruikt.
 
-## Wat is veranderd
+## Inloggen
+- Iedereen gebruikt dezelfde normale MijnLoop-inlog op `index.html`.
+- Een account met rol **Gebruiker** opent de hardloopapp.
+- Een account met rol **Beheerder** wordt na dezelfde login automatisch doorgestuurd naar `admin.html`.
+- De gewone app toont nergens een link naar de beheerpagina.
+- Rechtstreeks openen van `admin.html` zonder geldige beheerderssessie stuurt terug naar de gewone inlog.
 
-- Accounts worden centraal in Supabase opgeslagen.
-- Sportprofiel, planning, resultaten, Coach-historie en instellingen synchroniseren per account.
-- Desktop en mobiel zien na inloggen dezelfde gegevens.
-- `admin.html` beheert dezelfde centrale accountlijst op ieder apparaat.
-- De beheerder kan wachtwoorden blijven inzien en wijzigen, zoals gevraagd.
-- Strava/Garmin blijft uitgeschakeld.
+## Beheer
+De bestaande beheerfuncties blijven behouden: accounts inzien/bewerken, wachtwoorden bekijken/wijzigen, blokkeren, verwijderen en activiteit controleren.
 
-## Eerste update vanaf v25
+## Synchronisatie
+Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner zelf blijft lokaal berekend.
 
-Open na het plaatsen van v27 eerst MijnLoop op het apparaat waarop je huidige lokale accounts staan. Wanneer de centrale database nog leeg is, zet v27 die lokale accounts en hun sportdata automatisch één keer over naar Supabase. Daarna kun je op je telefoon dezelfde gebruikersnaam en hetzelfde wachtwoord gebruiken.
-
-Als er nog helemaal geen lokale accounts waren, open dan `admin.html` om de eerste centrale beheerder aan te maken.
-
-## Beheerpagina
-
-Voor jouw GitHub Pages-site:
-
-- App: `https://jkor95.github.io/Sport/`
-- Beheer: `https://jkor95.github.io/Sport/admin.html`
-
-## Techniek
-
-De frontend gebruikt alleen de publieke Supabase publishable key. Alle account- en sportdata loopt via de Edge Function `mijnloop-sync`. De tabellen hebben RLS ingeschakeld en zijn niet rechtstreeks toegankelijk voor `anon` of `authenticated`. De service-role sleutel staat uitsluitend server-side in Supabase.
-
-De eigen MijnLoop-sessies worden als willekeurige tokens uitgegeven en server-side alleen gehasht opgeslagen.
-
-## Belangrijk over wachtwoorden
-
-Omdat je als beheerder wachtwoorden wilt kunnen inzien, bewaart de centrale MijnLoop-accounttabel het gekozen wachtwoord leesbaar. Dat is bewust minder veilig dan standaard wachtwoordopslag. Gebruik voor MijnLoop daarom geen wachtwoord dat je ook voor e-mail, bankzaken of andere belangrijke accounts gebruikt.
-
-## v27 - beheeractiviteit
-
-- Beheer toont per account de laatste succesvolle login.
-- Beheer toont apart wanneer sportdata voor het laatst is opgeslagen of gewijzigd.
-- Actieve gewone gebruikers die 30 dagen of langer niet hebben ingelogd en niets hebben opgeslagen verschijnen als beheermelding.
-- Geblokkeerde accounts en beheerders tellen niet mee voor deze inactiviteitsmelding.
-- Gebruikersnamen zijn bij inloggen niet hoofdlettergevoelig: `jeremy`, `Jeremy` en `JEREMY` verwijzen naar hetzelfde account.
+## v28
+- beheerlogin samengevoegd met de normale login;
+- zichtbare beheerlink verwijderd van login en account/privacy;
+- adminrol wordt automatisch herkend;
+- beheerderslogout wist ook de normale beheerderssessie;
+- directe beheerpagina zonder beheerderssessie gaat terug naar de normale login;
+- service-worker cache verhoogd naar v28.
