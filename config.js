@@ -1,8 +1,8 @@
-// Only public connection details belong in this file. Never put a service_role,
-// secret key, personal password, or API key here or anywhere on GitHub.
+// MijnLoop v20: login en sportgegevens zijn lokaal.
+// Deze publieke Supabase-gegevens worden alleen gebruikt voor optionele serverbridges
+// zoals Strava/Garmin-via-Strava. Zet hier NOOIT een service_role, secret of wachtwoord.
 globalThis.SPORT_CONFIG = {
   supabaseUrl: 'https://gcxnxfwmgcrhfgjlqbnn.supabase.co',
   supabasePublishableKey: 'sb_publishable_ANR7qJwKme0Nx14831sVFQ_DTBj9FdJ',
-  appName: 'MijnLoop',
-  sdkUrl: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js'
+  appName: 'MijnLoop'
 };

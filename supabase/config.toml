@@ -1,15 +1,4 @@
-project_id = "sportkompas"
-
-# Authentication is verified inside each handler via Supabase Auth /user.
-# This also works with projects using asymmetric JWT signing keys.
-# Do not remove the explicit authentication checks from the source files.
-[functions.calendar-feed]
-verify_jwt = false
-
-[functions.calendar-link]
-verify_jwt = false
-
-
-# OAuth callback from Strava has no Supabase JWT. The function performs its own auth/state validation.
 [functions.strava]
 verify_jwt = false
+
+# AI blijft alleen als los standby-bestand in deze release; de app roept geen AI aan.

@@ -1,40 +1,22 @@
 (function(SK){
   'use strict';
-  let client,connecting,revision=0,user=null;
-  const configured=()=>!!(SPORT_CONFIG.supabaseUrl&&SPORT_CONFIG.supabasePublishableKey);
-  async function connect(){
-    if(client)return client;if(connecting)return connecting;
-    if(!configured())throw new Error('Vul eerst de twee publieke Supabase-gegevens in config.js in. De demo werkt al zonder koppeling.');
-    const url=new URL(SPORT_CONFIG.supabaseUrl);
-    if(url.protocol!=='https:')throw new Error('Gebruik de HTTPS-project-URL van Supabase.');
-    const key=SPORT_CONFIG.supabasePublishableKey;
-    if(key.startsWith('sb_secret_'))throw new Error('Stop: dit is een geheime Supabase-sleutel. Verwijder en roteer deze. Gebruik alleen de publishable/anon-sleutel.');
-    try { const payload=JSON.parse(atob(key.split('.')[1]||''));if(payload.role==='service_role')throw new Error('PRIVATE_KEY'); }catch(e){if(e.message==='PRIVATE_KEY')throw new Error('Stop: service_role mag nooit in de browser. Verwijder en roteer deze sleutel.');}
-    connecting=(async()=>{
-      if(!globalThis.supabase)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=SPORT_CONFIG.sdkUrl;script.crossOrigin='anonymous';script.onload=resolve;script.onerror=()=>reject(new Error('De beveiligde inlogbibliotheek kon niet worden geladen. Controleer je verbinding.'));document.head.appendChild(script);});
-      client=globalThis.supabase.createClient(SPORT_CONFIG.supabaseUrl,key,{auth:{storage:sessionStorage,storageKey:'sportkompas-auth-'+location.pathname,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-      return client;
-    })();
-    try{return await connecting;}catch(e){connecting=null;throw e;}
+  let user=null,revision=0;
+  const Auth=globalThis.MijnLoopLocalAuth;
+  const configured=()=>!!Auth;
+  async function connect(){if(!Auth)throw new Error('Lokale accountmodule ontbreekt.');return {local:true};}
+  async function checkedUser(){const u=Auth.currentUser();if(!u)throw new Error('Je lokale sessie is verlopen. Log opnieuw in.');user=u;return u;}
+  async function load(){const u=await checkedUser();let state=Auth.readState(u.id)||SK.freshState();SK.validateState(state);revision=Number(state.__localRevision||0);if('__localRevision'in state){state=structuredClone(state);delete state.__localRevision;}return {state,user:u};}
+  async function save(state){SK.validateState(state);const u=await checkedUser();const stored=structuredClone(state);revision+=1;stored.__localRevision=revision;Auth.writeState(u.id,stored);return state;}
+  async function login(username,password){user=await Auth.login(username,password);return load();}
+  async function logout(){Auth.logout();revision=0;user=null;}
+  async function password(oldPassword,newPassword){return Auth.changeOwnPassword(oldPassword,newPassword);}
+  async function invoke(name,body){
+    const cred=Auth.integrationCredentials();
+    if(!cred)throw new Error('Log eerst lokaal in.');
+    if(!SPORT_CONFIG?.supabaseUrl||!SPORT_CONFIG?.supabasePublishableKey)throw new Error('De optionele Supabase-koppeling is niet ingesteld.');
+    const res=await fetch(`${SPORT_CONFIG.supabaseUrl}/functions/v1/${encodeURIComponent(name)}`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SPORT_CONFIG.supabasePublishableKey,'X-Local-Account':cred.accountId,'X-Local-Secret':cred.secret},body:JSON.stringify(body||{})});
+    let data=null;try{data=await res.json();}catch{}
+    if(!res.ok)throw new Error(data?.error||'Deze optionele serverfunctie is niet ingesteld of kon niet worden bereikt.');return data;
   }
-  async function checkedUser(){const c=await connect();const {data,error}=await c.auth.getUser();if(error||!data.user)throw new Error('Je sessie is verlopen. Log opnieuw in.');user=data.user;return user;}
-  async function load(){
-    const c=await connect(),u=await checkedUser();
-    const {data,error}=await c.from('sport_states').select('data,revision').eq('user_id',u.id).maybeSingle();
-    if(error)throw new Error('Gegevens laden mislukt: '+error.message);
-    revision=Number(data?.revision||0);const state=data?.data||SK.freshState();SK.validateState(state);return {state,user:u};
-  }
-  async function save(state){
-    if(!navigator.onLine)throw new Error('Je bent offline. De wijziging is niet opgeslagen. Maak opnieuw verbinding en probeer nogmaals.');
-    SK.validateState(state);const c=await connect();
-    const {data,error}=await c.rpc('sport_save_state',{p_data:state,p_expected_revision:revision});
-    if(error){if(error.code==='40001'||error.message?.includes('SPORT_CONFLICT')){const e=new Error('Je schema is op een ander apparaat gewijzigd. De nieuwste versie is geladen. Controleer je invoer en sla opnieuw op.');e.code='CONFLICT';throw e;}throw new Error('Opslaan mislukt: '+error.message);}
-    const row=Array.isArray(data)?data[0]:data;revision=Number(row.revision);return row.data;
-  }
-  async function login(email,password){const c=await connect();const {error}=await c.auth.signInWithPassword({email,password});if(error)throw new Error('Inloggen is niet gelukt. Controleer je e-mailadres en wachtwoord.');return load();}
-  async function logout(){if(client)await client.auth.signOut({scope:'local'});revision=0;user=null;}
-  async function recover(email){const c=await connect();const {error}=await c.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw new Error('De aanvraag kon niet worden verstuurd. Probeer het later opnieuw.');}
-  async function password(password){if(password.length<12)throw new Error('Kies een wachtwoord van minimaal 12 tekens.');const c=await connect();const {error}=await c.auth.updateUser({password});if(error)throw new Error('Wachtwoord instellen mislukt: '+error.message);}
-  async function invoke(name,body){const c=await connect();const {data,error}=await c.functions.invoke(name,{body});if(error){let detail;try{detail=await error.context.json();}catch{}throw new Error(detail?.error||'Deze serverfunctie is nog niet ingesteld of kon niet worden bereikt. Controleer de installatiehandleiding.');}return data;}
-  Object.assign(SK,{DB:{configured,connect,load,save,login,logout,recover,password,invoke,get user(){return user;}}});
+  Object.assign(SK,{DB:{configured,connect,load,save,login,logout,password,invoke,get user(){return user||Auth?.currentUser()||null;}}});
 })(globalThis.SK ||= {});
