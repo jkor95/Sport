@@ -1,5 +1,5 @@
 /* Only public static app files are cached. Never cache API responses or user data. */
-const CACHE='mijnloop-shell-v23';
+const CACHE='mijnloop-shell-v24';
 const FILES=['./','./index.html','./admin.html','./styles.css','./admin.css','./config.js','./core/dates.js','./core/planner.js','./core/calendar.js','./demo.js','./local-auth.js','./admin.js','./db.js','./app.js','./manifest.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>(k.startsWith('sport-app-shell-')||k.startsWith('mijnloop-shell-'))&&k!==CACHE).map(k=>caches.delete(k))))));

@@ -1,6 +1,6 @@
-# MijnLoop v23 — lokale accounts + aparte beheerderspagina
+# MijnLoop v24 — lokaal accountbeheer met zichtbare wachtwoorden
 
-MijnLoop v23 gebruikt **geen Supabase Auth** meer. De login, accountlijst en sportgegevens worden lokaal in de browser opgeslagen.
+MijnLoop v24 gebruikt **geen Supabase Auth** meer. De login, accountlijst en sportgegevens worden lokaal in de browser opgeslagen.
 ### Gebruikersbeheer
 
 Op `admin.html` heeft ieder account nu de acties **Inzien**, **Bewerken**, **Wachtwoord resetten**, **Blokkeren/Activeren** en **Verwijderen**. Inzien toont accountgegevens plus een samenvatting van doel, tempo, vaste sportmomenten en trainingsstatus. Bewerken wijzigt naam, gebruikersnaam, rol en accountstatus zonder trainingsgegevens te wissen.
@@ -11,7 +11,7 @@ Op `admin.html` heeft ieder account nu de acties **Inzien**, **Bewerken**, **Wac
 - Gebruikersnamen mogen kort zijn en hebben geen vaste tekenregel meer. Ook één teken is toegestaan.
 - Wachtwoorden mogen eveneens kort zijn; alleen een leeg wachtwoord wordt geweigerd.
 - Dit geldt zowel voor gewone accounts als voor het beheerdersaccount.
-- Wachtwoorden blijven lokaal gehashd opgeslagen; ze worden niet als leesbare tekst bewaard.
+- Wachtwoorden worden nog steeds gehasht voor de logincontrole, maar v24 bewaart daarnaast bewust een leesbare lokale kopie zodat de beheerder ze kan inzien en wijzigen.
 
 
 ## Eerste installatie
@@ -36,17 +36,19 @@ Op `admin.html` kun je:
 - beheerdersaccounts toevoegen;
 - een volledige lokale beheer-backup downloaden/importeren.
 
-### Waarom het bestaande wachtwoord niet zichtbaar is
+### Wachtwoorden inzien en wijzigen
 
-Wachtwoorden worden niet als leesbare tekst opgeslagen. MijnLoop gebruikt PBKDF2-SHA256 met een unieke salt. Daardoor kan ook de beheerder het bestaande wachtwoord niet teruglezen.
+In v24 kan een beheerder via **Inzien** het actuele wachtwoord van een account bekijken en kopiëren. Via **Bewerken** kan het wachtwoord direct worden aangepast. De losse knop **Wachtwoord resetten** blijft ook beschikbaar.
 
-Bij **Wachtwoord resetten** toont MijnLoop één keer een nieuw tijdelijk wachtwoord. Dat kun je aan de gebruiker doorgeven. Dit voorkomt dat wachtwoorden als platte tekst in `localStorage` of GitHub terechtkomen.
+Om dit mogelijk te maken bewaart MijnLoop naast de PBKDF2-hash bewust ook een leesbare lokale kopie van het wachtwoord. Dat is minder veilig dan alleen een hash. Iedereen met volledige toegang tot hetzelfde browserprofiel/ontwikkelaarstools kan lokale gegevens mogelijk uitlezen. Gebruik dit daarom alleen op een vertrouwd apparaat.
+
+Accounts die al vóór v24 bestonden hebben nog geen leesbare kopie. Hun oude hash kan niet worden teruggedraaid. Zodra de gebruiker één keer onder v24 inlogt, of de beheerder het wachtwoord wijzigt/reset, wordt het wachtwoord voortaan zichtbaar.
 
 ## Belangrijk: lokaal betekent per browser/apparaat
 
 Accounts en sportgegevens staan in de browser waarin je ze hebt aangemaakt. Een account op je laptop bestaat dus niet automatisch op je telefoon.
 
-Gebruik in `admin.html` **Backup downloaden** om alle lokale accounts + sportgegevens over te zetten naar een ander apparaat. De beheer-backup is gevoelig: hij bevat wachtwoordhashes en de geheime integratiesleutels voor optionele koppelingen. Bewaar hem privé.
+Gebruik in `admin.html` **Backup downloaden** om alle lokale accounts + sportgegevens over te zetten naar een ander apparaat. De beheer-backup is zeer gevoelig: hij bevat vanaf v24 ook leesbare wachtwoorden, naast hashes en geheime integratiesleutels. Bewaar hem strikt privé.
 
 ## Overstappen vanaf v19 of ouder
 
@@ -54,17 +56,17 @@ Doe dit vóór je de oude GitHub-versie vervangt als je bestaande sportgegevens 
 
 1. Log in op de oude MijnLoop-versie.
 2. Ga naar **Voortgang → Mijn gegevens exporteren**.
-3. Installeer v23 en maak je lokale account aan via `admin.html`.
-4. Log in op MijnLoop v23.
+3. Installeer v24 en maak je lokale account aan via `admin.html`.
+4. Log in op MijnLoop v24.
 5. Ga naar **Instellingen → Account en privacy → Backup importeren** en selecteer je oude persoonlijke JSON-export.
 
-De oude gegevens blijven anders nog wel in je bestaande Supabase-project staan, maar v23 gebruikt die Supabase-login niet meer automatisch.
+De oude gegevens blijven anders nog wel in je bestaande Supabase-project staan, maar v24 gebruikt die Supabase-login niet meer automatisch.
 
 ## Strava / Garmin
 
 Strava is optioneel. De normale MijnLoop-login blijft volledig lokaal.
 
-Voor automatische Garmin/Strava-import gebruikt v23 een aparte Supabase Edge Function als OAuth-bridge. Die gebruikt **geen Supabase Auth** en kent je MijnLoop-wachtwoord niet.
+Voor automatische Garmin/Strava-import gebruikt v24 een aparte Supabase Edge Function als OAuth-bridge. Die gebruikt **geen Supabase Auth** en kent je MijnLoop-wachtwoord niet.
 
 Eenmalig nodig:
 1. Voer `supabase/migrations/202610070001_local_strava.sql` uit in Supabase SQL Editor.
