@@ -1,6 +1,13 @@
-# MijnLoop v20 — lokale accounts + aparte beheerderspagina
+# MijnLoop v21 — lokale accounts + aparte beheerderspagina
 
-MijnLoop v20 gebruikt **geen Supabase Auth** meer. De login, accountlijst en sportgegevens worden lokaal in de browser opgeslagen.
+MijnLoop v21 gebruikt **geen Supabase Auth** meer. De login, accountlijst en sportgegevens worden lokaal in de browser opgeslagen.
+## Eenvoudige lokale inlog
+
+- Gebruikersnamen mogen kort zijn en hebben geen vaste tekenregel meer. Ook één teken is toegestaan.
+- Wachtwoorden mogen eveneens kort zijn; alleen een leeg wachtwoord wordt geweigerd.
+- Dit geldt zowel voor gewone accounts als voor het beheerdersaccount.
+- Wachtwoorden blijven lokaal gehashd opgeslagen; ze worden niet als leesbare tekst bewaard.
+
 
 ## Eerste installatie
 
@@ -42,17 +49,17 @@ Doe dit vóór je de oude GitHub-versie vervangt als je bestaande sportgegevens 
 
 1. Log in op de oude MijnLoop-versie.
 2. Ga naar **Voortgang → Mijn gegevens exporteren**.
-3. Installeer v20 en maak je lokale account aan via `admin.html`.
-4. Log in op MijnLoop v20.
+3. Installeer v21 en maak je lokale account aan via `admin.html`.
+4. Log in op MijnLoop v21.
 5. Ga naar **Instellingen → Account en privacy → Backup importeren** en selecteer je oude persoonlijke JSON-export.
 
-De oude gegevens blijven anders nog wel in je bestaande Supabase-project staan, maar v20 gebruikt die Supabase-login niet meer automatisch.
+De oude gegevens blijven anders nog wel in je bestaande Supabase-project staan, maar v21 gebruikt die Supabase-login niet meer automatisch.
 
 ## Strava / Garmin
 
 Strava is optioneel. De normale MijnLoop-login blijft volledig lokaal.
 
-Voor automatische Garmin/Strava-import gebruikt v20 een aparte Supabase Edge Function als OAuth-bridge. Die gebruikt **geen Supabase Auth** en kent je MijnLoop-wachtwoord niet.
+Voor automatische Garmin/Strava-import gebruikt v21 een aparte Supabase Edge Function als OAuth-bridge. Die gebruikt **geen Supabase Auth** en kent je MijnLoop-wachtwoord niet.
 
 Eenmalig nodig:
 1. Voer `supabase/migrations/202610070001_local_strava.sql` uit in Supabase SQL Editor.

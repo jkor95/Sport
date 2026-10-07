@@ -1,4 +1,4 @@
-// MijnLoop v20: login en sportgegevens zijn lokaal.
+// MijnLoop v21: login en sportgegevens zijn lokaal.
 // Deze publieke Supabase-gegevens worden alleen gebruikt voor optionele serverbridges
 // zoals Strava/Garmin-via-Strava. Zet hier NOOIT een service_role, secret of wachtwoord.
 globalThis.SPORT_CONFIG = {

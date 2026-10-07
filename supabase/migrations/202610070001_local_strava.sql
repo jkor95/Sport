@@ -1,4 +1,4 @@
--- MijnLoop v20 - Strava bridge voor lokale MijnLoop-accounts.
+-- MijnLoop v21 - Strava bridge voor lokale MijnLoop-accounts.
 -- Supabase Auth wordt NIET gebruikt. De browser heeft per lokaal account een willekeurige
 -- integrationSecret; alleen de SHA-256 hash daarvan wordt server-side opgeslagen.
 

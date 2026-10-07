@@ -13,8 +13,8 @@
   function randomHex(bytes=32){return bytesHex(crypto.getRandomValues(new Uint8Array(bytes)));}
   function uuid(){return crypto.randomUUID?crypto.randomUUID():`${randomHex(4)}-${randomHex(2)}-4${randomHex(2).slice(1)}-${((8+Math.floor(Math.random()*4)).toString(16))+randomHex(2).slice(1)}-${randomHex(6)}`;}
   function normalizeUsername(value){return String(value||'').trim().toLowerCase();}
-  function validateUsername(value){const username=normalizeUsername(value);if(!/^[a-z0-9._-]{3,40}$/.test(username))throw new Error('Gebruik 3-40 tekens: letters, cijfers, punt, streepje of underscore.');return username;}
-  function validatePassword(value){const p=String(value||'');if(p.length<8)throw new Error('Gebruik een wachtwoord van minimaal 8 tekens.');if(p.length>200)throw new Error('Wachtwoord is te lang.');return p;}
+  function validateUsername(value){const username=normalizeUsername(value);if(!username)throw new Error('Vul een gebruikersnaam in.');if(username.length>200)throw new Error('Gebruikersnaam is te lang.');return username;}
+  function validatePassword(value){const p=String(value??'');if(!p.length)throw new Error('Vul een wachtwoord in.');if(p.length>200)throw new Error('Wachtwoord is te lang.');return p;}
   function users(){const rows=readJSON(localStorage,USERS_KEY,[]);return Array.isArray(rows)?rows:[];}
   function saveUsers(rows){writeJSON(localStorage,USERS_KEY,rows);}
   async function passwordHash(password,saltHex,iterations=ITERATIONS){
