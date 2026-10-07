@@ -1,6 +1,5 @@
-// MijnLoop v21: login en sportgegevens zijn lokaal.
-// Deze publieke Supabase-gegevens worden alleen gebruikt voor optionele serverbridges
-// Zet hier NOOIT een service_role, secret of wachtwoord.
+// MijnLoop v26: eigen MijnLoop-login, centrale synchronisatie via Supabase.
+// Deze publishable key mag in de browser staan. Zet hier NOOIT een service_role of secret.
 globalThis.SPORT_CONFIG = {
   supabaseUrl: 'https://gcxnxfwmgcrhfgjlqbnn.supabase.co',
   supabasePublishableKey: 'sb_publishable_ANR7qJwKme0Nx14831sVFQ_DTBj9FdJ',
