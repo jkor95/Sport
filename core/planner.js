@@ -240,9 +240,23 @@
     const exactGoal=goalAware?goalWeeks(p,start):null;
     const end=goalAware&&exactGoal!==null&&exactGoal<=52?p.raceDate:addDays(monday(start),weeks*7-1), at=now.toISOString();
     const runs=state.slots.filter(s=>s.sport==='run');
-    const oldMap=new Map(state.workouts.filter(w=>w.source==='plan').map(w=>[w.slotId+':'+w.date,w]));
+    const currentGoalKey=(goalAware&&p.raceDate&&p.goal!=='fit')?p.goal+':'+p.raceDate:'';
     const activeKeys=new Set(), changes=[]; const firstWeek=monday(start);
     const excluded=new Set(state.excludedOccurrences||[]); let blocked=0;
+    // Free dates that belonged to an older goal before rebuilding the normal plan.
+    // This must happen before conflict detection, otherwise an old locked goal event
+    // can keep the date blocked even after the user moved the goal date.
+    const staleGoalDates=new Set();
+    for(const w of state.workouts) {
+      if(w.source!=='goal'||w.status==='done'||w.status==='skipped'||w.date<start) continue;
+      if(!currentGoalKey||w.goalKey!==currentGoalKey) {
+        staleGoalDates.add(w.date);
+        if(w.status!=='cancelled') {
+          const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
+        }
+      }
+    }
+    const oldMap=new Map(state.workouts.filter(w=>w.source==='plan').map(w=>[w.slotId+':'+w.date,w]));
     const allocationCache=new Map();
     for(let day=start;day<=end;day=addDays(day,1)) {
       const wi=Math.max(0,Math.floor(daysBetween(firstWeek,day)/7));
@@ -251,9 +265,20 @@
       const allocations=allocationCache.get(wi), todays=state.slots.filter(s=>Number(s.day)===dayIndex(day));
       for(const slot of todays) {
         const key=slot.id+':'+day; activeKeys.add(key); if(excluded.has(key)) continue; const existing=oldMap.get(key);
+        // A plan workout can be cancelled automatically because the goal/race day
+        // temporarily occupies that date. Once the goal moves, restore that normal
+        // training instead of treating the date as permanently deleted.
+        if(existing && existing.status==='cancelled' && !excluded.has(key) && (existing.cancelReason==='goal-day' || staleGoalDates.has(day))) {
+          existing.status=state.hold?'held':'planned';
+          delete existing.cancelReason; delete existing.suppressedGoalKey;
+          touch(existing,at);
+        }
         if(existing && (finalStatuses.has(existing.status)||existing.locked)) continue;
         if(!existing && zonedInstant(day,slot.time,p.timezone)<now) continue;
-        if(goalAware&&p.raceDate===day && slot.sport==='run' && p.goal!=='fit'){ if(existing&&!finalStatuses.has(existing.status)&&!existing.locked){existing.status='cancelled';touch(existing,at);} continue; }
+        if(goalAware&&p.raceDate===day && slot.sport==='run' && p.goal!=='fit'){
+          if(existing&&!finalStatuses.has(existing.status)&&!existing.locked){existing.status='cancelled';existing.cancelReason='goal-day';existing.suppressedGoalKey=currentGoalKey;touch(existing,at);}
+          continue;
+        }
         let km=0,minutes=Math.max(15,Number(slot.minutes)||60),kind=normalizeKind(slot.kind),interval=null;
         if(slot.sport==='run') {
           const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
@@ -273,13 +298,6 @@
     }
     for(const w of state.workouts) if(w.source==='plan'&&w.date>=start&&w.date<=end&&!activeKeys.has(w.slotId+':'+w.date)&&!finalStatuses.has(w.status)&&!w.locked) {
       const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
-    }
-    const currentGoalKey=(goalAware&&p.raceDate&&p.goal!=='fit')?p.goal+':'+p.raceDate:'';
-    for(const w of state.workouts) {
-      if(w.source!=='goal'||w.status==='done'||w.status==='skipped'||w.date<start) continue;
-      if(!currentGoalKey||w.goalKey!==currentGoalKey) {
-        if(w.status!=='cancelled'){const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});}
-      }
     }
     const distance=raceDistance(p.goal);
     if(goalAware&&p.raceDate&&distance&&p.raceDate>=start&&p.raceDate<=end){
@@ -392,7 +410,11 @@
   }
   function cancelWorkout(state,id,{now=new Date()}={}) {
     const w=state.workouts.find(x=>x.id===id);if(!w||finalStatuses.has(w.status)) throw new Error('Alleen een geplande training kan worden verwijderd.');
-    const before=eventSnap(w);w.status='cancelled';touch(w,now.toISOString());
+    const before=eventSnap(w);
+    // A deliberate deletion of a recurring plan occurrence must remain deleted on
+    // future rebuilds. Automatic goal-day suppression never writes this exclusion.
+    if(w.source==='plan'&&w.slotId){state.excludedOccurrences=[...new Set([...(state.excludedOccurrences||[]),w.slotId+':'+w.date])];}
+    w.status='cancelled';delete w.cancelReason;delete w.suppressedGoalKey;touch(w,now.toISOString());
     changeLog(state,'Training verwijderd','De agendakoppeling krijgt een annulering met hetzelfde afspraak-ID.',[{id,title:w.title,before,after:eventSnap(w)}],now);
     return state;
   }
