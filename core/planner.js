@@ -66,6 +66,30 @@
   function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
   function raceDistance(goal){return {fit:0,'5k':5,'10k':10,half:21.1,marathon:42.2}[goal]||0;}
   function normalizeKind(kind){return kind==='easy'?'short':(kind||'short');}
+  function raceRunWindow(p, day){
+    if(!p?.raceDate || !raceDistance(p.goal)) return null;
+    const toRace=daysBetween(day,p.raceDate);
+    if(toRace===0) return 'race-day';
+    if(toRace===1||toRace===2) return 'rest-before';
+    if(toRace>=3&&toRace<=7) return 'short-only';
+    if(toRace===-1||toRace===-2) return 'rest-after';
+    return null;
+  }
+  function preRaceShortChoice(p,runs,start,end,excluded){
+    if(!p?.raceDate || !raceDistance(p.goal)) return null;
+    for(let offset=3;offset<=7;offset++){
+      const day=addDays(p.raceDate,-offset);
+      if(day<start||day>end) continue;
+      const candidates=runs.filter(s=>Number(s.day)===dayIndex(day)).sort((a,b)=>a.time.localeCompare(b.time));
+      const slot=candidates.find(s=>!excluded.has(s.id+':'+day));
+      if(slot) return {date:day,slotId:slot.id};
+    }
+    return null;
+  }
+  function preRaceShortKm(p){
+    const capKm={fit:3,'5k':3,'10k':4,half:5,marathon:5}[p.goal]||4;
+    return roundKm(Math.max(2,Math.min(capKm,Number(p.longestKm)||capKm,(Number(p.baseWeeklyKm)||capKm)*.25)));
+  }
   function goalWeeks(p,start=isoDay()) {
     if(!p.raceDate || p.raceDate<start) return null;
     return Math.max(1,Math.ceil(daysBetween(start,p.raceDate)/7));
@@ -239,10 +263,12 @@
     if(!Number.isInteger(weeks)||weeks<1||weeks>52) throw new Error('Kies 4-52 weken of gebruik je doeldatum.');
     const exactGoal=goalAware?goalWeeks(p,start):null;
     const end=goalAware&&exactGoal!==null&&exactGoal<=52?p.raceDate:addDays(monday(start),weeks*7-1), at=now.toISOString();
+    const oldPlanEnd=state.planEnd||end;
     const runs=state.slots.filter(s=>s.sport==='run');
     const currentGoalKey=(goalAware&&p.raceDate&&p.goal!=='fit')?p.goal+':'+p.raceDate:'';
     const activeKeys=new Set(), changes=[]; const firstWeek=monday(start);
     const excluded=new Set(state.excludedOccurrences||[]); let blocked=0;
+    const taperShort=preRaceShortChoice(p,runs,start,end,excluded);
     // Free dates that belonged to an older goal before rebuilding the normal plan.
     // This must happen before conflict detection, otherwise an old locked goal event
     // can keep the date blocked even after the user moved the goal date.
@@ -265,26 +291,36 @@
       const allocations=allocationCache.get(wi), todays=state.slots.filter(s=>Number(s.day)===dayIndex(day));
       for(const slot of todays) {
         const key=slot.id+':'+day; activeKeys.add(key); if(excluded.has(key)) continue; const existing=oldMap.get(key);
-        // A plan workout can be cancelled automatically because the goal/race day
-        // temporarily occupies that date. Once the goal moves, restore that normal
-        // training instead of treating the date as permanently deleted.
-        if(existing && existing.status==='cancelled' && !excluded.has(key) && (existing.cancelReason==='goal-day' || staleGoalDates.has(day))) {
+        const runWindow=slot.sport==='run'?raceRunWindow(p,day):null;
+        const keepAsShort=runWindow==='short-only'&&taperShort&&taperShort.date===day&&taperShort.slotId===slot.id;
+        const suppressRun=slot.sport==='run'&&(runWindow==='race-day'||runWindow==='rest-before'||runWindow==='rest-after'||(runWindow==='short-only'&&!keepAsShort));
+        if(suppressRun){
+          if(existing&&!['done','skipped'].includes(existing.status)){
+            const before=eventSnap(existing);
+            existing.status='cancelled';existing.cancelReason=runWindow==='race-day'?'goal-day':runWindow==='rest-after'?'goal-rest-after':'goal-taper';existing.suppressedGoalKey=currentGoalKey;touch(existing,at);
+            if(JSON.stringify(before)!==JSON.stringify(eventSnap(existing))) changes.push({id:existing.id,title:existing.title,before,after:eventSnap(existing)});
+          }
+          continue;
+        }
+        // Restore only workouts that MijnLoop itself suppressed for an older/current goal window.
+        // User-deleted workouts remain excluded and stay cancelled.
+        if(existing && existing.status==='cancelled' && !excluded.has(key) && ((existing.cancelReason||'').startsWith('goal-') || existing.cancelReason==='plan-window' || staleGoalDates.has(day))) {
           existing.status=state.hold?'held':'planned';
           delete existing.cancelReason; delete existing.suppressedGoalKey;
           touch(existing,at);
         }
         if(existing && (finalStatuses.has(existing.status)||existing.locked)) continue;
         if(!existing && zonedInstant(day,slot.time,p.timezone)<now) continue;
-        if(goalAware&&p.raceDate===day && slot.sport==='run' && p.goal!=='fit'){
-          if(existing&&!finalStatuses.has(existing.status)&&!existing.locked){existing.status='cancelled';existing.cancelReason='goal-day';existing.suppressedGoalKey=currentGoalKey;touch(existing,at);}
-          continue;
-        }
         let km=0,minutes=Math.max(15,Number(slot.minutes)||60),kind=normalizeKind(slot.kind),interval=null;
         if(slot.sport==='run') {
-          const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
+          if(keepAsShort){
+            km=preRaceShortKm(p);kind='short';interval=null;
+          } else {
+            const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
+          }
           minutes=Math.max(15,Math.ceil(km*p.pace+10));
         }
-        const title=slot.sport==='run'?(kind==='long'?`Lange duurloop - ${target.phase}`:kind==='interval'?`Interval - ${interval?.summary||'kwaliteit'}`:`Korte rustige loop - ${target.phase}`):sports[slot.sport];
+        const title=slot.sport==='run'?(keepAsShort?'Korte rustige loop - laatste week':kind==='long'?`Lange duurloop - ${target.phase}`:kind==='interval'?`Interval - ${interval?.summary||'kwaliteit'}`:`Korte rustige loop - ${target.phase}`):sports[slot.sport];
         const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
         if(conflict){blocked++;activeKeys.delete(key);continue;}
         if(existing) {
@@ -296,8 +332,19 @@
         }
       }
     }
-    for(const w of state.workouts) if(w.source==='plan'&&w.date>=start&&w.date<=end&&!activeKeys.has(w.slotId+':'+w.date)&&!finalStatuses.has(w.status)&&!w.locked) {
-      const before=eventSnap(w);w.status='cancelled';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
+    const cleanupEnd=oldPlanEnd>end?oldPlanEnd:end;
+    for(const w of state.workouts) if(w.source==='plan'&&w.date>=start&&w.date<=cleanupEnd&&!activeKeys.has(w.slotId+':'+w.date)&&!finalStatuses.has(w.status)&&!w.locked) {
+      const before=eventSnap(w);w.status='cancelled';w.cancelReason='plan-window';touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
+    }
+    // Explicitly keep the first two days after a race free of planned running, even
+    // when the app is reopened/recalculated after the doeldag and it falls back to
+    // a normal forward planning window. Other sports are left untouched.
+    if(p.raceDate&&raceDistance(p.goal)){
+      const after1=addDays(p.raceDate,1),after2=addDays(p.raceDate,2);
+      for(const w of state.workouts){
+        if(w.source!=='plan'||w.sport!=='run'||!['planned','held'].includes(w.status)||!(w.date===after1||w.date===after2)) continue;
+        const before=eventSnap(w);w.status='cancelled';w.cancelReason='goal-rest-after';w.suppressedGoalKey=p.goal+':'+p.raceDate;touch(w,at);changes.push({id:w.id,title:w.title,before,after:eventSnap(w)});
+      }
     }
     const distance=raceDistance(p.goal);
     if(goalAware&&p.raceDate&&distance&&p.raceDate>=start&&p.raceDate<=end){
@@ -313,7 +360,7 @@
     state.planStart=start;state.planEnd=end;
     adaptPlan(state,{now,writeAudit:false});
     const descriptor=goalAware?(exactGoal>52?`Je doel ligt ${exactGoal} weken weg; de app plant de komende 52 weken en start automatisch het 52-weken-doelmodel zodra je binnen dat venster komt.`:`${exactGoal} weken tot je doeldatum via het lokale ${Math.max(4,exactGoal)}-wekenmodel.`):`${weeks} weken vooruit via het lokale model.`;
-    changeLog(state,'Schema opgebouwd',`${descriptor} Korte, lange en intervaldagen volgen je gekozen weekindeling. Iedere vierde opbouwweek kan lichter zijn; richting een doel volgen piek en taper. Marathontrainingslopen blijven maximaal 32 km. ${blocked?blocked+' moment(en) niet ingepland wegens overlap. ':''}Alle berekeningen gebeuren lokaal in MijnLoop.`,changes,now);
+    changeLog(state,'Schema opgebouwd',`${descriptor} Korte, lange en intervaldagen volgen je gekozen weekindeling. Iedere vierde opbouwweek kan lichter zijn; richting een doel volgen piek en taper. In de laatste 7 dagen blijft maximaal één korte loop over, de laatste 2 dagen voor het doel zijn loopvrij en ook de eerste 2 dagen erna blijven loopvrij. ${blocked?blocked+' moment(en) niet ingepland wegens overlap. ':''}Alle berekeningen gebeuren lokaal in MijnLoop.`,changes,now);
     state.workouts.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
     return state;
   }
@@ -541,5 +588,5 @@
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(Number(w.external?.movingSeconds)||w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
     return {records,longest:longest?{km:longest.actual.km,date:longest.date,workoutId:longest.id}:null,fastest:fastest?{paceSeconds:Math.round(fastest.paceSeconds),date:fastest.workout.date,workoutId:fastest.workout.id}:null};
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,mergeExternalRuns,confirmImportedWorkout,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,mergeExternalRuns,confirmImportedWorkout,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
 })(globalThis.SK ||= {});

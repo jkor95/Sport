@@ -1,4 +1,4 @@
-# MijnLoop v18
+# MijnLoop v19
 
 MijnLoop is een hardloopgerichte webapp voor persoonlijke trainingsplanning, voortgang en optionele Strava/Garmin-import. De planner werkt lokaal met adaptieve modellen van **4 t/m 52 weken** en gebruikt geen actieve AI.
 
@@ -23,9 +23,9 @@ MijnLoop is een hardloopgerichte webapp voor persoonlijke trainingsplanning, voo
 - Meldingen/badges voor aankomende trainingen en trainingen die nog moeten worden ingevuld.
 - Agenda-abonnement, JSON-export en fysio-PDF.
 
-## Update naar v18
+## Update naar v19
 
-V18 is functioneel gebaseerd op v17. De grote wijziging is dat de GitHub-release is opgeschoond; de trainingslogica uit v17 blijft behouden.
+V19 bouwt voort op de opgeschoonde v18-release. De wedstrijddag-taper is nu dag-nauwkeurig: in de laatste 7 dagen blijft maximaal één korte rustige loop over, de laatste 2 dagen vóór het doel zijn loopvrij en ook de eerste 2 dagen na het doel blijven vrij van hardlopen. De Agenda heeft daarnaast een knop **Opnieuw beoordelen**. Gele informatiebalken met plannerwaarschuwingen zijn uit Coach verwijderd.
 
 1. Vervang de bestanden in je GitHub Pages-repository door de inhoud van deze map.
 2. **Behoud je bestaande `config.js`** als daar al jouw Supabase URL en publishable key in staan. Je kunt ook de meegeleverde versie vergelijken en alleen jouw waarden terugzetten.
@@ -40,7 +40,7 @@ Voor deze update is **geen nieuwe Supabase-wijziging nodig**.
 De release is bewust compact gehouden:
 
 ```text
-MijnLoop-v18/
+MijnLoop-v19/
 ├─ index.html
 ├─ app.js
 ├─ config.js
@@ -59,8 +59,7 @@ MijnLoop-v18/
 ├─ supabase/
 │  ├─ config.toml
 │  ├─ functions/
-│  ├─ migrations/
-│  └─ tests/
+│  └─ migrations/
 ├─ standby-ai/
 │  └─ ai-plan-standalone-index.ts
 ├─ .nojekyll
@@ -72,7 +71,7 @@ MijnLoop-v18/
 
 ## Belangrijk: Supabase
 
-De gewone MijnLoop-app blijft je bestaande Supabase-project gebruiken voor inloggen en persoonlijke opslag. Voor v18 hoef je niets nieuws aan de database te veranderen.
+De gewone MijnLoop-app blijft je bestaande Supabase-project gebruiken voor inloggen en persoonlijke opslag. Voor v19 hoef je niets nieuws aan de database te veranderen.
 
 Veiligheidsregels:
 
@@ -161,13 +160,13 @@ Deze versie gebruikt hiervoor geen extra Supabase-tabellen of pushprovider. De t
 
 ## AI standby
 
-MijnLoop v18 gebruikt **geen AI** in de app. Voor eventueel later gebruik blijft alleen dit bronbestand bewaard:
+MijnLoop v19 gebruikt **geen AI** in de app. Voor eventueel later gebruik blijft alleen dit bronbestand bewaard:
 
 ```text
 standby-ai/ai-plan-standalone-index.ts
 ```
 
-De huidige frontend roept deze functie nergens aan. Bestaande `ai-plan`-secrets of Edge Function in Supabase mogen blijven staan, maar zijn niet nodig voor MijnLoop v18.
+De huidige frontend roept deze functie nergens aan. Bestaande `ai-plan`-secrets of Edge Function in Supabase mogen blijven staan, maar zijn niet nodig voor MijnLoop v19.
 
 ## Belangrijke plannerregels
 
@@ -178,7 +177,10 @@ De huidige frontend roept deze functie nergens aan. Bestaande `ai-plan`-secrets 
 - Een door de doeldag tijdelijk weggehaalde normale training mag terugkomen zodra het doel wordt verplaatst.
 - Een training die je zelf bewust verwijdert blijft verwijderd.
 - De duur van hardlooptrainingen wordt berekend uit afstand, tempo en trainingstype; er is geen verborgen eindtijdlimiet.
+- In de laatste 7 dagen vóór een doeldatum blijft maximaal één korte rustige loop over.
+- De laatste 2 dagen vóór de doeldatum en de eerste 2 dagen erna worden geen hardlooptrainingen ingepland.
+- Agenda bevat een directe knop **Opnieuw beoordelen** om het schema opnieuw lokaal op te bouwen.
 
 ## Controle / onderhoud
 
-Deze v18-release is opgeschoond uit de geteste v17-code. Voor het opschonen is de volledige v17-regressieset gebruikt: **68/68 tests geslaagd**. Na het opschonen worden dezelfde runtimebestanden opnieuw gecontroleerd op syntax en verwijzingen.
+V19 is opnieuw regressiegetest op de bestaande plannerregels plus de nieuwe laatste-week- en rustdagregels rond de doeldatum: **71/71 tests geslaagd**.
