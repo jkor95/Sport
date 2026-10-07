@@ -1,69 +1,49 @@
-# Sport-app v7
+# MijnLoop v14
 
-Persoonlijke adaptieve sportagenda voor GitHub Pages + Supabase.
+MijnLoop is een hardloopgerichte sportagenda met **lokale, adaptieve hardloopschema's van 4 t/m 52 weken**. De trainingsberekeningen werken zonder AI.
 
-## Wat is nieuw in v5
+## Belangrijkste functies
 
-- **Doeldatumgerichte opbouw.** Het schema rekent terug vanaf een 5 km-, 10 km-, halve-marathon- of marathondoel. Lange duurlopen kunnen nu gedurende meerdere weken doorgroeien; de oude 35%-begrenzing is verwijderd. Er zijn basis-, opbouw-, lichtere, piek- en taperweken.
-- **Realistische begrenzing.** Een ambitieuze datum forceert geen enorme sprong vanuit een lage basis. Als de resterende tijd kort is, blijft de berekende piek lager en toont de app een waarschuwing.
-- **Doeldag in de agenda.** Als de doeldatum binnen maximaal 26 weken valt, wordt de horizon automatisch lang genoeg gemaakt om die datum mee te nemen. Op de exacte datum verschijnt een doeldag-event.
-- **Echte AI-modus.** OpenAI kan via de Supabase Edge Function `ai-plan` een weekstrategie voorstellen. Die strategie wordt daarna in Sport-app begrensd op startniveau, beschikbare tijd, grote sprongen en taper. De AI schrijft niet rechtstreeks naar de database.
-- **PDF voor fysio.** In Voortgang staat een knop `PDF voor fysio`. Kies week, maand, kwartaal of jaar. Het rapport bevat geregistreerde activiteiten, duur, hardloopafstand, RPE en gepland versus werkelijk. Trainingsnotities zijn optioneel. Het rapport wordt lokaal opgebouwd en via het browser-afdrukvenster als PDF opgeslagen.
-- **Bestaande accounts en gegevens blijven werken.** De databasevorm is niet gewijzigd; v5 gebruikt dezelfde `sport_states`-opslag en Supabase Authentication als v3.
+- Doelen: fit blijven, 5 km, 10 km, halve marathon en marathon.
+- Plannen op doeldatum of een vaste periode van 4 t/m 52 weken.
+- Tempo invoeren als `mm:ss/km`, bijvoorbeeld `6:30`.
+- Per hardloopdag: korte/rustige loop, lange afstand of interval.
+- Concrete intervalopdrachten in de agenda.
+- Lokale bijsturing na goede, zware of ingekorte trainingen.
+- Geen inhaalschuld voor gemiste kilometers.
+- Pijn/ziekte pauzeert de planning.
+- Marathontrainingsloop maximaal 32 km; 42,2 km alleen als marathondoeldag.
+- Coach-historie met resetknop.
+- Agenda-abonnement, JSON-export en fysio-PDF.
+- **PR-overzicht** voor 1 km, 5 km, 10 km, halve marathon en marathon.
+- Langste loop en snelste gemiddelde tempo vanaf 3 km.
+- **Optionele Strava-import** voor afstand, tijd, tempo, hoogte, apparaat, beschikbare best efforts en waar beschikbaar hartslag/cadans.
+- Garmin kan praktisch via **Garmin Connect -> Strava -> MijnLoop** lopen.
 
-## Jouw Supabase-koppeling
+## Geen actieve AI
 
-`config.js` bevat al:
+MijnLoop v14 bevat geen actieve AI-knoppen of AI-aanroepen. De bestaande `ai-plan` Edge Function mag als standby in Supabase blijven staan en wordt niet door de app gebruikt.
 
-- Project URL: `https://gcxnxfwmgcrhfgjlqbnn.supabase.co`
-- Publishable key: de eerder opgegeven publieke key
 
-Er staat geen `service_role`, databasewachtwoord of OpenAI API-sleutel in GitHub.
+## Als je v11/v12 nog niet hebt geinstalleerd
+Dat is geen probleem. V13 bevat alles uit de vorige versies. Vervang direct je GitHub-bestanden door v14. Voor automatische Strava/Garmin-import volg je daarna eenmalig `STRAVA-EENMALIGE-SETUP.md`.
 
-## Upgraden vanaf v3
+## Strava is optioneel
 
-Vervang in GitHub de v3-bestanden door de inhoud van deze map. Er is **geen extra SQL-migratie nodig** voor v5 als `202610060001_sportkompas.sql` en `202610060002_auth_only.sql` al zijn uitgevoerd.
+De basisupdate vereist alleen GitHub. Voor Strava-import is een **eenmalige** Supabase-installatie nodig: één tabel, twee secrets en één Edge Function. Zie `STRAVA-EENMALIGE-SETUP.md`.
 
-De Service Worker-cache heet nu `sport-app-shell-v5`, zodat oude appbestanden na herladen worden vervangen.
+## Technisch
 
-## AI activeren
+- Statische GitHub Pages-app.
+- Supabase Auth + persoonlijke JSON-state.
+- Lokale trainingsmotor in `core/planner.js`.
+- Strava OAuth-tokens blijven server-side en staan nooit in `config.js` of GitHub.
 
-De gewone doelgerichte planner en PDF-export werken zonder OpenAI. Alleen de schakelaar **AI-modus** heeft een server-side OpenAI-configuratie nodig.
 
-Benodigd in Supabase Edge Functions:
-
-- deploy `ai-plan`
-- voor de vraagfunctie ook deploy `ai-coach`
-- secret `OPENAI_API_KEY`
-- secret `OPENAI_MODEL`
-- secret `APP_ORIGIN` met exact de HTTPS-oorsprong van je GitHub Pages-site, bijvoorbeeld `https://gebruikersnaam.github.io`
-
-De OpenAI-sleutel hoort uitsluitend in Supabase Secrets en nooit in `config.js` of GitHub.
-
-## Veiligheidsmodel
-
-Ieder account gebruikt Supabase Authentication. `sport_states.user_id` is gekoppeld aan `auth.uid()` via RLS. De app gebruikt geen aparte `sport_members`-toelatingslijst. AI ontvangt geen naam, e-mail of vrije trainingsnotities voor het maken van een schema; alleen doel, startniveau, vaste hardloopruimte en een beperkte numerieke trainingssamenvatting.
-
-Sport-app is trainingssoftware, geen medische beoordeling. Bij pijn of ziekte pauzeert de bestaande planner toekomstige trainingen. Een marathonplan of AI-strategie garandeert niet dat een wedstrijd haalbaar of veilig is.
-
-## Tests
-
-Run lokaal:
-
-```sh
-npm test
-node --experimental-transform-types tools/test_edge_smoke.mjs
-```
-
-Bij oplevering van v5: 37 planner-/kalendertests geslaagd en 12 gesimuleerde Edge Function toegangscontroles geslaagd.
-
-## Nieuw in v5: exacte opbouw tot doeldatum
-
-Met een ingevulde doeldatum is die datum leidend. De keuzelijst voor vooruit plannen wordt dan genegeerd.
-
-- 8 weken resterend = 8 weekblokken tot de doeldag.
-- 11 weken resterend = 11 weekblokken tot de doeldag.
-- De planner verdeelt deze periode over opbouw, eventuele herstelweek, piek en taper.
-- De AI krijgt exact hetzelfde aantal resterende weken door als de browserplanner.
-- Voor een marathon probeert de planner bij voldoende basis richting een piekduurloop van ongeveer 28-32 km (hard maximum 32 km voor een geplande trainingsloop) te bouwen.
-- Als de huidige basis en resterende tijd dat niet realistisch toelaten, blijft de piek lager en verschijnt een waarschuwing. De app maakt dan geen kunstmatige sprong naar 42,2 km in de trainingen; 42,2 km blijft alleen de ingestelde doeldag.
+## Meldingen & badges (v14)
+- In-app aandachtsteller voor openstaande acties.
+- Categorie **Aankomende sportactiviteit** met instelbare voorlooptijd van 1 t/m 48 uur.
+- Categorie **Training voorbij, nog niet ingevuld** met instelbare wachttijd van direct t/m 3 uur.
+- Per categorie aan/uit, plus aparte schakelaars voor systeemmeldingen en app-icoonbadge.
+- Op iPhone/iPad werkt de app-icoonbadge voor een Home Screen-webapp wanneer meldingen zijn toegestaan.
+- Deze versie gebruikt geen extra Supabase-tabellen of Edge Functions voor meldingen. De melding/badge wordt bijgewerkt wanneer MijnLoop opent, actief is of synchroniseert.

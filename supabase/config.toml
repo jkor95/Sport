@@ -9,8 +9,7 @@ verify_jwt = false
 [functions.calendar-link]
 verify_jwt = false
 
-[functions.ai-coach]
-verify_jwt = false
 
-[functions.ai-plan]
+# OAuth callback from Strava has no Supabase JWT. The function performs its own auth/state validation.
+[functions.strava]
 verify_jwt = false

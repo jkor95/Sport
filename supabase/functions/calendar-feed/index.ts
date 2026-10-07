@@ -2,7 +2,7 @@ import {adminRest,sha256} from '../_shared/http.ts';
 import '../_shared/dates.js';
 import '../_shared/calendar.js';
 const SK=(globalThis as unknown as {SK:any}).SK;
-const headers={'Content-Type':'text/calendar; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Referrer-Policy':'no-referrer','Content-Disposition':'inline; filename="sportkompas.ics"'};
+const headers={'Content-Type':'text/calendar; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Referrer-Policy':'no-referrer','Content-Disposition':'inline; filename="mijnloop.ics"'};
 Deno.serve(async (req:Request)=>{
   const notFound=()=>new Response('Agenda niet beschikbaar.',{status:404,headers:{'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}});
   try{
