@@ -499,48 +499,6 @@
     if(planMode(p)==='fixed'&&state.planEnd&&daysBetween(today,state.planEnd)<21) notes.push('Je planning loopt binnenkort af. Bouw in Instellingen opnieuw verder op; afgeronde trainingen blijven bewaard.');
     return notes;
   }
-  function externalRunId(provider,id){return String(provider||'external')+':'+String(id||'');}
-  function mergeExternalRuns(state,activities,{now=new Date()}={}) {
-    if(!Array.isArray(activities)) throw new Error('Ongeldige importgegevens.');
-    let imported=0,updated=0;
-    const changes=[];
-    for(const a of activities){
-      if(!a||!a.id||!/^[0-9A-Za-z_-]{1,80}$/.test(String(a.id))) continue;
-      const date=String(a.date||''); if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
-      const km=roundKm(Number(a.distanceKm)||0), minutes=Math.max(0,Math.round((Number(a.movingSeconds)||0)/60));
-      if(km<=0||minutes<=0) continue;
-      const extId=externalRunId(a.provider||'strava',a.id);
-      let w=state.workouts.find(x=>x.external?.id===extId);
-      const incomingEfforts=Array.isArray(a.bestEfforts)?a.bestEfforts.slice(0,20).map(e=>({name:String(e.name||''),distanceKm:roundKm(Number(e.distanceKm)||0),seconds:Math.max(1,Math.round(Number(e.seconds)||0))})).filter(e=>e.distanceKm>0):[];
-      const external={id:extId,provider:String(a.provider||'strava'),providerId:String(a.id),url:String(a.url||''),deviceName:String(a.deviceName||''),elevationGain:Number(a.elevationGain)||0,movingSeconds:Math.max(1,Math.round(Number(a.movingSeconds)||minutes*60)),averagePaceSeconds:Number(a.averagePaceSeconds)||Math.round((minutes*60)/km),averageHeartrate:Number(a.averageHeartrate)||0,maxHeartrate:Number(a.maxHeartrate)||0,averageCadence:Number(a.averageCadence)||0,bestEfforts:incomingEfforts};
-      if(w){
-        external.bestEfforts=incomingEfforts.length?incomingEfforts:(w.external?.bestEfforts||[]);
-        external.deviceName=external.deviceName||w.external?.deviceName||'';
-        w.external=external;w.actual={...(w.actual||{}),km,minutes,plannedKm:w.actual?.plannedKm??w.km,plannedMinutes:w.actual?.plannedMinutes??w.minutes,loggedAt:w.actual?.loggedAt||now.toISOString(),rpe:w.actual?.rpe??5,reason:w.actual?.reason||'other',notes:w.actual?.notes||'Automatisch geimporteerd. Bevestig inspanning en reden als je wilt dat de lokale planner deze training gebruikt voor bijsturing.',needsReview:w.actual?.needsReview??true};
-        w.status='done';touch(w,now.toISOString());updated++;continue;
-      }
-      w=state.workouts.find(x=>x.sport==='run'&&x.date===date&&['planned','held'].includes(x.status)&&!x.actual&&!x.external);
-      if(w){
-        w.actual={km,minutes,rpe:5,reason:'other',notes:'Automatisch geimporteerd. Bevestig inspanning en reden als je wilt dat de lokale planner deze training gebruikt voor bijsturing.',plannedKm:w.km,plannedMinutes:w.minutes,loggedAt:now.toISOString(),needsReview:true};
-        w.status='done';w.external=external;touch(w,now.toISOString());
-      } else {
-        const time=/^\d{2}:\d{2}$/.test(String(a.time||''))?String(a.time):'12:00';
-        w=makeWorkout({date,time,sport:'run',kind:'short',title:String(a.name||'Geimporteerde hardlooptraining').slice(0,120),km,minutes,baseKm:km,baseMinutes:minutes,status:'done',source:'strava',locked:false,external},now);
-        w.actual={km,minutes,rpe:5,reason:'other',notes:'Automatisch geimporteerd. Bevestig inspanning en reden als je wilt dat de lokale planner deze training gebruikt voor bijsturing.',plannedKm:km,plannedMinutes:minutes,loggedAt:now.toISOString(),needsReview:true};
-        state.workouts.push(w);
-      }
-      changes.push({id:w.id,title:w.title,before:{km:w.actual?.plannedKm||km,status:'planned',date:w.date,time:w.time},after:eventSnap(w)});imported++;
-    }
-    if(imported||updated) changeLog(state,'Activiteiten geimporteerd',`${imported} nieuwe en ${updated} bijgewerkte hardloopactiviteit(en) uit externe bron. Geimporteerde activiteiten sturen het schema pas mee nadat je inspanning en reden hebt bevestigd.`,changes.slice(0,20),now);
-    return {imported,updated};
-  }
-  function confirmImportedWorkout(state,id,actual,{now=new Date()}={}){
-    const w=state.workouts.find(x=>x.id===id);if(!w||!w.external)throw new Error('Geimporteerde training niet gevonden.');
-    if(!w.actual)throw new Error('Deze import bevat geen traininggegevens.');
-    w.actual.needsReview=false;
-    return logWorkout(state,id,actual,{now});
-  }
-
   function notificationSettings(state){
     const raw=state&&state.notifications&&typeof state.notifications==='object'?state.notifications:{};
     return {
@@ -576,17 +534,13 @@
   function personalRecords(state){
     const targets=[['1 km',1],['5 km',5],['10 km',10],['Halve marathon',21.0975],['Marathon',42.195]];
     const runs=state.workouts.filter(w=>w.sport==='run'&&w.status==='done'&&w.actual&&w.actual.km>0&&w.actual.minutes>0);
-    const bestEfforts=[];
-    for(const w of runs)for(const e of (w.external?.bestEfforts||[]))if(e.distanceKm>0&&e.seconds>0)bestEfforts.push({distanceKm:e.distanceKm,seconds:e.seconds,date:w.date,workoutId:w.id,estimated:false,source:w.external.provider});
     const records=targets.map(([label,target])=>{
-      const exact=bestEfforts.filter(e=>Math.abs(e.distanceKm-target)<=Math.max(.08,target*.025)).sort((a,b)=>a.seconds-b.seconds)[0];
-      if(exact)return {label,distanceKm:target,...exact};
-      const candidates=runs.filter(w=>Math.abs(w.actual.km-target)<=Math.max(.12,target*.03)).map(w=>({seconds:Math.round((Number(w.external?.movingSeconds)||w.actual.minutes*60)*(target/w.actual.km)),date:w.date,workoutId:w.id,estimated:true,source:w.external?.provider||'manual'})).sort((a,b)=>a.seconds-b.seconds);
+      const candidates=runs.filter(w=>Math.abs(w.actual.km-target)<=Math.max(.12,target*.03)).map(w=>({seconds:Math.round((w.actual.minutes*60)*(target/w.actual.km)),date:w.date,workoutId:w.id,estimated:Math.abs(w.actual.km-target)>.05,source:'manual'})).sort((a,b)=>a.seconds-b.seconds);
       return {label,distanceKm:target,...(candidates[0]||{seconds:null,date:null,workoutId:null,estimated:false,source:null})};
     });
     const longest=runs.slice().sort((a,b)=>b.actual.km-a.actual.km)[0]||null;
-    const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(Number(w.external?.movingSeconds)||w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
+    const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
     return {records,longest:longest?{km:longest.actual.km,date:longest.date,workoutId:longest.id}:null,fastest:fastest?{paceSeconds:Math.round(fastest.paceSeconds),date:fastest.workout.date,workoutId:fastest.workout.id}:null};
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,mergeExternalRuns,confirmImportedWorkout,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
 })(globalThis.SK ||= {});

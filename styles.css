@@ -11,7 +11,6 @@
 
 .interval-meta{color:#5e713d;font-weight:600;margin-top:4px}.calendar-event.run{border-left:3px solid #6f8f43}.brand-mark{background:linear-gradient(145deg,#d9f06f,#a6d650)!important;color:#15352b!important}
 
-/* v12: nieuw hardlooplogo, PR-overzicht en Strava/Garmin-via-Strava koppeling */
 .logo-mark{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;padding:0;background:transparent!important}
 .logo-mark img{display:block;width:30px;height:30px;border-radius:8px}
 .pr-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:14px}
@@ -24,7 +23,6 @@
 .pr-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
 .pr-summary>div{border-top:1px solid var(--border,#d9dfd8);padding-top:12px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
 .pr-summary span{color:var(--muted,#667066);font-size:13px}.pr-summary strong{font-size:17px}
-.strava-tag{border-color:#fc5200!important;color:#a83a00!important;background:#fff3ed!important}
 @media(max-width:950px){.pr-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.pr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-summary{grid-template-columns:1fr}.pr-card strong{font-size:22px}}
 
