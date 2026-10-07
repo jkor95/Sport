@@ -1,4 +1,4 @@
-# MijnLoop v26 — centrale synchronisatie met eigen login
+# MijnLoop v27 - beheeractiviteit en centrale synchronisatie
 
 MijnLoop gebruikt nog steeds zijn eigen eenvoudige gebruikersnaam/wachtwoord-login en de losse `admin.html` beheerpagina. Supabase Auth wordt **niet** gebruikt.
 
@@ -13,7 +13,7 @@ MijnLoop gebruikt nog steeds zijn eigen eenvoudige gebruikersnaam/wachtwoord-log
 
 ## Eerste update vanaf v25
 
-Open na het plaatsen van v26 eerst MijnLoop op het apparaat waarop je huidige lokale accounts staan. Wanneer de centrale database nog leeg is, zet v26 die lokale accounts en hun sportdata automatisch één keer over naar Supabase. Daarna kun je op je telefoon dezelfde gebruikersnaam en hetzelfde wachtwoord gebruiken.
+Open na het plaatsen van v27 eerst MijnLoop op het apparaat waarop je huidige lokale accounts staan. Wanneer de centrale database nog leeg is, zet v27 die lokale accounts en hun sportdata automatisch één keer over naar Supabase. Daarna kun je op je telefoon dezelfde gebruikersnaam en hetzelfde wachtwoord gebruiken.
 
 Als er nog helemaal geen lokale accounts waren, open dan `admin.html` om de eerste centrale beheerder aan te maken.
 
@@ -33,3 +33,11 @@ De eigen MijnLoop-sessies worden als willekeurige tokens uitgegeven en server-si
 ## Belangrijk over wachtwoorden
 
 Omdat je als beheerder wachtwoorden wilt kunnen inzien, bewaart de centrale MijnLoop-accounttabel het gekozen wachtwoord leesbaar. Dat is bewust minder veilig dan standaard wachtwoordopslag. Gebruik voor MijnLoop daarom geen wachtwoord dat je ook voor e-mail, bankzaken of andere belangrijke accounts gebruikt.
+
+## v27 - beheeractiviteit
+
+- Beheer toont per account de laatste succesvolle login.
+- Beheer toont apart wanneer sportdata voor het laatst is opgeslagen of gewijzigd.
+- Actieve gewone gebruikers die 30 dagen of langer niet hebben ingelogd en niets hebben opgeslagen verschijnen als beheermelding.
+- Geblokkeerde accounts en beheerders tellen niet mee voor deze inactiviteitsmelding.
+- Gebruikersnamen zijn bij inloggen niet hoofdlettergevoelig: `jeremy`, `Jeremy` en `JEREMY` verwijzen naar hetzelfde account.
