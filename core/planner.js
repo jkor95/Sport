@@ -544,8 +544,22 @@
     const targets=[['1 km',1],['5 km',5],['10 km',10],['Halve marathon',21.0975],['Marathon',42.195]];
     const runs=state.workouts.filter(w=>w.sport==='run'&&w.status==='done'&&w.actual&&w.actual.km>0&&w.actual.minutes>0);
     const records=targets.map(([label,target])=>{
-      const candidates=runs.filter(w=>Math.abs(w.actual.km-target)<=Math.max(.12,target*.03)).map(w=>({seconds:Math.round((w.actual.minutes*60)*(target/w.actual.km)),date:w.date,workoutId:w.id,estimated:Math.abs(w.actual.km-target)>.05,source:'manual'})).sort((a,b)=>a.seconds-b.seconds);
-      return {label,distanceKm:target,...(candidates[0]||{seconds:null,date:null,workoutId:null,estimated:false,source:null})};
+      const tolerance=Math.max(.12,target*.03);
+      const candidates=runs
+        .filter(w=>w.actual.km>=target-tolerance)
+        .map(w=>{
+          const specific=Math.abs(w.actual.km-target)<=tolerance;
+          return {
+            seconds:Math.round((w.actual.minutes*60)*(target/w.actual.km)),
+            date:w.date,
+            workoutId:w.id,
+            recordType:specific?'distance':'average',
+            sourceKm:Number(w.actual.km),
+            source:'manual'
+          };
+        })
+        .sort((a,b)=>a.seconds-b.seconds);
+      return {label,distanceKm:target,...(candidates[0]||{seconds:null,date:null,workoutId:null,recordType:null,sourceKm:null,source:null})};
     });
     const longest=runs.slice().sort((a,b)=>b.actual.km-a.actual.km)[0]||null;
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;

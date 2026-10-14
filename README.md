@@ -51,3 +51,10 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Een verwijderde geregistreerde loop telt daarna niet meer mee in voortgang of de automatische Coach-beoordeling; toekomstige trainingen worden opnieuw beoordeeld.
 - Een verwijderd vast schema-moment blijft voor die specifieke datum uitgesloten bij een volgende schema-opbouw.
 - De doeldag zelf wijzig of verwijder je via Instellingen.
+
+
+## v34
+- Persoonlijke records kunnen nu ook uit het gemiddelde tempo van een langere hardloopactiviteit worden berekend.
+- Een loop van 5,00 km kan bijvoorbeeld een 1 km-record opleveren op basis van het gemiddelde tempo.
+- Bij ieder record staat expliciet of het een 'PR op specifieke afstand' is of een 'PR op gemiddeld tempo', inclusief de afstand waaruit dat gemiddelde kwam.
+- De snelste geldige tijd wint, ongeacht of die uit een specifieke afstand of een gemiddeld tempo van een langere loop komt.
