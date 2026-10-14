@@ -58,3 +58,11 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Een loop van 5,00 km kan bijvoorbeeld een 1 km-record opleveren op basis van het gemiddelde tempo.
 - Bij ieder record staat expliciet of het een 'PR op specifieke afstand' is of een 'PR op gemiddeld tempo', inclusief de afstand waaruit dat gemiddelde kwam.
 - De snelste geldige tijd wint, ongeacht of die uit een specifieke afstand of een gemiddeld tempo van een langere loop komt.
+
+
+## v35
+- Intervaltrainingen gebruiken nu een totale geplande afstand die de volledige sessie omvat: inlopen, snelle stukken, herstel en uitlopen.
+- De intervalopdracht schaalt mee met de geplande hele-kilometerafstand. Een korte sessie van 3 km krijgt dus niet langer een opdracht die al ruim meer dan 3 km vraagt.
+- Iedere intervalstap wordt afzonderlijk getoond met exacte duur en exact richttempo per kilometer.
+- Inlopen/uitlopen, snelle stukken en rustige herstelstukken hebben verschillende kleuren.
+- De geplande tijdsduur van een interval wordt voortaan uit de daadwerkelijke intervalstappen berekend in plaats van alleen afstand x normaal tempo.

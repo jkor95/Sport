@@ -222,22 +222,40 @@
   function paceText(pace){
     const sec=Math.max(180,Math.round(Number(pace)*60)),m=Math.floor(sec/60),s=String(sec%60).padStart(2,'0');return `${m}:${s}`;
   }
-  function intervalPrescription(p,target,wi,sessionKm=8){
-    const phase=target.phase, km=Math.max(3,Number(sessionKm)||8), easySec=Math.round(Number(p.pace)*60);
-    if(phase==='herstel'||km<5.5) return {summary:'6 x 1 min vlot',detail:'12-15 min rustig inlopen, 6 x 1 min vlot met 2 min rustig dribbelen, daarna rustig uitlopen tot je geplande afstand.',effort:'RPE 6/10 - soepel, niet sprinten'};
-    if(phase==='taper') return {summary:'4 x 400 m ontspannen vlot',detail:'12-15 min rustig inlopen, 4 x 400 m vlot met 400 m zeer rustig herstel, daarna rustig uitlopen.',effort:'RPE 6-7/10 - fris eindigen'};
-    const banks={
-      fit:[{s:'6 x 1 min',d:'6 x 1 min vlot / 2 min rustig',need:4},{s:'5 x 2 min',d:'5 x 2 min vlot / 2 min rustig',need:5.5},{s:'6 x 2 min',d:'6 x 2 min vlot / 90 sec rustig',need:6.5},{s:'8 x 1 min',d:'8 x 1 min vlot / 90 sec rustig',need:5.5}],
-      '5k':[{s:'6 x 400 m',d:'6 x 400 m / 200 m rustig',need:6},{s:'6 x 600 m',d:'6 x 600 m / 300 m rustig',need:7.5},{s:'5 x 800 m',d:'5 x 800 m / 400 m rustig',need:8.5},{s:'4 x 1 km',d:'4 x 1 km / 400 m rustig',need:9}],
-      '10k':[{s:'6 x 400 m',d:'6 x 400 m / 200 m rustig',need:6},{s:'5 x 800 m',d:'5 x 800 m / 400 m rustig',need:8.5},{s:'4 x 1 km',d:'4 x 1 km / 400 m rustig',need:9},{s:'3 x 1,6 km',d:'3 x 1,6 km / 600 m rustig',need:10.5}],
-      half:[{s:'6 x 400 m',d:'6 x 400 m / 200 m rustig',need:6},{s:'4 x 1 km',d:'4 x 1 km / 400 m rustig',need:9},{s:'3 x 1,6 km',d:'3 x 1,6 km / 600 m rustig',need:10.5},{s:'3 x 2 km',d:'3 x 2 km / 800 m rustig',need:12}],
-      marathon:[{s:'6 x 400 m',d:'6 x 400 m / 200 m rustig',need:6},{s:'5 x 800 m',d:'5 x 800 m / 400 m rustig',need:8.5},{s:'4 x 1 km',d:'4 x 1 km / 400 m rustig',need:9},{s:'3 x 2 km',d:'3 x 2 km / 800 m rustig',need:12}]
-    };
-    const bank=banks[p.goal]||banks.fit, preferred=target.modelIndex%bank.length;
-    let choice=bank[preferred];
-    if(choice.need>km){const fitting=bank.filter(x=>x.need<=km);choice=fitting.length?fitting.at(-1):bank[0];}
-    const faster=p.goal==='fit'?25:p.goal==='marathon'?40:p.goal==='half'?45:55, lo=Math.max(180,easySec-faster-15),hi=Math.max(lo+5,easySec-faster+5);
-    return {summary:choice.s,detail:`12-15 min rustig inlopen, ${choice.d}, daarna rustig uitlopen tot ongeveer ${kmText(roundKm(km))} km totaal. Richttempo snelle stukken ongeveer ${paceText(lo/60)}-${paceText(hi/60)}/km als dat gecontroleerd voelt.`,effort:phase==='piek'?'RPE 7-8/10 - stevig maar controleerbaar':'RPE 7/10 - controle houden'};
+  function intervalPrescription(p,target,wi,sessionKm=6){
+    const desired=clamp(planKm(sessionKm||6),3,10);
+    const normalSec=Math.round(Number(p.pace)*60);
+    const easySec=clamp(normalSec+75,330,540);
+    const fastBase=p.goal==='fit'?40:p.goal==='marathon'?45:p.goal==='half'?50:55;
+    const fastSec=clamp(normalSec-fastBase,240,420);
+    let warm=8,reps=5,fast=60,recovery=120;
+    if(desired<=3){warm=6;reps=4;fast=30;recovery=90;}
+    else if(desired===4){warm=8;reps=5;fast=30;recovery=90;}
+    else if(desired===5){warm=8;reps=5;fast=60;recovery=120;}
+    else if(desired===6){warm=10;reps=6;fast=60;recovery=120;}
+    else if(desired===7){warm=12;reps=8;fast=60;recovery=90;}
+    else if(desired===8){warm=12;reps=8;fast=90;recovery=90;}
+    else {warm=15;reps=8;fast=120;recovery=90;}
+    if(target.phase==='taper'){reps=Math.max(4,Math.min(reps,5));fast=Math.min(fast,60);recovery=Math.max(recovery,120);}
+    if(target.phase==='herstel'){reps=Math.max(4,Math.min(reps,5));fast=Math.min(fast,45);recovery=Math.max(recovery,120);}
+    const distanceFor=(seconds,paceSeconds)=>seconds/paceSeconds;
+    const workDistance=reps*(distanceFor(fast,fastSec)+distanceFor(recovery,easySec));
+    const warmDistance=distanceFor(warm*60,easySec);
+    const remaining=Math.max(0,desired-warmDistance-workDistance);
+    const cooldown=Math.max(5,Math.round(remaining*easySec/60));
+    const steps=[{type:'warmup',label:'Inlopen',durationSec:warm*60,paceSec:easySec}];
+    for(let i=1;i<=reps;i++){
+      steps.push({type:'fast',label:`Snel ${i}/${reps}`,durationSec:fast,paceSec:fastSec});
+      steps.push({type:'recovery',label:`Rustig ${i}/${reps}`,durationSec:recovery,paceSec:easySec});
+    }
+    steps.push({type:'cooldown',label:'Uitlopen',durationSec:cooldown*60,paceSec:easySec});
+    const totalSeconds=steps.reduce((sum,s)=>sum+s.durationSec,0);
+    const totalMinutes=totalSeconds/60;
+    const fastLabel=fast<60?`${fast} sec`:fast%60===0?`${fast/60} min`:`${Math.floor(fast/60)}:${String(fast%60).padStart(2,'0')} min`;
+    const summary=`${reps} x ${fastLabel} vlot`;
+    const detail=`Volledige intervaltraining van ongeveer ${kmText(desired)} km, inclusief inlopen, herstel en uitlopen. Volg de stappen hieronder op volgorde.`;
+    const effort=target.phase==='piek'?'Snelle stukken RPE 7-8/10 - stevig maar controleerbaar':'Snelle stukken RPE 7/10 - vlot, geen volle sprint';
+    return {summary,detail,effort,plannedKm:desired,totalMinutes,steps,fastPaceSec:fastSec,easyPaceSec:easySec};
   }
   function runAllocations(p,runs,target,wi){
     const out=new Map(), normalized=runs.map(s=>({...s,kind:normalizeKind(s.kind)}));
@@ -250,12 +268,12 @@
       const maxForLong=Math.max(0,remaining-intervalReserve-shortReserve), km=planKm(Math.min(32,target.longKm,Math.max(maxForLong,target.weeklyKm*.35)));
       out.set(long.id,{km,kind:'long',dynamicDuration:true});remaining=Math.max(0,remaining-km);
     }
-    if(interval){const km=planKm(Math.min(intervalReserve,remaining,cap(interval)));out.set(interval.id,{km,kind:'interval',interval:intervalPrescription(p,target,wi,km)});remaining=Math.max(0,remaining-km);}
+    if(interval){const proposed=planKm(Math.min(intervalReserve,remaining,cap(interval))), prescription=intervalPrescription(p,target,wi,proposed);const km=prescription.plannedKm;out.set(interval.id,{km,kind:'interval',interval:prescription});remaining=Math.max(0,remaining-km);}
     const other=shorts.length?shorts:normalized.filter(s=>!out.has(s.id));
     if(other.length){for(let i=0;i<other.length;i++){const s=other[i],left=other.length-i,desired=remaining/left,km=planKm(Math.min(desired,cap(s),32));out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);}}
     if(normalized.length===1){
       const s=normalized[0],kind=normalizeKind(s.kind),km=planKm(kind==='long'?Math.min(32,target.longKm):Math.min(target.weeklyKm,cap(s)));
-      out.set(s.id,{km,kind,dynamicDuration:kind==='long',interval:kind==='interval'?intervalPrescription(p,target,wi,km):null});
+      const prescription=kind==='interval'?intervalPrescription(p,target,wi,km):null;out.set(s.id,{km:prescription?.plannedKm??km,kind,dynamicDuration:kind==='long',interval:prescription});
     }
     return out;
   }
@@ -321,7 +339,7 @@
           } else {
             const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
           }
-          minutes=Math.max(15,Math.round(km*p.pace*60)/60);
+          minutes=kind==='interval'&&interval?.totalMinutes?interval.totalMinutes:Math.max(15,Math.round(km*p.pace*60)/60);
         }
         const title=slot.sport==='run'?(keepAsShort?'Korte rustige loop - laatste week':kind==='long'?`Lange duurloop - ${target.phase}`:kind==='interval'?`Interval - ${interval?.summary||'kwaliteit'}`:`Korte rustige loop - ${target.phase}`):sports[slot.sport];
         const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
