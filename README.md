@@ -35,3 +35,10 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - iPhone-vriendelijke MM:SS-invoer: 1422 wordt 14:22 en 515 wordt 5:15/km.
 - 'Rustig tempo' verduidelijkt naar normaal/rustig looptempo.
 - Geplande hardlooptijd gebruikt het ingestelde tempo zonder vaste +10 minuten, zodat gemiddeld gepland tempo niet kunstmatig te langzaam wordt.
+
+
+## v32
+- Als je een handmatige hardloopactiviteit 1-3 dagen na een nog open geplande loop toevoegt, vraagt MijnLoop of dit dezelfde verschoven training is.
+- Bij koppelen wordt de oorspronkelijke planning naar de nieuwe dag verplaatst. De geplande afstand/tijd blijven als referentie bewaard; bij een reeds gelopen training opent daarna direct het invulscherm met de ingevoerde werkelijke afstand en tijd.
+- Automatisch gegenereerde trainingsafstanden en Coach-aanpassingen gebruiken alleen hele kilometers. Een voorstel van 5,22 km wordt bijvoorbeeld 5 km.
+- Werkelijke en handmatig ingevoerde afstanden blijven decimalen tot twee cijfers ondersteunen.

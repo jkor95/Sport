@@ -4,6 +4,7 @@
   const validStatuses = new Set(['planned','done','skipped','cancelled','held']);
   const kmText=n=>Number(Math.max(0,Number(n)||0)).toFixed(2).replace('.',',');
   const durationText=minutes=>{const sec=Math.max(0,Math.round((Number(minutes)||0)*60));return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;};
+  const planKm=n=>Math.max(0,Math.round(Number(n)||0));
   const finalStatuses = new Set(['done','skipped','cancelled']);
   const notificationDefaults = Object.freeze({enabled:true,appBadge:true,systemNotifications:true,upcoming:true,upcomingHours:4,pending:true,pendingDelayMinutes:30});
   function freshState() {
@@ -90,7 +91,7 @@
   }
   function preRaceShortKm(p){
     const capKm={fit:3,'5k':3,'10k':4,half:5,marathon:5}[p.goal]||4;
-    return roundKm(Math.max(2,Math.min(capKm,Number(p.longestKm)||capKm,(Number(p.baseWeeklyKm)||capKm)*.25)));
+    return planKm(Math.max(2,Math.min(capKm,Number(p.longestKm)||capKm,(Number(p.baseWeeklyKm)||capKm)*.25)));
   }
   function goalWeeks(p,start=isoDay()) {
     if(!p.raceDate || p.raceDate<start) return null;
@@ -203,7 +204,7 @@
     }
     if(preGoalBase){
       const gentle=clamp(1+wi*.004,1,1.12);
-      return {weekStart,weeklyKm:roundKm(base*gentle),longKm:roundKm(Math.min(32,longest*gentle)),phase:'basis',left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total,peakLongKm:peakLongTarget(p)};
+      return {weekStart,weeklyKm:roundKm(base*gentle),longKm:planKm(Math.min(32,longest*gentle)),phase:'basis',left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total,peakLongKm:planKm(peakLongTarget(p))};
     }
     const model=OFFLINE_MODELS[p.goal]?.[total]?.[modelIndex]||buildOfflineModel(p.goal,total)[modelIndex];
     const peakWeekly=peakWeeklyTarget(p), longTarget=longRunTargetForModel(p,total,modelIndex);
@@ -216,7 +217,7 @@
     const requiredWeekly=longKm/0.62;
     weekly=Math.max(weekly,Math.min(peakWeekly,requiredWeekly));
     longKm=Math.min(32,longKm,Math.max(3,weekly*.64));
-    return {weekStart,weeklyKm:roundKm(Math.max(1,weekly)),longKm:roundKm(Math.max(1,longKm)),phase:model.phase,left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total,peakLongKm:roundKm(longTarget.peakKm),peakIndex:longTarget.peakIndex};
+    return {weekStart,weeklyKm:roundKm(Math.max(1,weekly)),longKm:planKm(Math.max(1,longKm)),phase:model.phase,left:toGoal,totalWeeks:total,modelIndex,modelWeeks:total,peakLongKm:planKm(longTarget.peakKm),peakIndex:longTarget.peakIndex};
   }
   function paceText(pace){
     const sec=Math.max(180,Math.round(Number(pace)*60)),m=Math.floor(sec/60),s=String(sec%60).padStart(2,'0');return `${m}:${s}`;
@@ -246,14 +247,14 @@
     const intervalReserve=interval?Math.min(remaining,cap(interval),Math.max(3,Math.min(target.weeklyKm*.24,10))):0;
     const shortReserve=shorts.length?Math.min(remaining*.18,shorts.length*3):0;
     if(long){
-      const maxForLong=Math.max(0,remaining-intervalReserve-shortReserve), km=roundKm(Math.min(32,target.longKm,Math.max(maxForLong,target.weeklyKm*.35)));
+      const maxForLong=Math.max(0,remaining-intervalReserve-shortReserve), km=planKm(Math.min(32,target.longKm,Math.max(maxForLong,target.weeklyKm*.35)));
       out.set(long.id,{km,kind:'long',dynamicDuration:true});remaining=Math.max(0,remaining-km);
     }
-    if(interval){const km=roundKm(Math.min(intervalReserve,remaining,cap(interval)));out.set(interval.id,{km,kind:'interval',interval:intervalPrescription(p,target,wi,km)});remaining=Math.max(0,remaining-km);}
+    if(interval){const km=planKm(Math.min(intervalReserve,remaining,cap(interval)));out.set(interval.id,{km,kind:'interval',interval:intervalPrescription(p,target,wi,km)});remaining=Math.max(0,remaining-km);}
     const other=shorts.length?shorts:normalized.filter(s=>!out.has(s.id));
-    if(other.length){for(let i=0;i<other.length;i++){const s=other[i],left=other.length-i,desired=remaining/left,km=roundKm(Math.min(desired,cap(s),32));out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);}}
+    if(other.length){for(let i=0;i<other.length;i++){const s=other[i],left=other.length-i,desired=remaining/left,km=planKm(Math.min(desired,cap(s),32));out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);}}
     if(normalized.length===1){
-      const s=normalized[0],kind=normalizeKind(s.kind),km=roundKm(kind==='long'?Math.min(32,target.longKm):Math.min(target.weeklyKm,cap(s)));
+      const s=normalized[0],kind=normalizeKind(s.kind),km=planKm(kind==='long'?Math.min(32,target.longKm):Math.min(target.weeklyKm,cap(s)));
       out.set(s.id,{km,kind,dynamicDuration:kind==='long',interval:kind==='interval'?intervalPrescription(p,target,wi,km):null});
     }
     return out;
@@ -410,7 +411,7 @@
             km=Math.max(km,modest);reasons.push('Een vergelijkbare recente loop ging rustig beter dan gepland; daarom slechts een kleine stap omhoog.');
           }
           const cap=normalizeKind(w.kind)==='long'?32:w.baseKm*1.03;
-          w.km=roundKm(Math.max(0,Math.min(km,cap)));
+          w.km=planKm(Math.max(0,Math.min(km,cap)));
           if(w.km!==w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.round(w.km*state.profile.pace*60)/60));
           w.adaptation=[...new Set(reasons)].join(' ');
         } else if(fatigued&&w.date<=addDays(today,7)) w.adaptation='Er is hoge inspanning gemeld. Beoordeel deze andere sport zelf; hardloopkilometers zijn niet uitwisselbaar met deze sport.';
