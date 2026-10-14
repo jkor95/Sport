@@ -320,7 +320,7 @@
           } else {
             const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
           }
-          minutes=Math.max(15,Math.ceil(km*p.pace+10));
+          minutes=Math.max(15,Math.round(km*p.pace*60)/60);
         }
         const title=slot.sport==='run'?(keepAsShort?'Korte rustige loop - laatste week':kind==='long'?`Lange duurloop - ${target.phase}`:kind==='interval'?`Interval - ${interval?.summary||'kwaliteit'}`:`Korte rustige loop - ${target.phase}`):sports[slot.sport];
         const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
@@ -351,7 +351,7 @@
     const distance=raceDistance(p.goal);
     if(goalAware&&p.raceDate&&distance&&p.raceDate>=start&&p.raceDate<=end){
       let race=state.workouts.find(w=>w.source==='goal'&&w.goalKey===p.goal+':'+p.raceDate);
-      const raceMinutes=Math.max(30,Math.ceil(distance*p.pace));
+      const raceMinutes=Math.max(1,Math.round(distance*p.pace*60)/60);
       if(!race) {
         race=makeWorkout({date:p.raceDate,time:'09:00',sport:'run',kind:'race',title:`Doeldag - ${SK.goals[p.goal]}`,km:distance,minutes:raceMinutes,baseKm:distance,baseMinutes:raceMinutes,source:'goal',slotId:null,locked:true,goalKey:p.goal+':'+p.raceDate},now);
         state.workouts.push(race);
@@ -411,7 +411,7 @@
           }
           const cap=normalizeKind(w.kind)==='long'?32:w.baseKm*1.03;
           w.km=roundKm(Math.max(0,Math.min(km,cap)));
-          if(w.km!==w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.ceil(w.km*state.profile.pace+10)));
+          if(w.km!==w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.round(w.km*state.profile.pace*60)/60));
           w.adaptation=[...new Set(reasons)].join(' ');
         } else if(fatigued&&w.date<=addDays(today,7)) w.adaptation='Er is hoge inspanning gemeld. Beoordeel deze andere sport zelf; hardloopkilometers zijn niet uitwisselbaar met deze sport.';
       }

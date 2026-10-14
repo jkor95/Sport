@@ -24,8 +24,14 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - service-worker cache verhoogd naar v28.
 
 
-## v30 - uniforme afstand, duur en tempo
+## v31 - uniforme afstand, duur en tempo
 - Kilometers worden overal tot twee decimalen verwerkt en als twee decimalen weergegeven.
 - Duur wordt overal als MM:SS weergegeven; kloktijden blijven HH:MM.
 - Toekomstige hardlooptrainingen tonen afstand, aanbevolen duur en gemiddeld gepland tempo per kilometer.
 - Jouw totaal toont sporttijd als MM:SS in plaats van decimale minuten.
+
+
+## v31
+- iPhone-vriendelijke MM:SS-invoer: 1422 wordt 14:22 en 515 wordt 5:15/km.
+- 'Rustig tempo' verduidelijkt naar normaal/rustig looptempo.
+- Geplande hardlooptijd gebruikt het ingestelde tempo zonder vaste +10 minuten, zodat gemiddeld gepland tempo niet kunstmatig te langzaam wordt.
