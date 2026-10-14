@@ -458,16 +458,22 @@
     changeLog(state,'Training gewijzigd','Handmatige wijziging. Datum en tijd worden niet vanzelf teruggezet.',[{id,title:w.title,before,after:eventSnap(w)}],now);
     return state;
   }
-  function cancelWorkout(state,id,{now=new Date()}={}) {
-    const w=state.workouts.find(x=>x.id===id);if(!w||finalStatuses.has(w.status)) throw new Error('Alleen een geplande training kan worden verwijderd.');
-    const before=eventSnap(w);
-    // A deliberate deletion of a recurring plan occurrence must remain deleted on
-    // future rebuilds. Automatic goal-day suppression never writes this exclusion.
+  function deleteWorkout(state,id,{now=new Date()}={}) {
+    const index=state.workouts.findIndex(x=>x.id===id);
+    if(index<0) throw new Error('Training niet gevonden.');
+    const w=state.workouts[index];
+    if(w.source==='goal') throw new Error('De doeldag wijzig of verwijder je via Instellingen.');
+    const wasRegistered=(w.status==='done'||w.status==='skipped')&&!!w.actual;
     if(w.source==='plan'&&w.slotId){state.excludedOccurrences=[...new Set([...(state.excludedOccurrences||[]),w.slotId+':'+w.date])];}
-    w.status='cancelled';delete w.cancelReason;delete w.suppressedGoalKey;touch(w,now.toISOString());
-    changeLog(state,'Training verwijderd','De agendakoppeling krijgt een annulering met hetzelfde afspraak-ID.',[{id,title:w.title,before,after:eventSnap(w)}],now);
+    state.workouts.splice(index,1);
+    if(wasRegistered&&(state.profile?.autoAdapt||state.hold)){
+      adaptPlan(state,{now,trigger:`${w.title} verwijderd; deze activiteit telt niet meer mee in de beoordeling.`});
+    }else{
+      changeLog(state,'Activiteit verwijderd',wasRegistered?'De geregistreerde activiteit is verwijderd en telt niet meer mee in voortgang of Coach.':'Het geplande moment is verwijderd; je hoeft hiervoor geen nulregistratie in te vullen.',[],now);
+    }
     return state;
   }
+  const cancelWorkout=deleteWorkout;
   function resumePlan(state,weekly,longest,{now=new Date()}={}) {
     const p={...state.profile,baseWeeklyKm:Number(weekly),longestKm:Number(longest)};validateProfile(p,state.slots);
     state.profile=p;state.hold=false;state.holdSince=null;state.lastResume=now.toISOString();
@@ -480,7 +486,7 @@
     if(state.hold) notes.push('Je planning staat gepauzeerd. Er worden geen nieuwe actieve trainingen ingepland totdat je bewust hervat.');
     const p=state.profile,today=isoDay(now);
     const pending=state.workouts.filter(w=>w.status==='planned'&&w.date<today);
-    if(pending.length) notes.push(`${pending.length} eerdere training(en) nog niet geregistreerd. Vul de werkelijke uitvoering in; de app kan deze niet raden.`);
+    if(pending.length) notes.push(`${pending.length} eerdere training(en) staan nog open. Registreer wat je hebt gedaan of verwijder een gemiste training als je die niet wilt bewaren.`);
     const runs=state.slots.filter(s=>s.sport==='run'), days=new Set(runs.map(s=>Number(s.day)));
     const capacity=runs.reduce((a,s)=>a+(normalizeKind(s.kind)==='long'?32:Math.max(0,(s.minutes-10)/p.pace)),0);
     if(capacity<p.baseWeeklyKm*.9)notes.push('Je vaste korte/intervalmomenten plus maximaal 32 km op je lange dag bieden minder ruimte dan je opgegeven hardloopbasis. Het schema kan daardoor worden ingekort.');
@@ -545,5 +551,5 @@
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
     return {records,longest:longest?{km:longest.actual.km,date:longest.date,workoutId:longest.id}:null,fastest:fastest?{paceSeconds:Math.round(fastest.paceSeconds),date:fastest.workout.date,workoutId:fastest.workout.id}:null};
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,deleteWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
 })(globalThis.SK ||= {});

@@ -42,3 +42,12 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Bij koppelen wordt de oorspronkelijke planning naar de nieuwe dag verplaatst. De geplande afstand/tijd blijven als referentie bewaard; bij een reeds gelopen training opent daarna direct het invulscherm met de ingevoerde werkelijke afstand en tijd.
 - Automatisch gegenereerde trainingsafstanden en Coach-aanpassingen gebruiken alleen hele kilometers. Een voorstel van 5,22 km wordt bijvoorbeeld 5 km.
 - Werkelijke en handmatig ingevoerde afstanden blijven decimalen tot twee cijfers ondersteunen.
+
+
+## v33
+- Gemiste trainingen kunnen direct worden verwijderd; 0 km en 0:00 invoeren is niet meer nodig.
+- De verwijderknop staat ook in het registratiescherm van een verlopen training.
+- Handmatig toegevoegde activiteiten kunnen ook na registratie definitief worden verwijderd.
+- Een verwijderde geregistreerde loop telt daarna niet meer mee in voortgang of de automatische Coach-beoordeling; toekomstige trainingen worden opnieuw beoordeeld.
+- Een verwijderd vast schema-moment blijft voor die specifieke datum uitgesloten bij een volgende schema-opbouw.
+- De doeldag zelf wijzig of verwijder je via Instellingen.
