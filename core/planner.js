@@ -6,7 +6,7 @@
   const durationText=minutes=>{const sec=Math.max(0,Math.round((Number(minutes)||0)*60));return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;};
   const planKm=n=>Math.max(0,Math.round(Number(n)||0));
   const finalStatuses = new Set(['done','skipped','cancelled']);
-  const notificationDefaults = Object.freeze({enabled:true,appBadge:true,systemNotifications:true,upcoming:true,upcomingHours:4,pending:true,pendingDelayMinutes:30});
+  const notificationDefaults = Object.freeze({enabled:true,appBadge:true,systemNotifications:true,upcoming:true,upcomingHours:4,pushUpcoming:true,pending:true,pendingDelayMinutes:30,pushPending:true});
   function freshState() {
     return {schemaVersion:1, profile:null, slots:[], workouts:[], adjustments:[], excludedOccurrences:[], hold:false, holdSince:null, lastResume:null, notifications:{...notificationDefaults}};
   }
@@ -534,8 +534,10 @@
       systemNotifications:raw.systemNotifications!==false,
       upcoming:raw.upcoming!==false,
       upcomingHours:[1,2,4,8,12,24,48].includes(Number(raw.upcomingHours))?Number(raw.upcomingHours):4,
+      pushUpcoming:raw.pushUpcoming!==false,
       pending:raw.pending!==false,
-      pendingDelayMinutes:[0,15,30,60,120,180].includes(Number(raw.pendingDelayMinutes))?Number(raw.pendingDelayMinutes):30
+      pendingDelayMinutes:[0,15,30,60,120,180].includes(Number(raw.pendingDelayMinutes))?Number(raw.pendingDelayMinutes):30,
+      pushPending:raw.pushPending!==false
     };
   }
   function workoutStartInstant(w){
