@@ -34,6 +34,7 @@
   }
   function hasUsers(){return hasUsersCache;}
   function currentUser(){return read(localStorage,USER_SESSION,null)?.user||null;}
+  function sessionToken(){return read(localStorage,USER_SESSION,null)?.token||'';}
   function currentAdmin(){const admin=read(sessionStorage,ADMIN_SESSION,null);if(admin?.user?.role==='admin')return admin.user;const userSession=read(localStorage,USER_SESSION,null);if(userSession?.user?.role==='admin'){write(sessionStorage,ADMIN_SESSION,userSession);return userSession.user;}return null;}
   async function bootstrapAdmin({username,password,displayName=''}){username=validateUsername(username);password=validatePassword(password);const r=await api('bootstrap',{username,password,displayName});hasUsersCache=true;return r.user;}
   async function login(username,password){username=validateUsername(username);password=validatePassword(password);const r=await api('login',{username,password});write(localStorage,USER_SESSION,r);if(r?.user?.role==='admin')write(sessionStorage,ADMIN_SESSION,r);else sessionStorage.removeItem(ADMIN_SESSION);return r.user;}
@@ -49,5 +50,5 @@
   async function loadState(){return api('load');}
   async function saveState(state,revision){return api('save',{state,revision});}
   function generatePassword(length=6){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',bytes=crypto.getRandomValues(new Uint8Array(length));return [...bytes].map(b=>alphabet[b%alphabet.length]).join('');}
-  global.MijnLoopLocalAuth={connect,hasUsers,bootstrapAdmin,login,logout,currentUser,adminLogout,currentAdmin,listUsers,adminState,createUser,updateUser,setPassword,deleteUser,changeOwnPassword,loadState,saveState,generatePassword};
+  global.MijnLoopLocalAuth={connect,hasUsers,bootstrapAdmin,login,logout,currentUser,sessionToken,adminLogout,currentAdmin,listUsers,adminState,createUser,updateUser,setPassword,deleteUser,changeOwnPassword,loadState,saveState,generatePassword};
 })(globalThis);
