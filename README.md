@@ -66,3 +66,11 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Iedere intervalstap wordt afzonderlijk getoond met exacte duur en exact richttempo per kilometer.
 - Inlopen/uitlopen, snelle stukken en rustige herstelstukken hebben verschillende kleuren.
 - De geplande tijdsduur van een interval wordt voortaan uit de daadwerkelijke intervalstappen berekend in plaats van alleen afstand x normaal tempo.
+
+
+## v36
+- Echte Web Push toegevoegd voor MijnLoop, ook wanneer de PWA gesloten is.
+- Push is per meldingscategorie aan/uit te zetten: aankomende sportactiviteit en nog niet ingevulde training.
+- De bestaande tijd vooraf / vertraging wordt ook voor echte push gebruikt.
+- Supabase controleert ongeveer iedere 5 minuten en dedupliceert meldingen per training en categorie.
+- Op iPhone moet MijnLoop op het beginscherm staan en via dat icoon worden geopend.
