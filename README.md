@@ -74,3 +74,10 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - De bestaande tijd vooraf / vertraging wordt ook voor echte push gebruikt.
 - Supabase controleert ongeveer iedere 5 minuten en dedupliceert meldingen per training en categorie.
 - Op iPhone moet MijnLoop op het beginscherm staan en via dat icoon worden geopend.
+
+
+## v37
+- Bij het registreren van een hardlooptraining kun je nu aangeven welk type loop je werkelijk hebt gedaan: kort/rustig, interval of lange duurloop.
+- Gepland type en werkelijk type worden apart bewaard en in het trainingsdetail getoond.
+- De Coach gebruikt het werkelijke type voor vergelijkingen met toekomstige trainingen. Een rustige loop op een geplande intervaldag telt dus niet meer als uitgevoerde intervaltraining.
+- Een gemiste interval/duurloop wordt niet als inhaaltraining zwaarder teruggezet. Een onverwacht zwaarder type training geeft tijdelijk extra herstelruimte.
