@@ -33,3 +33,90 @@
 .attention-item:last-of-type{border-bottom:0}.attention-item p{font-size:11px;color:var(--muted);line-height:1.55;margin-top:3px}.attention-glyph{width:38px;height:38px;border-radius:12px;background:#eef5e1;color:#456f37;display:grid;place-items:center}
 .notification-settings{display:grid;gap:14px}.notification-category{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(170px,.8fr);gap:14px;align-items:end;padding:14px;border:1px solid var(--line);border-radius:14px;background:#f8faf5}.notification-category label{margin:0}.notification-settings .notice .btn{margin-left:8px}
 @media(max-width:640px){.attention-count{top:-4px;right:-4px}.attention-item{grid-template-columns:36px 1fr;align-items:start}.attention-item>.btn{grid-column:2;justify-self:start}.attention-glyph{width:34px;height:34px}.notification-category{grid-template-columns:1fr}.notification-settings .notice .btn{margin:9px 0 0;display:flex;width:max-content}}
+
+
+/* v38: consistente mobiele uitlijning door de hele app */
+@media(max-width:640px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .content,.card,.stack,.settings-grid,.dashboard-grid,.progress-grid,.form-grid,fieldset,form{min-width:0;max-width:100%}
+
+  /* Formulieren: op een telefoon altijd 1 duidelijke kolom. */
+  .form-grid,.modal .form-grid{grid-template-columns:minmax(0,1fr)!important}
+  .form-grid>.span2,.modal .form-grid>.span2,.form-grid .narrow-full,.modal .form-grid .span-mobile{grid-column:1!important}
+  label,input,select,textarea{min-width:0;max-width:100%}
+  input[type=date],input[type=time],input[type=number],input[type=text],input[type=password],select{width:100%;min-height:46px}
+  .field-help{max-width:100%;overflow-wrap:anywhere}
+
+  /* Modals mogen nooit breder worden dan het zichtbare scherm. */
+  .modal-overlay{padding:10px;overflow:hidden}
+  .modal,.modal.wide{width:min(100%,590px);max-width:100%;padding:20px;overflow-x:hidden}
+  .modal-head{min-width:0}
+  .modal-head>div{min-width:0}
+  .modal-head h2,.modal-head p{overflow-wrap:anywhere}
+  .modal-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:9px}
+  .modal-actions .btn{width:100%;min-width:0;white-space:normal;text-align:center}
+  .modal-actions .btn.danger{grid-column:1/-1}
+  .modal-actions>*:only-child{grid-column:1/-1}
+
+  /* De drie geplande/werkelijke hoofdwaarden blijven gelijkmatig verdeeld. */
+  .metric-banner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:14px}
+  .metric-banner>div{min-width:0}
+  .metric-banner strong{font-size:clamp(18px,6vw,23px);overflow-wrap:anywhere}
+  .metric-banner span{display:block;line-height:1.35}
+
+  /* Trainingskaarten: vaste kolommen voorkomen verspringende knoppen/afstanden. */
+  .workout{display:grid;grid-template-columns:35px minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;gap:7px 10px;flex-wrap:initial}
+  .workout>.sport-icon{grid-column:1;grid-row:1/3}
+  .workout>.workout-info{grid-column:2;grid-row:1/3}
+  .workout>.workout-distance{grid-column:3;grid-row:1;align-self:end}
+  .workout>.btn{grid-column:3;grid-row:2;justify-self:end;align-self:start}
+  .workout-info,.workout-info strong,.workout-meta{min-width:0;overflow-wrap:anywhere}
+
+  /* Kopregels en knoppen mogen omslaan zonder elkaar weg te drukken. */
+  .page-heading,.card-header,.section-row,.audit-head,.key-value{min-width:0}
+  .page-heading{flex-wrap:wrap}
+  .page-heading>.button-row{width:100%;justify-content:flex-start}
+  .card-header{flex-wrap:wrap}
+  .section-row{gap:10px}
+  .section-row h3{min-width:0}
+  .key-value{align-items:flex-start;flex-wrap:wrap}
+  .key-value strong{margin-left:auto;text-align:right;overflow-wrap:anywhere}
+  .button-row{max-width:100%}
+  .button-row>.btn{min-width:0;white-space:normal}
+
+  /* Intervalstappen blijven leesbaar op smalle schermen. */
+  .interval-step{grid-template-columns:26px minmax(0,1fr);gap:7px 9px}
+  .interval-step div{min-width:0}
+  .interval-step div strong{overflow-wrap:anywhere}
+  .interval-step>b{grid-column:2;justify-self:start}
+  .interval-step div span{white-space:normal}
+
+  /* Instellingen en meldingen. */
+  .notification-category{min-width:0}
+  .notification-settings .notice{overflow-wrap:anywhere}
+  .slot-row{min-width:0}
+  .slot-row input,.slot-row select{width:100%;min-width:0}
+
+  /* Tabellen/grafieken en records: voorkom dat tekst het scherm verbreedt. */
+  .scroll-x{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .chart-bars{max-width:100%;overflow:hidden}
+  .pr-card,.pr-summary>div{min-width:0}
+  .pr-card small,.pr-summary strong{overflow-wrap:anywhere}
+}
+@media(max-width:420px){
+  .content{padding-left:12px;padding-right:12px}
+  .card{padding:16px}
+  .modal{padding:18px 16px}
+  .metric-banner{grid-template-columns:1fr 1fr}
+  .metric-banner>div:nth-child(3){grid-column:1/-1}
+  .mini-stats{grid-template-columns:1fr}
+  .stat-card{padding:14px}
+  .pr-grid{grid-template-columns:1fr}
+  .modal-actions{grid-template-columns:1fr}
+  .modal-actions .btn.danger{grid-column:auto}
+  .workout{grid-template-columns:35px minmax(0,1fr)}
+  .workout>.sport-icon{grid-column:1;grid-row:1/3}
+  .workout>.workout-info{grid-column:2;grid-row:1}
+  .workout>.workout-distance{grid-column:2;grid-row:2;justify-self:start}
+  .workout>.btn{grid-column:1/-1;grid-row:3;width:100%;justify-self:stretch}
+}
