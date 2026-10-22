@@ -81,3 +81,10 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Gepland type en werkelijk type worden apart bewaard en in het trainingsdetail getoond.
 - De Coach gebruikt het werkelijke type voor vergelijkingen met toekomstige trainingen. Een rustige loop op een geplande intervaldag telt dus niet meer als uitgevoerde intervaltraining.
 - Een gemiste interval/duurloop wordt niet als inhaaltraining zwaarder teruggezet. Een onverwacht zwaarder type training geeft tijdelijk extra herstelruimte.
+
+
+## v38
+- Responsive uitlijning door de hele webapp aangescherpt, vooral voor iPhone/smalle schermen.
+- Formulieren en modals gebruiken op mobiel één kolom zodat datum-, tijd-, duur- en selectvelden niet meer buiten beeld lopen.
+- Modal-knoppen, statistiekblokken, trainingskaarten, intervalstappen, kopregels, instellingen en records hebben stabielere mobiele uitlijning.
+- Extra bescherming tegen horizontale overflow en afgesneden invoervelden toegevoegd.
