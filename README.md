@@ -95,3 +95,5 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Coach vergelijkt voortaan het schema dat vlak voor de beoordeling daadwerkelijk actief was met het definitieve nieuwe schema. Interne tussenstappen van het basismodel worden niet meer als advieswijziging getoond.
 - Een afstandspaar zoals 7,00 → 6,00 km verschijnt alleen als de actuele geplande afstand echt van 7 naar 6 veranderde. Als 6 km al actief was en 6 km blijft, verschijnt geen 7 → 6 opnieuw.
 - Als alleen duur, moment of status wijzigt, toont Coach dat apart in plaats van een misleidende 6,00 → 6,00 km.
+
+- Oude Coach-items met de titel `Schema opgebouwd` uit versies voor v39 tonen hun oude tussenstap-afstanden niet meer, omdat die niet betrouwbaar het definitieve agenda-advies weergaven.
