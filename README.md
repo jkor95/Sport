@@ -88,3 +88,10 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Formulieren en modals gebruiken op mobiel één kolom zodat datum-, tijd-, duur- en selectvelden niet meer buiten beeld lopen.
 - Modal-knoppen, statistiekblokken, trainingskaarten, intervalstappen, kopregels, instellingen en records hebben stabielere mobiele uitlijning.
 - Extra bescherming tegen horizontale overflow en afgesneden invoervelden toegevoegd.
+
+
+## v39
+- Na iedere geregistreerde of verwijderde loop wordt het resterende actieve schema opnieuw doorgerekend op basis van de recente werkelijke trainingshistorie, zonder de modelopbouw vanaf week 1 te resetten.
+- Coach vergelijkt voortaan het schema dat vlak voor de beoordeling daadwerkelijk actief was met het definitieve nieuwe schema. Interne tussenstappen van het basismodel worden niet meer als advieswijziging getoond.
+- Een afstandspaar zoals 7,00 → 6,00 km verschijnt alleen als de actuele geplande afstand echt van 7 naar 6 veranderde. Als 6 km al actief was en 6 km blijft, verschijnt geen 7 → 6 opnieuw.
+- Als alleen duur, moment of status wijzigt, toont Coach dat apart in plaats van een misleidende 6,00 → 6,00 km.
