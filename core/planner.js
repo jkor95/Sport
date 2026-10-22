@@ -277,17 +277,21 @@
     }
     return out;
   }
-  function generatePlan(state, {start=isoDay(),weeks=12,now=new Date()} = {}) {
+  function generatePlan(state, {start=isoDay(),weeks=12,now=new Date(),rebuild=false,trigger=null} = {}) {
     const p=state.profile; validateProfile(p,state.slots);
-    const window=planWindow(p,start), goalAware=window.mode==='goal'&&!!p.raceDate;
-    weeks=goalAware?window.weeks:clamp(Number(weeks)||Number(p.horizon)||12,4,52);
+    const previousPlanStart=state.planStart||null,previousPlanEnd=state.planEnd||null;
+    const auditBefore=new Map(state.workouts.filter(w=>(w.source==='plan'||w.source==='goal')&&!finalStatuses.has(w.status)).map(w=>[w.id,{title:w.title,snap:eventSnap(w)}]));
+    const anchorStart=rebuild&&previousPlanStart?previousPlanStart:start;
+    const window=planWindow(p,anchorStart), goalAware=window.mode==='goal'&&!!p.raceDate;
+    weeks=goalAware?clamp(Number(p.horizon)||window.weeks||12,4,52):clamp(Number(weeks)||Number(p.horizon)||12,4,52);
     if(!Number.isInteger(weeks)||weeks<1||weeks>52) throw new Error('Kies 4-52 weken of gebruik je doeldatum.');
-    const exactGoal=goalAware?goalWeeks(p,start):null;
-    const end=goalAware&&exactGoal!==null&&exactGoal<=52?p.raceDate:addDays(monday(start),weeks*7-1), at=now.toISOString();
-    const oldPlanEnd=state.planEnd||end;
+    const exactGoal=goalAware?goalWeeks(p,anchorStart):null;
+    const calculatedEnd=goalAware&&exactGoal!==null&&exactGoal<=52?p.raceDate:addDays(monday(anchorStart),weeks*7-1);
+    const end=rebuild&&previousPlanEnd&&previousPlanEnd>=start?previousPlanEnd:calculatedEnd, at=now.toISOString();
+    const oldPlanEnd=previousPlanEnd||end;
     const runs=state.slots.filter(s=>s.sport==='run');
     const currentGoalKey=(goalAware&&p.raceDate&&p.goal!=='fit')?p.goal+':'+p.raceDate:'';
-    const activeKeys=new Set(), changes=[]; const firstWeek=monday(start);
+    const activeKeys=new Set(), changes=[]; const firstWeek=monday(anchorStart);
     const excluded=new Set(state.excludedOccurrences||[]); let blocked=0;
     const taperShort=preRaceShortChoice(p,runs,start,end,excluded);
     // Free dates that belonged to an older goal before rebuilding the normal plan.
@@ -378,10 +382,18 @@
         const before=eventSnap(race);Object.assign(race,{km:distance,baseKm:distance,minutes:raceMinutes,baseMinutes:raceMinutes,title:`Doeldag - ${SK.goals[p.goal]}`,locked:true,status:state.hold?'held':'planned'});touch(race,at);changes.push({id:race.id,title:race.title,before,after:eventSnap(race)});
       } else if(!finalStatuses.has(race.status)) Object.assign(race,{km:distance,baseKm:distance,minutes:raceMinutes,baseMinutes:raceMinutes,title:`Doeldag - ${SK.goals[p.goal]}`,locked:true,status:state.hold?'held':'planned'});
     }
-    state.planStart=start;state.planEnd=end;
+    state.planStart=rebuild&&previousPlanStart?previousPlanStart:start;state.planEnd=end;
     adaptPlan(state,{now,writeAudit:false});
-    const descriptor=goalAware?(exactGoal>52?`Je doel ligt ${exactGoal} weken weg; de app plant de komende 52 weken en start automatisch het 52-weken-doelmodel zodra je binnen dat venster komt.`:`${exactGoal} weken tot je doeldatum via het lokale ${Math.max(4,exactGoal)}-wekenmodel.`):`${weeks} weken vooruit via het lokale model.`;
-    changeLog(state,'Schema opgebouwd',`${descriptor} Korte, lange en intervaldagen volgen je gekozen weekindeling. Iedere vierde opbouwweek kan lichter zijn; richting een doel volgen piek en taper. In de laatste 7 dagen blijft maximaal één korte loop over, de laatste 2 dagen voor het doel zijn loopvrij en ook de eerste 2 dagen erna blijven loopvrij. ${blocked?blocked+' moment(en) niet ingepland wegens overlap. ':''}Alle berekeningen gebeuren lokaal in MijnLoop.`,changes,now);
+    const netChanges=[];
+    for(const w of state.workouts){
+      const previous=auditBefore.get(w.id);if(!previous)continue;
+      const after=eventSnap(w);
+      if(JSON.stringify(previous.snap)!==JSON.stringify(after))netChanges.push({id:w.id,title:w.title,before:previous.snap,after});
+    }
+    const descriptor=goalAware?(exactGoal>52?`Je doel ligt ${exactGoal} weken weg; de app plant de komende 52 weken en start automatisch het 52-weken-doelmodel zodra je binnen dat venster komt.`:`${exactGoal} weken tot je doeldatum via het lokale ${Math.max(4,exactGoal)}-wekenmodel.`):`${weeks} weken via het actieve lokale model.`;
+    const auditTitle=rebuild?'Schema opnieuw beoordeeld':'Schema opgebouwd';
+    const netDetail=netChanges.length?`${netChanges.length} toekomstige training(en) zijn netto aangepast ten opzichte van het schema dat hiervoor actief was.`:'De toekomstige planning is opnieuw doorgerekend; er veranderde niets aan de actuele afstanden of momenten.';
+    changeLog(state,auditTitle,`${trigger?trigger+' ':''}${netDetail} ${descriptor} ${blocked?blocked+' moment(en) niet ingepland wegens overlap. ':''}Alle berekeningen gebeuren lokaal in MijnLoop.`,netChanges,now);
     state.workouts.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
     return state;
   }
@@ -465,8 +477,10 @@
     if(actual.reason==='pain'||actual.reason==='illness') {state.hold=true;state.holdSince=now.toISOString();}
     const kindNames={short:'korte/rustige loop',long:'lange duurloop',interval:'interval',race:'doeldag'},kindChange=w.sport==='run'&&w.actual.kind!==w.actual.plannedKind?` Gepland: ${kindNames[w.actual.plannedKind]||'loop'}, werkelijk: ${kindNames[w.actual.kind]||'loop'}.`:'';
     const trigger=w.sport==='run'?`${kmText(w.actual.km)} van ${kmText(w.actual.plannedKm)} km geregistreerd.${kindChange}`:`${durationText(w.actual.minutes)} ${sports[w.sport].toLowerCase()} geregistreerd.`;
-    if(state.profile.autoAdapt||state.hold) adaptPlan(state,{now,trigger});
-    else changeLog(state,'Training opgeslagen','Automatisch aanpassen staat uit. Beoordeel je schema via Coach.',[],now);
+    if(state.profile.autoAdapt||state.hold){
+      const today=isoDay(now,state.profile.timezone),window=planWindow(state.profile,state.planStart||today);
+      generatePlan(state,{now,start:today,weeks:window.weeks,rebuild:true,trigger});
+    }else changeLog(state,'Training opgeslagen','Automatisch aanpassen staat uit. Beoordeel je schema via Coach.',[],now);
     return state;
   }
   function checkMove(state,w) {
@@ -494,7 +508,8 @@
     if(w.source==='plan'&&w.slotId){state.excludedOccurrences=[...new Set([...(state.excludedOccurrences||[]),w.slotId+':'+w.date])];}
     state.workouts.splice(index,1);
     if(wasRegistered&&(state.profile?.autoAdapt||state.hold)){
-      adaptPlan(state,{now,trigger:`${w.title} verwijderd; deze activiteit telt niet meer mee in de beoordeling.`});
+      const today=isoDay(now,state.profile.timezone),window=planWindow(state.profile,state.planStart||today);
+      generatePlan(state,{now,start:today,weeks:window.weeks,rebuild:true,trigger:`${w.title} verwijderd; deze activiteit telt niet meer mee in de beoordeling.`});
     }else{
       changeLog(state,'Activiteit verwijderd',wasRegistered?'De geregistreerde activiteit is verwijderd en telt niet meer mee in voortgang of Coach.':'Het geplande moment is verwijderd; je hoeft hiervoor geen nulregistratie in te vullen.',[],now);
     }
