@@ -389,9 +389,13 @@
     const today=isoDay(now,state.profile?.timezone), until=addDays(today,14), changes=[];
     const recent=state.workouts.filter(w=>(w.status==='done'||w.status==='skipped')&&w.actual&&w.date>=addDays(today,-21)&&w.date<=today&&(!state.lastResume||w.actual.loggedAt>state.lastResume)).sort((a,b)=>b.date.localeCompare(a.date)||b.actual.loggedAt.localeCompare(a.actual.loggedAt));
     const runs=recent.filter(w=>w.sport==='run');
+    const actualKind=w=>normalizeKind(w.actual?.kind||w.kind), plannedKind=w=>normalizeKind(w.actual?.plannedKind||w.kind);
+    const matchedRuns=runs.filter(w=>actualKind(w)===plannedKind(w));
+    const changedRuns=runs.filter(w=>actualKind(w)!==plannedKind(w));
     const ratio=w=>w.actual.plannedKm>0?w.actual.km/w.actual.plannedKm:1;
-    const shortRuns=runs.filter(w=>w.actual.plannedKm>0 && ratio(w)<.80);
-    const strongRuns=runs.filter(w=>w.actual.plannedKm>0 && ratio(w)>=1.02 && w.actual.rpe<=6 && w.actual.reason==='normal');
+    const shortRuns=matchedRuns.filter(w=>w.actual.plannedKm>0 && ratio(w)<.80);
+    const strongRuns=matchedRuns.filter(w=>w.actual.plannedKm>0 && ratio(w)>=1.02 && w.actual.rpe<=6 && w.actual.reason==='normal');
+    const extraLoad=changedRuns.some(w=>w.date>=addDays(today,-3)&&['interval','long'].includes(actualKind(w))&&actualKind(w)!==plannedKind(w));
     const fatigued=recent.some(w=>w.actual.reason==='fatigue'||w.actual.rpe>=8);
     const repeated=shortRuns.filter(w=>!['time','weather'].includes(w.actual.reason)).length>=2;
     const positiveStreak=strongRuns.filter(w=>w.date>=addDays(today,-10)).length>=2;
@@ -412,18 +416,21 @@
         if(w.sport==='run') {
           let factor=1; const reasons=[];
           if((fatigued||repeated)&&w.date<=until) {factor=.82;reasons.push(fatigued?'Lichtere periode na hoge inspanning of vermoeidheid.':'Meerdere moeilijke of sterk ingekorte trainingen: opbouw tijdelijk lager.');}
+          if(extraLoad&&w.date<=addDays(today,4)){factor=Math.min(factor,.90);reasons.push('Je deed recent een zwaarder type loop dan gepland; daarom tijdelijk extra herstelruimte.');}
           if(unlogged) {factor=Math.min(factor,.90);reasons.push('Meerdere eerdere trainingen zijn niet geregistreerd; geen extra opbouw.');}
           if(positiveStreak&&!fatigued&&!repeated&&w.date<=addDays(today,10)&&normalizeKind(w.kind)!=='interval') {factor=Math.max(factor,1.03);reasons.push('Twee recente trainingen gingen comfortabel goed: kleine positieve bijstelling van maximaal 3%.');}
           let km=w.baseKm*factor;
           for(const r of shortRuns) {
-            const left=daysBetween(r.date,w.date), sameSlot=r.slotId&&w.slotId===r.slotId, comparable=sameSlot||normalizeKind(r.kind)===normalizeKind(w.kind);
+            const left=daysBetween(r.date,w.date), sameSlot=r.slotId&&w.slotId===r.slotId, comparable=sameSlot||actualKind(r)===normalizeKind(w.kind);
             if(comparable&&left>0&&left<=14&&r.actual.km>0) {
               const forgiving=['time','weather'].includes(r.actual.reason)?1.20:1.08;
               km=Math.min(km,r.actual.km*forgiving);
               reasons.push(`Vorige vergelijkbare loop: ${kmText(r.actual.km)} van ${kmText(r.actual.plannedKm)} km. Geen inhaalkilometers.`);
             }
           }
-          const strongest=strongRuns.find(r=>{const left=daysBetween(r.date,w.date);return left>0&&left<=10&&(r.slotId&&w.slotId===r.slotId||normalizeKind(r.kind)===normalizeKind(w.kind));});
+          const strongest=strongRuns.find(r=>{const left=daysBetween(r.date,w.date);return left>0&&left<=10&&(r.slotId&&w.slotId===r.slotId||actualKind(r)===normalizeKind(w.kind));});
+          const changedType=changedRuns.find(r=>{const left=daysBetween(r.date,w.date);return left>0&&left<=10&&plannedKind(r)===normalizeKind(w.kind);});
+          if(changedType){const names={short:'korte/rustige loop',long:'lange duurloop',interval:'interval',race:'doeldag'};reasons.push(`De vorige geplande ${names[plannedKind(changedType)]||'loop'} werd uitgevoerd als ${names[actualKind(changedType)]||'ander type'}. Deze training wordt niet zwaarder gemaakt om dat in te halen.`);}
           if(strongest&&!fatigued&&!repeated&&factor>=1){
             const modest=Math.min(w.baseKm*1.03,strongest.actual.km*1.02);
             km=Math.max(km,modest);reasons.push('Een vergelijkbare recente loop ging rustig beter dan gepland; daarom slechts een kleine stap omhoog.');
@@ -451,11 +458,13 @@
     if(!Number.isFinite(km)||km<0||km>300||!Number.isFinite(minutes)||minutes<0||minutes>1440||!Number.isInteger(rpe)||rpe<1||rpe>10) throw new Error('Controleer afstand, minuten en inspanning (1-10).');
     if(km>0&&minutes<=0) throw new Error('Vul de werkelijke tijdsduur in.');
     if(!['normal','time','fatigue','weather','pain','illness','other','missed'].includes(actual.reason)) throw new Error('Kies een reden.');
-    const old=w.actual;
-    w.actual={km,minutes,rpe,reason:actual.reason,notes:String(actual.notes||'').slice(0,1000),plannedKm:old?.plannedKm??w.km,plannedMinutes:old?.plannedMinutes??w.minutes,loggedAt:now.toISOString(),...(w.external?{needsReview:false}:{})};
+    const old=w.actual,plannedKind=normalizeKind(old?.plannedKind||w.kind),actualKind=w.sport==='run'?(plannedKind==='race'?'race':normalizeKind(actual.kind||old?.kind||plannedKind)):null;
+    if(w.sport==='run'&&!['short','long','interval','race'].includes(actualKind))throw new Error('Kies welk soort loop je werkelijk hebt gedaan.');
+    w.actual={km,minutes,rpe,reason:actual.reason,notes:String(actual.notes||'').slice(0,1000),plannedKm:old?.plannedKm??w.km,plannedMinutes:old?.plannedMinutes??w.minutes,...(w.sport==='run'?{kind:actualKind,plannedKind:old?.plannedKind??plannedKind}:{}),loggedAt:now.toISOString(),...(w.external?{needsReview:false}:{})};
     w.status=km===0&&minutes===0?'skipped':'done';touch(w,now.toISOString());
     if(actual.reason==='pain'||actual.reason==='illness') {state.hold=true;state.holdSince=now.toISOString();}
-    const trigger=w.sport==='run'?`${kmText(w.actual.km)} van ${kmText(w.actual.plannedKm)} km geregistreerd.`:`${durationText(w.actual.minutes)} ${sports[w.sport].toLowerCase()} geregistreerd.`;
+    const kindNames={short:'korte/rustige loop',long:'lange duurloop',interval:'interval',race:'doeldag'},kindChange=w.sport==='run'&&w.actual.kind!==w.actual.plannedKind?` Gepland: ${kindNames[w.actual.plannedKind]||'loop'}, werkelijk: ${kindNames[w.actual.kind]||'loop'}.`:'';
+    const trigger=w.sport==='run'?`${kmText(w.actual.km)} van ${kmText(w.actual.plannedKm)} km geregistreerd.${kindChange}`:`${durationText(w.actual.minutes)} ${sports[w.sport].toLowerCase()} geregistreerd.`;
     if(state.profile.autoAdapt||state.hold) adaptPlan(state,{now,trigger});
     else changeLog(state,'Training opgeslagen','Automatisch aanpassen staat uit. Beoordeel je schema via Coach.',[],now);
     return state;
