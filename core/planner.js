@@ -391,7 +391,7 @@
       if(JSON.stringify(previous.snap)!==JSON.stringify(after))netChanges.push({id:w.id,title:w.title,before:previous.snap,after});
     }
     const descriptor=goalAware?(exactGoal>52?`Je doel ligt ${exactGoal} weken weg; de app plant de komende 52 weken en start automatisch het 52-weken-doelmodel zodra je binnen dat venster komt.`:`${exactGoal} weken tot je doeldatum via het lokale ${Math.max(4,exactGoal)}-wekenmodel.`):`${weeks} weken via het actieve lokale model.`;
-    const auditTitle=rebuild?'Schema opnieuw beoordeeld':'Schema opgebouwd';
+    const auditTitle=rebuild?'Schema opnieuw beoordeeld':'Schema opnieuw opgebouwd';
     const netDetail=netChanges.length?`${netChanges.length} toekomstige training(en) zijn netto aangepast ten opzichte van het schema dat hiervoor actief was.`:'De toekomstige planning is opnieuw doorgerekend; er veranderde niets aan de actuele afstanden of momenten.';
     changeLog(state,auditTitle,`${trigger?trigger+' ':''}${netDetail} ${descriptor} ${blocked?blocked+' moment(en) niet ingepland wegens overlap. ':''}Alle berekeningen gebeuren lokaal in MijnLoop.`,netChanges,now);
     state.workouts.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
