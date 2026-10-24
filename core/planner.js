@@ -16,6 +16,10 @@
     if (!(+p.baseWeeklyKm >= 1 && +p.baseWeeklyKm <= 150)) throw new Error('Vul je werkelijke gemiddelde hardloopkilometers per week in (1-150).');
     if (!(+p.longestKm >= 1 && +p.longestKm <= +p.baseWeeklyKm)) throw new Error('Je recente langste loop moet tussen 1 km en je weektotaal liggen.');
     if (!(+p.pace >= 3 && +p.pace <= 15)) throw new Error('Vul een rustig tempo in tussen 3:00 en 15:00 min/km.');
+    if (p.shortBaseKm!=null && !(+p.shortBaseKm>=1 && +p.shortBaseKm<=30)) throw new Error('Vul voor je normale korte rondje 1-30 km in.');
+    if (p.intervalBaseKm!=null && !(+p.intervalBaseKm>=1 && +p.intervalBaseKm<=30)) throw new Error('Vul voor je normale intervaltraining 1-30 km in.');
+    if (p.longBaseKm!=null && !(+p.longBaseKm>=1 && +p.longBaseKm<=32)) throw new Error('Vul voor je normale lange duurloop 1-32 km in.');
+    if (p.shortBaseKm!=null && p.longBaseKm!=null && +p.longBaseKm<+p.shortBaseKm) throw new Error('Je normale lange duurloop kan niet korter zijn dan je normale korte rondje.');
     if (p.timezone !== 'Europe/Amsterdam') throw new Error('Deze versie gebruikt Europe/Amsterdam.');
     if (!slots.length || slots.length > 14) throw new Error('Kies 1-14 vaste sportmomenten.');
     const runs = slots.filter(s=>s.sport==='run');
@@ -70,6 +74,38 @@
   function raceDistance(goal){return {fit:0,'5k':5,'10k':10,half:21.1,marathon:42.2}[goal]||0;}
   function normalizeKind(kind){return kind==='easy'?'short':(kind||'short');}
   function plannedRunPace(p,kind){const base=Number(p?.pace)||6,k=normalizeKind(kind);return k==='long'?base+20/60:base;}
+  function robustRecentKm(items,fallback){
+    const list=items.filter(x=>Number(x.km)>0).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,8);
+    if(!list.length)return {km:planKm(fallback),count:0,fromHistory:false};
+    const sorted=list.map(x=>Number(x.km)).slice().sort((a,b)=>a-b),mid=Math.floor(sorted.length/2);
+    const median=sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
+    const filtered=list.filter(x=>Number(x.km)>=median*.65&&Number(x.km)<=median*1.45);
+    const usable=filtered.length?filtered:list;
+    let weighted=0,weight=0;
+    usable.forEach((x,i)=>{const w=Math.pow(.84,i);weighted+=Number(x.km)*w;weight+=w;});
+    return {km:planKm(weight?weighted/weight:fallback),count:usable.length,fromHistory:true};
+  }
+  function personalizedRunBases(state){
+    const p=state?.profile||{},slots=Array.isArray(state?.slots)?state.slots:[],runSlots=Math.max(1,slots.filter(s=>s.sport==='run').length);
+    const fallbackShort=clamp(Number(p.shortBaseKm)||Math.min(5,Number(p.longestKm)||Math.max(3,(Number(p.baseWeeklyKm)||10)/runSlots)),2,30);
+    const fallbackLong=clamp(Number(p.longBaseKm)||Number(p.longestKm)||Math.max(fallbackShort+1,6),fallbackShort,32);
+    const fallbackInterval=clamp(Number(p.intervalBaseKm)||Math.max(3,fallbackShort),3,30);
+    const auto=p.personalizeHistory!==false;
+    const today=isoDay(),cutoff=addDays(today,-42);
+    const history=(Array.isArray(state?.workouts)?state.workouts:[]).filter(w=>w.sport==='run'&&w.status==='done'&&w.actual&&Number(w.actual.km)>0&&w.date>=cutoff&&w.date<=today);
+    const byKind=kind=>history.filter(w=>normalizeKind(w.actual?.kind||w.kind)===kind).map(w=>({km:Number(w.actual.km),date:w.date}));
+    const short=auto?robustRecentKm(byKind('short'),fallbackShort):{km:planKm(fallbackShort),count:0,fromHistory:false};
+    const interval=auto?robustRecentKm(byKind('interval'),fallbackInterval):{km:planKm(fallbackInterval),count:0,fromHistory:false};
+    const long=auto?robustRecentKm(byKind('long'),fallbackLong):{km:planKm(fallbackLong),count:0,fromHistory:false};
+    return {
+      shortKm:clamp(short.km,2,30),
+      intervalKm:clamp(interval.km,3,30),
+      longKm:clamp(Math.max(long.km,short.km),2,32),
+      shortCount:short.count,intervalCount:interval.count,longCount:long.count,
+      shortFromHistory:short.fromHistory,intervalFromHistory:interval.fromHistory,longFromHistory:long.fromHistory,
+      auto
+    };
+  }
   function raceRunWindow(p, day){
     if(!p?.raceDate || !raceDistance(p.goal)) return null;
     const toRace=daysBetween(day,p.raceDate);
@@ -258,23 +294,48 @@
     const effort=target.phase==='piek'?'Snelle stukken RPE 7-8/10 - stevig maar controleerbaar':'Snelle stukken RPE 7/10 - vlot, geen volle sprint';
     return {summary,detail,effort,plannedKm:desired,totalMinutes,steps,fastPaceSec:fastSec,easyPaceSec:easySec};
   }
-  function runAllocations(p,runs,target,wi){
+  function runAllocations(state,p,runs,target,wi){
     const out=new Map(), normalized=runs.map(s=>({...s,kind:normalizeKind(s.kind)}));
     const long=normalized.find(s=>s.kind==='long'), interval=normalized.find(s=>s.kind==='interval'), shorts=normalized.filter(s=>s.kind==='short');
+    const bases=personalizedRunBases(state);
     const cap=s=>Math.max(0,(Number(s.minutes)-10)/Number(p.pace));
-    let remaining=target.weeklyKm;
-    const intervalReserve=interval?Math.min(remaining,cap(interval),Math.max(3,Math.min(target.weeklyKm*.24,10))):0;
-    const shortReserve=shorts.length?Math.min(remaining*.18,shorts.length*3):0;
+    const phaseFactor=target.phase==='taper'?.70:target.phase==='herstel'?.85:1;
+    const shortFloor=planKm(Math.max(2,bases.shortKm*phaseFactor));
+    const intervalFloor=planKm(Math.max(3,bases.intervalKm*phaseFactor));
+    const longFloor=planKm(Math.max(shortFloor,bases.longKm*phaseFactor));
+    const shortFloorTotal=shorts.length*shortFloor;
+    const intervalMin=interval?Math.min(10,Math.max(3,Math.min(intervalFloor,cap(interval)))):0;
+    const longMin=long?Math.min(32,longFloor):0;
+    let remaining=Math.max(target.weeklyKm,shortFloorTotal+intervalMin+longMin);
+
     if(long){
-      const maxForLong=Math.max(0,remaining-intervalReserve-shortReserve), km=planKm(Math.min(32,target.longKm,Math.max(maxForLong,target.weeklyKm*.35)));
+      const reserve=shortFloorTotal+intervalMin;
+      const desired=Math.max(longMin,target.longKm);
+      const km=planKm(Math.min(32,Math.max(longMin,Math.min(desired,Math.max(longMin,remaining-reserve)))));
       out.set(long.id,{km,kind:'long',dynamicDuration:true});remaining=Math.max(0,remaining-km);
     }
-    if(interval){const proposed=planKm(Math.min(intervalReserve,remaining,cap(interval))), prescription=intervalPrescription(p,target,wi,proposed);const km=prescription.plannedKm;out.set(interval.id,{km,kind:'interval',interval:prescription});remaining=Math.max(0,remaining-km);}
+    if(interval){
+      const reserve=shortFloorTotal;
+      const desired=Math.max(intervalMin,Math.min(target.weeklyKm*.24,10));
+      const proposed=planKm(Math.max(intervalMin,Math.min(desired,cap(interval),Math.max(intervalMin,remaining-reserve))));
+      const prescription=intervalPrescription(p,target,wi,proposed),km=prescription.plannedKm;
+      out.set(interval.id,{km,kind:'interval',interval:prescription});remaining=Math.max(0,remaining-km);
+    }
     const other=shorts.length?shorts:normalized.filter(s=>!out.has(s.id));
-    if(other.length){for(let i=0;i<other.length;i++){const s=other[i],left=other.length-i,desired=remaining/left,km=planKm(Math.min(desired,cap(s),32));out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);}}
+    if(other.length){
+      for(let i=0;i<other.length;i++){
+        const s=other[i],left=other.length-i,minForRest=Math.max(0,left-1)*shortFloor;
+        const desired=Math.max(shortFloor,(remaining-minForRest));
+        const km=planKm(Math.min(Math.max(shortFloor,desired),cap(s),32));
+        out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);
+      }
+    }
     if(normalized.length===1){
-      const s=normalized[0],kind=normalizeKind(s.kind),km=planKm(kind==='long'?Math.min(32,target.longKm):Math.min(target.weeklyKm,cap(s)));
-      const prescription=kind==='interval'?intervalPrescription(p,target,wi,km):null;out.set(s.id,{km:prescription?.plannedKm??km,kind,dynamicDuration:kind==='long',interval:prescription});
+      const s=normalized[0],kind=normalizeKind(s.kind);
+      const personal=kind==='long'?bases.longKm:kind==='interval'?bases.intervalKm:bases.shortKm;
+      const km=planKm(kind==='long'?Math.min(32,Math.max(personal,target.longKm)):Math.min(Math.max(personal,target.weeklyKm),cap(s)));
+      const prescription=kind==='interval'?intervalPrescription(p,target,wi,km):null;
+      out.set(s.id,{km:prescription?.plannedKm??km,kind,dynamicDuration:kind==='long',interval:prescription});
     }
     return out;
   }
@@ -313,7 +374,7 @@
     for(let day=start;day<=end;day=addDays(day,1)) {
       const wi=Math.max(0,Math.floor(daysBetween(firstWeek,day)/7));
       const target=targetForWeek(p,wi,firstWeek,weeks);
-      if(!allocationCache.has(wi)) allocationCache.set(wi,runAllocations(p,runs,target,wi));
+      if(!allocationCache.has(wi)) allocationCache.set(wi,runAllocations(state,p,runs,target,wi));
       const allocations=allocationCache.get(wi), todays=state.slots.filter(s=>Number(s.day)===dayIndex(day));
       for(const slot of todays) {
         const key=slot.id+':'+day; activeKeys.add(key); if(excluded.has(key)) continue; const existing=oldMap.get(key);
@@ -610,5 +671,5 @@
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
     return {records,longest:longest?{km:longest.actual.km,date:longest.date,workoutId:longest.id}:null,fastest:fastest?{paceSeconds:Math.round(fastest.paceSeconds),date:fastest.workout.date,workoutId:fastest.workout.id}:null};
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,deleteWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,plannedRunPace,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,deleteWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,plannedRunPace,personalizedRunBases,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
 })(globalThis.SK ||= {});
