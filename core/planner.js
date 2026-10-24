@@ -301,6 +301,7 @@
     const cap=s=>Math.max(0,(Number(s.minutes)-10)/Number(p.pace));
     const phaseFactor=target.phase==='taper'?.70:target.phase==='herstel'?.85:1;
     const shortFloor=planKm(Math.max(2,bases.shortKm*phaseFactor));
+    const shortCeiling=target.phase==='taper'||target.phase==='herstel'?shortFloor:planKm(Math.max(shortFloor,bases.shortKm*1.20));
     const intervalFloor=planKm(Math.max(3,bases.intervalKm*phaseFactor));
     const longFloor=planKm(Math.max(shortFloor,bases.longKm*phaseFactor));
     const shortFloorTotal=shorts.length*shortFloor;
@@ -326,7 +327,7 @@
       for(let i=0;i<other.length;i++){
         const s=other[i],left=other.length-i,minForRest=Math.max(0,left-1)*shortFloor;
         const desired=Math.max(shortFloor,(remaining-minForRest));
-        const km=planKm(Math.min(Math.max(shortFloor,desired),cap(s),32));
+        const km=planKm(Math.min(Math.max(shortFloor,desired),shortCeiling,cap(s),32));
         out.set(s.id,{km,kind:normalizeKind(s.kind)});remaining=Math.max(0,remaining-km);
       }
     }
