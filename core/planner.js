@@ -69,6 +69,7 @@
   function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
   function raceDistance(goal){return {fit:0,'5k':5,'10k':10,half:21.1,marathon:42.2}[goal]||0;}
   function normalizeKind(kind){return kind==='easy'?'short':(kind||'short');}
+  function plannedRunPace(p,kind){const base=Number(p?.pace)||6,k=normalizeKind(kind);return k==='long'?base+20/60:base;}
   function raceRunWindow(p, day){
     if(!p?.raceDate || !raceDistance(p.goal)) return null;
     const toRace=daysBetween(day,p.raceDate);
@@ -343,7 +344,7 @@
           } else {
             const a=allocations.get(slot.id)||{km:0,kind}; km=a.km;kind=a.kind;interval=a.interval||null;
           }
-          minutes=kind==='interval'&&interval?.totalMinutes?interval.totalMinutes:Math.max(15,Math.round(km*p.pace*60)/60);
+          minutes=kind==='interval'&&interval?.totalMinutes?interval.totalMinutes:Math.max(15,Math.round(km*plannedRunPace(p,kind)*60)/60);
         }
         const title=slot.sport==='run'?(keepAsShort?'Korte rustige loop - laatste week':kind==='long'?`Lange duurloop - ${target.phase}`:kind==='interval'?`Interval - ${interval?.summary||'kwaliteit'}`:`Korte rustige loop - ${target.phase}`):sports[slot.sport];
         const conflict=state.workouts.find(w=>w.id!==existing?.id && w.date===day && ['planned','done','held'].includes(w.status) && (w.source!=='plan'||w.locked||w.status==='done') && overlap(w,{time:slot.time,minutes}));
@@ -449,7 +450,7 @@
           }
           const cap=normalizeKind(w.kind)==='long'?32:w.baseKm*1.03;
           w.km=planKm(Math.max(0,Math.min(km,cap)));
-          if(w.km!==w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.round(w.km*state.profile.pace*60)/60));
+          if(w.km!==w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.round(w.km*plannedRunPace(state.profile,w.kind)*60)/60));
           w.adaptation=[...new Set(reasons)].join(' ');
         } else if(fatigued&&w.date<=addDays(today,7)) w.adaptation='Er is hoge inspanning gemeld. Beoordeel deze andere sport zelf; hardloopkilometers zijn niet uitwisselbaar met deze sport.';
       }
@@ -609,5 +610,5 @@
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
     return {records,longest:longest?{km:longest.actual.km,date:longest.date,workoutId:longest.id}:null,fastest:fastest?{paceSeconds:Math.round(fastest.paceSeconds),date:fastest.workout.date,workoutId:fastest.workout.id}:null};
   }
-  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,deleteWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
+  Object.assign(SK,{freshState,validateProfile,validateState,generatePlan,adaptPlan,logWorkout,makeWorkout,checkMove,editWorkout,deleteWorkout,cancelWorkout,resumePlan,warnings,eventSnap,changeLog,resetCoachHistory,touch,targetForWeek,goalWeeks,taperWeeks,planWindow,buildOfflineModel,OFFLINE_MODELS,intervalPrescription,normalizeKind,plannedRunPace,personalRecords,notificationDefaults,notificationSettings,attentionItems,peakLongTarget,longRunTargetForModel,raceRunWindow,preRaceShortChoice,preRaceShortKm});
 })(globalThis.SK ||= {});
