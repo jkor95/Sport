@@ -97,3 +97,11 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Als alleen duur, moment of status wijzigt, toont Coach dat apart in plaats van een misleidende 6,00 → 6,00 km.
 
 - Oude Coach-items met de titel `Schema opgebouwd` uit versies voor v39 tonen hun oude tussenstap-afstanden niet meer, omdat die niet betrouwbaar het definitieve agenda-advies weergaven.
+
+
+## v40
+- iPhone invoerzoom uitgeschakeld: de viewport staat vast en mobiele invoervelden gebruiken minimaal 16px tekst, zodat Safari niet meer automatisch inzoomt bij typen.
+- Het ingestelde normaal/rustige tempo geldt voortaan voor korte/rustige lopen.
+- Lange duurlopen worden automatisch 20 seconden per kilometer rustiger gepland. Bij 5:30/km wordt een lange duurloop dus 5:50/km.
+- Intervaltrainingen blijven hun eigen snelle en hersteltempo's gebruiken.
+- Bestaande accounts worden bij de eerste start van v40 automatisch eenmaal opnieuw doorgerekend met deze temporegels.
