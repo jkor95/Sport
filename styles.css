@@ -120,3 +120,9 @@
   .workout>.workout-distance{grid-column:2;grid-row:2;justify-self:start}
   .workout>.btn{grid-column:1/-1;grid-row:3;width:100%;justify-self:stretch}
 }
+
+
+/* v40: voorkom iOS invoerzoom en houd formulierfocus stabiel */
+@media(max-width:640px){
+  input,select,textarea{font-size:16px!important}
+}
