@@ -115,3 +115,5 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - De oude vaste reserve van ongeveer 3 km voor een korte loop is verwijderd. Als jouw normale korte rondje rond 5 km ligt, gebruikt de planner dat als persoonlijke ondergrens buiten herstel/taper.
 - Automatische schema-afstanden blijven hele kilometers; handmatige en werkelijke afstanden mogen decimalen houden.
 - Bestaande accounts krijgen bij de eerste start van v41 automatisch persoonlijke basiswaarden op basis van aanwezige historie, met de bestaande instellingen als vangnet.
+
+- Korte/rustige trainingen mogen buiten herstel/taper maximaal ongeveer 20% boven je persoonlijke korte basis groeien; weekopbouw wordt daardoor niet meer onnodig op het korte rondje afgewenteld.
