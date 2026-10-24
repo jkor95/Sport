@@ -105,3 +105,13 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Lange duurlopen worden automatisch 20 seconden per kilometer rustiger gepland. Bij 5:30/km wordt een lange duurloop dus 5:50/km.
 - Intervaltrainingen blijven hun eigen snelle en hersteltempo's gebruiken.
 - Bestaande accounts worden bij de eerste start van v40 automatisch eenmaal opnieuw doorgerekend met deze temporegels.
+
+
+## v41
+- Trainingsafstanden zijn persoonlijker: de planner gebruikt een aparte normale basis voor korte/rustige loop, intervaltraining en lange duurloop.
+- Automatische personalisatie kijkt naar ongeveer de laatste 6 weken van daadwerkelijk geregistreerde hardlooptrainingen en gebruikt maximaal 8 recente trainingen per type.
+- Een eenmalige sterke uitschieter wordt met een robuuste mediaan/filter afgezwakt voordat de basis wordt berekend.
+- In Instellingen kun je de drie basisafstanden zelf invullen en automatische personalisatie aan/uit zetten.
+- De oude vaste reserve van ongeveer 3 km voor een korte loop is verwijderd. Als jouw normale korte rondje rond 5 km ligt, gebruikt de planner dat als persoonlijke ondergrens buiten herstel/taper.
+- Automatische schema-afstanden blijven hele kilometers; handmatige en werkelijke afstanden mogen decimalen houden.
+- Bestaande accounts krijgen bij de eerste start van v41 automatisch persoonlijke basiswaarden op basis van aanwezige historie, met de bestaande instellingen als vangnet.
