@@ -405,3 +405,105 @@
   .compact-chart{height:105px;margin:10px 0 22px}
   .progress-history-list .workout{padding:8px 9px}
 }
+
+
+/* v47: uniforme, iets grotere mobiele typografie */
+@media(max-width:640px){
+  body{font-size:12px}
+  .content{font-size:12px}
+
+  /* Algemene koppen en kaarttekst */
+  .page-heading h1{font-size:23px!important;line-height:1.12}
+  .page-heading p{font-size:11px!important;line-height:1.45}
+  .card-header h2,.compact-head h2{font-size:16px!important}
+  .card-header p,.compact-head p{font-size:10.5px!important;line-height:1.4}
+  .card h3{font-size:14px}
+  .small{font-size:10.5px!important}
+  .tiny{font-size:9.5px!important}
+  .muted{line-height:1.45}
+
+  /* Knoppen, badges en navigatie */
+  .btn{font-size:10.5px}
+  .btn.compact{font-size:10px}
+  .tag{font-size:9.5px}
+  .nav button,.nav span{font-size:10px}
+  .nav svg{width:20px;height:20px}
+  .segmented button{font-size:11px}
+  .toolbar .btn{font-size:10.5px}
+  .week-title{font-size:12.5px}
+
+  /* Dashboard */
+  .main:has(.dashboard-compact) .page-heading h1{font-size:22px!important}
+  .dashboard-hero h2{font-size:21px!important}
+  .dashboard-hero p{font-size:11px!important}
+  .dashboard-hero .eyebrow{font-size:9.5px!important}
+  .dashboard-hero-action .btn{font-size:10.5px!important}
+  .dashboard-kpi>span{font-size:9px!important}
+  .dashboard-kpi>strong{font-size:19px!important}
+  .dashboard-kpi>strong small{font-size:9.5px!important}
+  .dashboard-kpi>em{font-size:8.5px!important}
+  .dashboard-card-header h2{font-size:16px!important}
+  .dashboard-card-header p{font-size:9.5px!important}
+  .dashboard-week-card .day-chip strong{font-size:15px!important}
+  .dashboard-week-card .day-chip span{font-size:8.5px!important}
+  .dashboard-day-head h3{font-size:13.5px!important}
+  .dashboard-day-head .btn{font-size:9.5px!important}
+  .dashboard-day-list .workout-info strong,.dashboard-upcoming .workout-info strong{font-size:12.5px!important}
+  .dashboard-day-list .workout-meta,.dashboard-upcoming .workout-meta{font-size:10px!important}
+  .dashboard-day-list .workout-distance,.dashboard-upcoming .workout-distance{font-size:15.5px!important}
+  .dashboard-day-list .btn,.dashboard-upcoming .btn{font-size:9.5px!important}
+  .dashboard-mini-head strong{font-size:12px!important}
+  .dashboard-mini-card p{font-size:10px!important}
+  .dashboard-goal-grid span{font-size:9.5px!important}
+  .dashboard-mini-card .btn{font-size:9.5px!important}
+
+  /* Agenda */
+  .agenda-month-separator span{font-size:17px!important}
+  .agenda-week-separator{font-size:9px!important}
+  .agenda-plan-date>span{font-size:9px!important}
+  .agenda-plan-date>strong{font-size:19px!important}
+  .agenda-plan-date>em{font-size:8px!important}
+  .agenda-plan-main strong{font-size:12px!important}
+  .agenda-plan-main span{font-size:10px!important}
+  .agenda-plan-side b{font-size:12px!important}
+  .agenda-plan-side span{font-size:9px!important}
+  .agenda-plan-status{font-size:8.5px!important}
+  .calendar-label,.calendar-event,.calendar-event .time{font-size:9px!important}
+  .cell-date{font-size:10.5px!important}
+
+  /* Coach */
+  .coach-card p{font-size:11px!important;line-height:1.5}
+  .audit-head h3{font-size:13px!important}
+  .audit p{font-size:10.5px!important;line-height:1.5}
+  .change{font-size:10px!important}
+  .key-value{font-size:11px}
+  .key-value span,.key-value strong{font-size:11px}
+
+  /* Voortgang */
+  .progress-summary span{font-size:9px!important}
+  .progress-summary strong{font-size:18px!important}
+  .progress-summary small{font-size:9.5px!important}
+  .progress-pr-row>div:first-child span{font-size:9px!important}
+  .progress-pr-row>div:first-child strong{font-size:19px!important}
+  .progress-pr-meta>span{font-size:9px!important}
+  .progress-pr-meta>small{font-size:8.5px!important}
+  .progress-pr-row .btn{font-size:9px!important}
+  .progress-record-highlights{font-size:9.5px!important}
+  .legend{font-size:10px}
+  .data-table{font-size:11px}
+  .data-table th{font-size:9.5px}
+
+  /* Instellingen / formulieren */
+  .form-grid label,.slot-row label{font-size:11.5px!important}
+  .field-help{font-size:9.5px!important;line-height:1.4}
+  fieldset>legend,legend{font-size:13px}
+  input,select,textarea{font-size:16px!important}
+  .checkline span{font-size:11px}
+  .notification-settings{font-size:11px}
+  .notice{font-size:11px!important;line-height:1.5}
+
+  /* Account / overige */
+  .account-text strong,.account-text span{font-size:11px}
+  .security-note{font-size:10.5px}
+  .footer-note{font-size:9.5px}
+}
