@@ -332,3 +332,76 @@
   .agenda-plan-side b{font-size:11px}
   .agenda-plan-side span{font-size:8px}
 }
+
+
+/* v46: compactere Voortgang, Coach en Instellingen */
+.progress-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.progress-summary>div{padding:13px 15px;min-width:0}
+.progress-summary>div+div{border-left:1px solid var(--line)}
+.progress-summary span{display:block;font-size:9px;color:var(--muted);margin-bottom:4px}
+.progress-summary strong{font-size:19px;line-height:1.1}
+.progress-summary small{font-size:9px;color:var(--muted);font-weight:500}
+.compact-head{margin-bottom:12px}
+.compact-head h2{font-size:17px}
+.compact-head p{font-size:10px;margin-top:2px}
+.progress-records-card,.progress-chart-card,.progress-history-card{padding:17px 18px;margin-top:14px}
+.progress-pr-list{display:grid;gap:6px}
+.progress-pr-row{display:grid;grid-template-columns:110px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fbfcf9}
+.progress-pr-row.has-pr{background:#f4f9e9}
+.progress-pr-row>div:first-child{display:flex;align-items:baseline;gap:8px}
+.progress-pr-row>div:first-child span{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.progress-pr-row>div:first-child strong{font-size:19px}
+.progress-pr-meta{min-width:0}
+.progress-pr-meta>span{display:block;font-size:9px;color:var(--ink)}
+.progress-pr-meta>small{display:block;font-size:8px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-pr-row .btn{font-size:8px;padding:5px 8px;min-height:27px}
+.progress-record-highlights{margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:9px;color:var(--muted)}
+.progress-record-highlights b{color:var(--ink);margin-left:5px}
+.compact-chart{height:120px;margin:14px 0 25px}
+.compact-chart .bar-label{font-size:8px;bottom:-19px}
+.compact-details{margin-top:10px;font-size:10px}
+.progress-history-list{gap:7px}
+.progress-history-list .workout{padding:9px 10px}
+.history-more summary{margin-bottom:8px}
+
+/* Overige pagina's: minder verticale ruimte zonder kleinere hoofdtekst */
+@media(max-width:640px){
+  .content>.page-heading:not(:has(+ .dashboard-compact)){margin:12px 0 12px}
+  .content>.page-heading:not(:has(+ .dashboard-compact)) h1{font-size:22px}
+  .content>.page-heading:not(:has(+ .dashboard-compact)) p{font-size:10px;margin-top:3px}
+  .settings-grid{gap:11px}
+  .settings-grid .stack{gap:11px}
+  .settings-grid>.card,.settings-grid .stack>.card{padding:14px 15px}
+  fieldset{margin-bottom:15px}
+  legend{margin-bottom:9px}
+  .form-separator{margin:15px 0}
+  .form-grid{gap:10px}
+  .form-grid label{font-size:11px}
+  .field-help{font-size:9px;line-height:1.35}
+  .slot-row{margin-bottom:7px}
+  .audit{padding:11px 0}
+  .audit-head h3{font-size:12px}
+  .audit p{font-size:10px;line-height:1.45;margin:5px 0}
+  .change{padding:6px 8px;font-size:9px}
+  .key-value{padding:7px 0}
+  .coach-card p{font-size:10px;line-height:1.5}
+  .progress-summary{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:10px}
+  .progress-summary>div{padding:10px 11px}
+  .progress-summary>div:nth-child(3){border-left:0;border-top:1px solid var(--line)}
+  .progress-summary>div:nth-child(4){border-top:1px solid var(--line)}
+  .progress-summary span{font-size:8px}
+  .progress-summary strong{font-size:17px}
+  .progress-records-card,.progress-chart-card,.progress-history-card{padding:13px;margin-top:10px}
+  .compact-head{margin-bottom:9px}
+  .compact-head h2{font-size:15px}
+  .compact-head p{font-size:9px}
+  .progress-pr-row{grid-template-columns:88px minmax(0,1fr) auto;padding:8px 9px;gap:7px}
+  .progress-pr-row>div:first-child{display:block}
+  .progress-pr-row>div:first-child span{font-size:8px}
+  .progress-pr-row>div:first-child strong{display:block;font-size:18px;margin-top:1px}
+  .progress-pr-meta>span{font-size:8px}
+  .progress-pr-meta>small{font-size:7.5px}
+  .progress-pr-row .btn{font-size:8px;padding:5px 7px}
+  .compact-chart{height:105px;margin:10px 0 22px}
+  .progress-history-list .workout{padding:8px 9px}
+}
