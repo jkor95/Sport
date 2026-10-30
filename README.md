@@ -151,3 +151,9 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Oudere trainingshistorie staat inklapbaar zodat de pagina niet eindeloos lang wordt.
 - Coach-uitleg ingekort en Coach-kaarten/auditregels mobiel compacter gemaakt.
 - Instellingen gebruiken minder witruimte tussen secties, velden en vaste sportmomenten zonder de invoertekst kleiner te maken.
+
+
+## v47
+- Mobiele typografie door de hele app gelijkgetrokken en iets vergroot.
+- Dashboardtekst is nog een stap groter gemaakt zonder de compacte v43-v46 indeling terug te draaien.
+- Agenda, Coach, Voortgang, Instellingen en overige pagina's gebruiken nu dezelfde leesbare basisgrootte.
