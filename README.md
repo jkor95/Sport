@@ -144,3 +144,10 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Meerdere activiteiten op dezelfde dag staan gegroepeerd onder één datum.
 - Nieuwe maanden en weken krijgen compacte scheidingen, vergelijkbaar met een agenda-planning.
 - Planning-navigatie springt per vier weken; Maand blijft beschikbaar als klassieke kalender.
+
+
+## v46
+- Voortgang volledig compacter opgebouwd: één samenvattingsbalk, PR's als korte regels, compactere weekgrafiek en alleen de 6 laatste trainingen direct zichtbaar.
+- Oudere trainingshistorie staat inklapbaar zodat de pagina niet eindeloos lang wordt.
+- Coach-uitleg ingekort en Coach-kaarten/auditregels mobiel compacter gemaakt.
+- Instellingen gebruiken minder witruimte tussen secties, velden en vaste sportmomenten zonder de invoertekst kleiner te maken.
