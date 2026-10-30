@@ -253,3 +253,30 @@
   .dashboard-goal-grid span{font-size:8px}
   .dashboard-mini-card .btn{padding:6px 7px;font-size:8px}
 }
+
+/* v44: iets grotere dashboardtekst, compacte indeling behouden */
+@media(max-width:640px){
+  .main:has(.dashboard-compact) .page-heading h1{font-size:21px}
+  .dashboard-hero h2{font-size:20px}
+  .dashboard-hero p{font-size:10.5px}
+  .dashboard-hero .eyebrow{font-size:9px}
+  .dashboard-hero-action .btn{font-size:10px}
+  .dashboard-kpi>span{font-size:8.5px}
+  .dashboard-kpi>strong{font-size:18px}
+  .dashboard-kpi>strong small{font-size:9px}
+  .dashboard-kpi>em{font-size:8px}
+  .dashboard-card-header h2{font-size:16px}
+  .dashboard-card-header p{font-size:9px}
+  .dashboard-week-card .day-chip strong{font-size:14px}
+  .dashboard-week-card .day-chip span{font-size:8px}
+  .dashboard-day-head h3{font-size:13px}
+  .dashboard-day-head .btn{font-size:9px}
+  .dashboard-day-list .workout-info strong,.dashboard-upcoming .workout-info strong{font-size:12px}
+  .dashboard-day-list .workout-meta,.dashboard-upcoming .workout-meta{font-size:9.5px}
+  .dashboard-day-list .workout-distance,.dashboard-upcoming .workout-distance{font-size:15px}
+  .dashboard-day-list .btn,.dashboard-upcoming .btn{font-size:9px}
+  .dashboard-mini-head strong{font-size:11.5px}
+  .dashboard-mini-card p{font-size:9.5px}
+  .dashboard-goal-grid span{font-size:9px}
+  .dashboard-mini-card .btn{font-size:9px}
+}
