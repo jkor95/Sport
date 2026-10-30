@@ -157,3 +157,8 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Mobiele typografie door de hele app gelijkgetrokken en iets vergroot.
 - Dashboardtekst is nog een stap groter gemaakt zonder de compacte v43-v46 indeling terug te draaien.
 - Agenda, Coach, Voortgang, Instellingen en overige pagina's gebruiken nu dezelfde leesbare basisgrootte.
+
+
+## v48
+- Mobiele typografie nog een duidelijke stap vergroot voor betere leesbaarheid op iPhone.
+- Dashboard, Agenda, Coach, Voortgang, Instellingen, formulieren, knoppen en navigatie gebruiken grotere tekst zonder de compacte indeling terug te draaien.
