@@ -117,3 +117,11 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Bestaande accounts krijgen bij de eerste start van v41 automatisch persoonlijke basiswaarden op basis van aanwezige historie, met de bestaande instellingen als vangnet.
 
 - Korte/rustige trainingen mogen buiten herstel/taper maximaal ongeveer 20% boven je persoonlijke korte basis groeien; weekopbouw wordt daardoor niet meer onnodig op het korte rondje afgewenteld.
+
+
+## v42
+- Dashboard volledig compacter gemaakt: volgende training, drie kerncijfers, weekoverzicht en eerstvolgende trainingen staan nu veel dichter bij elkaar.
+- De drie losse grote statistiekkaarten zijn vervangen door één compacte KPI-balk.
+- De volgende training heeft een lagere hero-kaart en minder lege ruimte.
+- Coach en doel zijn samengevoegd tot twee compacte informatiekaarten; 'Goed om te weten' is van het dashboard verwijderd.
+- Weekagenda en trainingskaarten gebruiken minder padding zodat meer relevante informatie tegelijk op een iPhone-scherm past.
