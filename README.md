@@ -125,3 +125,9 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - De volgende training heeft een lagere hero-kaart en minder lege ruimte.
 - Coach en doel zijn samengevoegd tot twee compacte informatiekaarten; 'Goed om te weten' is van het dashboard verwijderd.
 - Weekagenda en trainingskaarten gebruiken minder padding zodat meer relevante informatie tegelijk op een iPhone-scherm past.
+
+
+## v43
+- Mobiel dashboard nog compacter gemaakt.
+- Kritieke frontendbestanden krijgen ?v=43 zodat iPhone/PWA geen oude app.js of styles.css kan blijven tonen.
+- Service worker gebruikt skipWaiting en clients.claim zodat een nieuwe versie directer actief wordt.
