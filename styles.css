@@ -205,3 +205,51 @@
   .dashboard-kpi>strong{font-size:17px}
   .dashboard-secondary{grid-template-columns:1fr 1fr}
 }
+
+/* v43: nog compacter dashboard + cache-refresh release */
+@media(max-width:640px){
+  .main:has(.dashboard-compact) .page-heading{margin:8px 0 8px}
+  .main:has(.dashboard-compact) .page-heading h1{font-size:19px;line-height:1.1}
+  .main:has(.dashboard-compact) .page-heading p{display:none}
+  .dashboard-compact{gap:8px}
+  .dashboard-hero{min-height:0;padding:13px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+  .dashboard-hero h2{font-size:18px;line-height:1.1;margin:5px 0 3px}
+  .dashboard-hero p{font-size:9px;line-height:1.4;margin:0}
+  .dashboard-hero .eyebrow{font-size:8px}
+  .dashboard-hero-action{align-self:center}
+  .dashboard-hero-action .btn{min-height:32px;padding:7px 10px;font-size:9px;white-space:nowrap}
+  .dashboard-kpis{border-radius:11px}
+  .dashboard-kpi{padding:8px 7px}
+  .dashboard-kpi>span{font-size:7px;margin-bottom:2px}
+  .dashboard-kpi>strong{font-size:16px;line-height:1.05}
+  .dashboard-kpi>strong small{font-size:8px}
+  .dashboard-kpi>em{font-size:7px;margin-top:2px}
+  .dashboard-progress{height:3px}
+  .dashboard-week-card,.dashboard-upcoming{padding:11px 12px}
+  .dashboard-card-header{margin-bottom:7px}
+  .dashboard-card-header h2{font-size:14px}
+  .dashboard-card-header p{font-size:8px;margin-top:1px}
+  .dashboard-week-card .week-strip{gap:4px}
+  .dashboard-week-card .day-chip{padding:5px 1px;gap:2px;border-radius:8px}
+  .dashboard-week-card .day-chip strong{font-size:12px}
+  .dashboard-week-card .day-chip span{font-size:7px}
+  .dashboard-day-head{margin:8px 0 5px}
+  .dashboard-day-head h3{font-size:11px}
+  .dashboard-day-head .btn{padding:6px 8px;font-size:8px}
+  .dashboard-day-list,.dashboard-upcoming .workout-list{gap:6px}
+  .dashboard-day-list .workout,.dashboard-upcoming .workout{padding:7px 8px;gap:8px}
+  .dashboard-day-list .sport-icon,.dashboard-upcoming .sport-icon{width:29px;height:29px;border-radius:9px}
+  .dashboard-day-list .workout-info strong,.dashboard-upcoming .workout-info strong{font-size:10px}
+  .dashboard-day-list .workout-meta,.dashboard-upcoming .workout-meta{font-size:8px}
+  .dashboard-day-list .workout-distance,.dashboard-upcoming .workout-distance{font-size:13px}
+  .dashboard-day-list .btn,.dashboard-upcoming .btn{min-height:28px;padding:5px 7px;font-size:8px}
+  .dashboard-secondary{gap:7px}
+  .dashboard-mini-card{padding:10px}
+  .dashboard-mini-head{gap:6px;margin-bottom:5px}
+  .dashboard-mini-head .coach-glyph,.dashboard-mini-head .goal-icon{width:26px;height:26px}
+  .dashboard-mini-head strong{font-size:10px}
+  .dashboard-mini-card p{font-size:8px;line-height:1.35;margin-bottom:6px;-webkit-line-clamp:1}
+  .dashboard-goal-grid{grid-template-columns:1fr 1fr;gap:3px 6px;margin:4px 0 6px}
+  .dashboard-goal-grid span{font-size:8px}
+  .dashboard-mini-card .btn{padding:6px 7px;font-size:8px}
+}
