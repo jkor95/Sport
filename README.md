@@ -131,3 +131,8 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 - Mobiel dashboard nog compacter gemaakt.
 - Kritieke frontendbestanden krijgen ?v=43 zodat iPhone/PWA geen oude app.js of styles.css kan blijven tonen.
 - Service worker gebruikt skipWaiting en clients.claim zodat een nieuwe versie directer actief wordt.
+
+
+## v44
+- Lettergrootte op het compacte mobiele dashboard weer iets verhoogd voor betere leesbaarheid.
+- De compacte v43-indeling en beperkte scrollhoogte blijven behouden.
