@@ -136,3 +136,11 @@ Opslaan synchroniseert automatisch met de centrale Supabase-database. De planner
 ## v44
 - Lettergrootte op het compacte mobiele dashboard weer iets verhoogd voor betere leesbaarheid.
 - De compacte v43-indeling en beperkte scrollhoogte blijven behouden.
+
+
+## v45
+- De oude weeklijst in Agenda is vervangen door een doorlopende Planning-weergave over zes weken.
+- Dagen zonder activiteit worden niet meer getoond.
+- Meerdere activiteiten op dezelfde dag staan gegroepeerd onder één datum.
+- Nieuwe maanden en weken krijgen compacte scheidingen, vergelijkbaar met een agenda-planning.
+- Planning-navigatie springt per vier weken; Maand blijft beschikbaar als klassieke kalender.
