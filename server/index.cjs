@@ -96,7 +96,11 @@ const server=http.createServer(async(req,res)=>{
   const body=JSON.parse(buf||'{}');const out=await action(req,body);respond(res,200,out);return;
  }
  if(req.method!=='GET'&&req.method!=='HEAD'){respond(res,405,{error:'Ongeldige methode'});return}
- const p=path.resolve(root,'.'+decodeURIComponent(url.pathname==='/'?'/index.html':url.pathname));
+ const requested=decodeURIComponent(url.pathname==='/'?'/index.html':url.pathname);
+ // Never expose server-side code, deployment files, or hidden paths via HTTP.
+ const parts=requested.split('/').filter(Boolean);
+ if(parts.some(x=>x.startsWith('.'))||['server','supabase','node_modules'].includes(parts[0])||['Dockerfile','package.json','package-lock.json'].includes(parts[0])){respond(res,404,{error:'Niet gevonden'});return}
+ const p=path.resolve(root,'.'+requested);
  if(!p.startsWith(root+path.sep)||!fs.existsSync(p)||!fs.statSync(p).isFile()){respond(res,404,{error:'Niet gevonden'});return}
  res.writeHead(200,{'Content-Type':types[path.extname(p)]||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':p.endsWith('config.js')?'no-store':'public, max-age=60'});if(req.method==='HEAD')res.end();else fs.createReadStream(p).pipe(res);
  }catch(e){if(e instanceof SyntaxError){respond(res,400,{error:'Ongeldige JSON'});return}if(e.code==='23505'){respond(res,409,{error:'Bestaat al'});return}if(e.status){respond(res,e.status,{error:e.message,code:e.code});return}console.error(e);respond(res,500,{error:'Interne serverfout'})}
