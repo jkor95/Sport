@@ -27,3 +27,12 @@ Dockerfile serves the unchanged static UI with Nginx. In Coolify select this bra
 
 ## Current state
 Only separate branch, Dockerfile, and preparation notes created. The live `main` remains unchanged.
+
+## 2026-10-31: source recovered from owner
+Downloaded `mijnloop-sync.zip` has been inspected locally. The single `index.ts` file defines these API actions:
+`status`, `migrate-local`, `bootstrap`, `login`, `admin-login`, `logout`, `load`, `save`, `change-password`, `admin-list`, `admin-state`, `admin-create`, `admin-update`, `admin-password`, `admin-delete`.
+
+Tables used: `mijnloop_accounts`, `mijnloop_sessions`, `mijnloop_states`.
+Current sessions are SHA-256 token hashes with expiration. Current passwords are stored as plaintext (`password_plain`) and compared directly. **Security-critical migration**: replace plaintext passwords with Argon2id/scrypt hashes; do not copy the old password exposure behavior into the replacement admin API. Migrate users safely and make existing sessions reauthenticate. Preserve saved sport data and revision-based conflict protection. Existing CORS origin is hardcoded to GitHub Pages and must be adapted for new own-domain HTTPS.
+
+The downloaded source is **not committed to this public repository** because it contains security-sensitive implementation details and should be reviewed/reworked first. No existing database or live function has been altered.
