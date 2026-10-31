@@ -51,7 +51,7 @@ async function action(req,b){
  if(type==='load'){const r=await pool.query('SELECT data,revision FROM sport_states WHERE account_id=$1',[u.id]);return {user:pub(u),state:r.rows[0]?.data||null,revision:r.rows[0]?.revision||0}}
  if(type==='save'){
   const expected=Number(b.revision||0);if(!Number.isSafeInteger(expected)||expected<0||typeof b.state!=='object'||b.state===null)throw err('Ongeldige gegevens');
-  const r=await pool.query(`INSERT INTO sport_states(account_id,data,revision) SELECT $1,$2::jsonb,1 WHERE $3=0 ON CONFLICT(account_id) DO UPDATE SET data=EXCLUDED.data,revision=sport_states.revision+1,updated_at=now() WHERE sport_states.revision=$3 RETURNING data,revision`,[u.id,JSON.stringify(b.state),expected]);
+  const r=expected===0 ? await pool.query(`INSERT INTO sport_states(account_id,data,revision) VALUES($1,$2::jsonb,1) ON CONFLICT(account_id) DO NOTHING RETURNING data,revision`,[u.id,JSON.stringify(b.state)]) : await pool.query(`UPDATE sport_states SET data=$2::jsonb,revision=revision+1,updated_at=now() WHERE account_id=$1 AND revision=$3 RETURNING data,revision`,[u.id,JSON.stringify(b.state),expected]);
   if(!r.rowCount)throw Object.assign(err('CONFLICT',409),{code:'CONFLICT'});return {state:r.rows[0].data,revision:r.rows[0].revision};
  }
  if(type==='change-password'){
