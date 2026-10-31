@@ -4,6 +4,9 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const {Pool}=require('pg');
+const webpush=require('web-push');
+const pushConfigured=()=>Boolean(process.env.VAPID_PUBLIC_KEY&&process.env.VAPID_PRIVATE_KEY&&process.env.VAPID_SUBJECT);
+const pushUrlOK=(v)=>{try{const u=new URL(v);return u.protocol==='https:'&&u.port===''&&(u.hostname==='web.push.apple.com'||u.hostname.endsWith('.push.apple.com')||u.hostname==='fcm.googleapis.com'||u.hostname==='updates.push.services.mozilla.com'||u.hostname.endsWith('.notify.windows.com'));}catch{return false}};
 const pool=new Pool({connectionString:process.env.DATABASE_URL,max:5,connectionTimeoutMillis:5000});
 const root=path.resolve(__dirname,'..');
 const ttl=30*86400000;
@@ -21,6 +24,8 @@ async function init(){
  await pool.query(`CREATE TABLE IF NOT EXISTS sport_accounts(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),username text NOT NULL,username_key text NOT NULL UNIQUE,display_name text NOT NULL,role text NOT NULL DEFAULT 'user' CHECK(role IN ('admin','user')),active boolean NOT NULL DEFAULT true,password_hash text NOT NULL,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now(),last_login_at timestamptz)`);
  await pool.query(`CREATE TABLE IF NOT EXISTS sport_sessions(token_hash text PRIMARY KEY,account_id uuid NOT NULL REFERENCES sport_accounts(id) ON DELETE CASCADE,expires_at timestamptz NOT NULL)`);
  await pool.query(`CREATE TABLE IF NOT EXISTS sport_states(account_id uuid PRIMARY KEY REFERENCES sport_accounts(id) ON DELETE CASCADE,data jsonb NOT NULL,revision integer NOT NULL DEFAULT 0,updated_at timestamptz NOT NULL DEFAULT now())`);
+ await pool.query(`CREATE TABLE IF NOT EXISTS sport_push_subscriptions(id bigserial PRIMARY KEY,account_id uuid NOT NULL REFERENCES sport_accounts(id) ON DELETE CASCADE,endpoint text NOT NULL UNIQUE,subscription jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now())`);
+ if(pushConfigured())webpush.setVapidDetails(process.env.VAPID_SUBJECT,process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);
  const username=process.env.INITIAL_ADMIN_USERNAME,passwordValue=process.env.INITIAL_ADMIN_PASSWORD;
  if(username&&passwordValue){
   const c=await pool.query('SELECT count(*)::int AS n FROM sport_accounts');
@@ -84,12 +89,52 @@ async function action(req,b){
   await pool.query('DELETE FROM sport_accounts WHERE id=$1',[b.userId]);return {ok:true};
  }
 }
+async function pushAction(req,b){
+ const u=await session(req);
+ if(!pushConfigured())throw err('Pushmeldingen zijn nog niet ingesteld op de Dell-server.',503);
+ const type=String(b.action||'');
+ if(type==='config')return {publicKey:process.env.VAPID_PUBLIC_KEY};
+ if(type==='subscribe'){
+  const sub=b.subscription;
+  if(!sub||typeof sub!=='object'||!pushUrlOK(sub.endpoint)||typeof sub.keys?.p256dh!=='string'||typeof sub.keys?.auth!=='string'||JSON.stringify(sub).length>5000)throw err('Ongeldige pushregistratie.');
+  await pool.query(`INSERT INTO sport_push_subscriptions(account_id,endpoint,subscription) VALUES($1,$2,$3::jsonb) ON CONFLICT(endpoint) DO UPDATE SET account_id=EXCLUDED.account_id,subscription=EXCLUDED.subscription`,[u.id,sub.endpoint,JSON.stringify(sub)]);
+  return {ok:true};
+ }
+ if(type==='unsubscribe'){
+  const endpoint=b.subscription?.endpoint;
+  if(typeof endpoint!=='string')throw err('Ongeldige pushregistratie.');
+  await pool.query('DELETE FROM sport_push_subscriptions WHERE account_id=$1 AND endpoint=$2',[u.id,endpoint]);
+  return {ok:true};
+ }
+ if(type==='test'){
+  const r=await pool.query('SELECT id,subscription FROM sport_push_subscriptions WHERE account_id=$1',[u.id]);
+  if(!r.rowCount)throw err('Schakel eerst pushmeldingen in op dit apparaat.');
+  let sent=0;
+  for(const row of r.rows){
+   try{
+    await webpush.sendNotification(row.subscription,JSON.stringify({title:'MijnLoop',body:'Dit is een testmelding van je eigen Dell-server.',tag:'mijnloop-test',data:{url:'./'}}),{TTL:60,timeout:10000});
+    sent++;
+   }catch(e){
+    if(e.statusCode===404||e.statusCode===410)await pool.query('DELETE FROM sport_push_subscriptions WHERE id=$1',[row.id]);
+    else console.error('Push verzenden mislukt:',e.statusCode||e.message);
+   }
+  }
+  if(!sent)throw err('Pushmelding kon niet worden bezorgd. Probeer opnieuw te registreren.',502);
+  return {ok:true,sent};
+ }
+ throw err('Ongeldige pushactie.');
+}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png'};
 function respond(res,status,obj){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(obj))}
 const server=http.createServer(async(req,res)=>{
  try{
  const url=new URL(req.url,'http://localhost');
  if(url.pathname==='/health'){respond(res,200,{ok:true});return}
+ if(url.pathname==='/functions/v1/mijnloop-push'){
+  if(req.method!=='POST'){respond(res,405,{error:'POST vereist'});return}
+  let buf='';for await(const part of req){buf+=part;if(buf.length>10_000)throw err('Aanvraag te groot',413)}
+  const body=JSON.parse(buf||'{}');const out=await pushAction(req,body);respond(res,200,out);return;
+ }
  if(url.pathname==='/functions/v1/mijnloop-sync'){
   if(req.method!=='POST'){respond(res,405,{error:'POST vereist'});return}
   let buf='';for await(const part of req){buf+=part;if(buf.length>2_000_000)throw err('Aanvraag te groot',413)}
