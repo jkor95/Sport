@@ -1,0 +1,25 @@
+name: MijnLoop veilige tests
+
+on:
+  push:
+    branches:
+      - 'automation/**'
+      - 'selfhost-dell-preparation'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  planner:
+    runs-on: docker
+    container:
+      image: node:22-alpine
+    permissions:
+      contents: read
+    steps:
+      - name: Haal broncode op
+        uses: actions/checkout@v4
+      - name: Controleer Node.js-versie
+        run: node --version
+      - name: Voer alle 66 plannertests uit
+        run: node --test tests/*.test.cjs
