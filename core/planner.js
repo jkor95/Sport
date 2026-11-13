@@ -496,7 +496,7 @@
           if((fatigued||repeated)&&w.date<=until) {factor=.82;reasons.push(fatigued?'Lichtere periode na hoge inspanning of vermoeidheid.':'Meerdere moeilijke of sterk ingekorte trainingen: opbouw tijdelijk lager.');}
           if(extraLoad&&w.date<=addDays(today,4)){factor=Math.min(factor,.90);reasons.push('Je deed recent een zwaarder type loop dan gepland; daarom tijdelijk extra herstelruimte.');}
           if(unlogged) {factor=Math.min(factor,.90);reasons.push('Meerdere eerdere trainingen zijn niet geregistreerd; geen extra opbouw.');}
-          if(positiveStreak&&!fatigued&&!repeated&&w.date<=addDays(today,10)&&normalizeKind(w.kind)!=='interval') {factor=Math.max(factor,1.03);reasons.push('Twee recente trainingen gingen comfortabel goed: kleine positieve bijstelling van maximaal 3%.');}
+          if(positiveStreak&&!fatigued&&!repeated&&w.date<=addDays(today,10)&&normalizeKind(w.kind)!=='interval'&&Math.floor(w.baseKm*1.03)>w.baseKm) {factor=Math.max(factor,1.03);reasons.push('Twee recente trainingen gingen comfortabel goed: kleine positieve bijstelling van maximaal 3%.');}
           let km=w.baseKm*factor;
           for(const r of shortRuns) {
             const left=daysBetween(r.date,w.date), sameSlot=r.slotId&&w.slotId===r.slotId, comparable=sameSlot||actualKind(r)===normalizeKind(w.kind);
@@ -511,10 +511,11 @@
           if(changedType){const names={short:'korte/rustige loop',long:'lange duurloop',interval:'interval',race:'doeldag'};reasons.push(`De vorige geplande ${names[plannedKind(changedType)]||'loop'} werd uitgevoerd als ${names[actualKind(changedType)]||'ander type'}. Deze training wordt niet zwaarder gemaakt om dat in te halen.`);}
           if(strongest&&!fatigued&&!repeated&&factor>=1){
             const modest=Math.min(w.baseKm*1.03,strongest.actual.km*1.02);
-            km=Math.max(km,modest);reasons.push('Een vergelijkbare recente loop ging rustig beter dan gepland; daarom slechts een kleine stap omhoog.');
+            if(Math.floor(modest)>w.baseKm){km=Math.max(km,modest);reasons.push('Een vergelijkbare recente loop ging rustig beter dan gepland; daarom slechts een kleine stap omhoog.');}
           }
           const cap=normalizeKind(w.kind)==='long'?32:w.baseKm*1.03;
-          w.km=planKm(Math.max(0,Math.min(km,cap)));
+          // Never round a small fractional increase up past the 3% ceiling.
+          w.km=Math.max(0,Math.floor(Math.min(km,cap)+1e-9));
           if(w.km!==w.baseKm) w.minutes=Math.min(w.baseMinutes,Math.max(15,Math.round(w.km*plannedRunPace(state.profile,w.kind)*60)/60));
           w.adaptation=[...new Set(reasons)].join(' ');
         } else if(fatigued&&w.date<=addDays(today,7)) w.adaptation='Er is hoge inspanning gemeld. Beoordeel deze andere sport zelf; hardloopkilometers zijn niet uitwisselbaar met deze sport.';
