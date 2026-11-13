@@ -346,11 +346,14 @@
     const auditBefore=new Map(state.workouts.filter(w=>(w.source==='plan'||w.source==='goal')&&!finalStatuses.has(w.status)).map(w=>[w.id,{title:w.title,snap:eventSnap(w)}]));
     const anchorStart=rebuild&&previousPlanStart?previousPlanStart:start;
     const window=planWindow(p,anchorStart), goalAware=window.mode==='goal'&&!!p.raceDate;
-    weeks=goalAware?clamp(Number(p.horizon)||window.weeks||12,4,52):clamp(Number(weeks)||Number(p.horizon)||12,4,52);
-    if(!Number.isInteger(weeks)||weeks<1||weeks>52) throw new Error('Kies 4-52 weken of gebruik je doeldatum.');
+    // In goal mode the race date, not the saved fixed horizon, determines the
+    // entire model and taper. The horizon only applies to fixed planning.
+    weeks=goalAware?clamp(window.weeks,4,52):clamp(Number(weeks)||Number(p.horizon)||12,4,52);
+    if(!Number.isInteger(weeks)||weeks<4||weeks>52) throw new Error('Kies 4-52 weken of gebruik je doeldatum.');
     const exactGoal=goalAware?goalWeeks(p,anchorStart):null;
     const calculatedEnd=goalAware&&exactGoal!==null&&exactGoal<=52?p.raceDate:addDays(monday(anchorStart),weeks*7-1);
-    const end=rebuild&&previousPlanEnd&&previousPlanEnd>=start?previousPlanEnd:calculatedEnd, at=now.toISOString();
+    const end=goalAware&&exactGoal!==null&&exactGoal<=52?calculatedEnd:
+      (rebuild&&previousPlanEnd&&previousPlanEnd>=start?previousPlanEnd:calculatedEnd), at=now.toISOString();
     const oldPlanEnd=previousPlanEnd||end;
     const runs=state.slots.filter(s=>s.sport==='run');
     const currentGoalKey=(goalAware&&p.raceDate&&p.goal!=='fit')?p.goal+':'+p.raceDate:'';
@@ -578,7 +581,23 @@
     }
     return state;
   }
-  const cancelWorkout=deleteWorkout;
+  function cancelWorkout(state,id,{now=new Date()}={}) {
+    const w=state.workouts.find(x=>x.id===id);
+    if(!w) throw new Error('Training niet gevonden.');
+    if(['done','skipped'].includes(w.status)) throw new Error('Een geregistreerde training kun je niet annuleren.');
+    if(w.status==='cancelled') return state;
+    const before=eventSnap(w);
+    // Keep a cancellation tombstone so subscribed calendars can remove it.
+    // Unlike manual workouts, goal events reappear on deliberate regeneration.
+    if(w.source==='plan'&&w.slotId) {
+      state.excludedOccurrences=[...new Set([...(state.excludedOccurrences||[]),w.slotId+':'+w.date])];
+    }
+    w.status='cancelled';
+    w.cancelReason='user';
+    touch(w,now.toISOString());
+    changeLog(state,'Training geannuleerd','Het agendamoment blijft als annulering bewaard.',[{id:w.id,title:w.title,before,after:eventSnap(w)}],now);
+    return state;
+  }
   function resumePlan(state,weekly,longest,{now=new Date()}={}) {
     const p={...state.profile,baseWeeklyKm:Number(weekly),longestKm:Number(longest)};validateProfile(p,state.slots);
     state.profile=p;state.hold=false;state.holdSince=null;state.lastResume=now.toISOString();
