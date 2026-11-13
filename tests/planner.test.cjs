@@ -73,6 +73,27 @@ test('personal records prefer exact imported best efforts',()=>{const s=fixture(
 
 test('external import preserves wearable metrics when supplied',()=>{const s=fixture();S.mergeExternalRuns(s,[{provider:'strava',id:'wear1',date:'2026-10-03',time:'09:00',name:'Garmin Run',distanceKm:8,movingSeconds:2880,deviceName:'Garmin fēnix 7',elevationGain:42,averageHeartrate:151,maxHeartrate:176,averageCadence:82,bestEfforts:[]}],{now:NOW});const w=s.workouts.find(x=>x.external?.providerId==='wear1');assert.equal(w.external.deviceName,'Garmin fēnix 7');assert.equal(w.external.averageHeartrate,151);assert.equal(w.external.maxHeartrate,176);assert.equal(w.external.averageCadence,82);assert.equal(w.external.elevationGain,42);});
 
+test('unreviewed imported run does not influence personalized training bases',()=>{
+  const s=S.freshState();s.profile={baseWeeklyKm:20,longestKm:8,timezone:'Europe/Amsterdam'};
+  s.slots=[{id:'tue',sport:'run',kind:'short'}];
+  const today=S.isoDay();
+  const w=S.makeWorkout({date:today,time:'07:00',sport:'run',kind:'short',title:'Device import',km:12,minutes:60,status:'done'});
+  w.actual={km:12,minutes:60,needsReview:true};
+  s.workouts.push(w);
+  assert.equal(S.personalizedRunBases(s).shortCount,0);
+  w.actual.needsReview=false;
+  assert.equal(S.personalizedRunBases(s).shortCount,1);
+});
+
+test('imported runs validate before review without fabricating an effort score',()=>{
+  const s=fixture();
+  S.mergeExternalRuns(s,[{provider:'strava',id:'valid-import-001',date:'2026-10-03',time:'09:00',name:'Morning run',distanceKm:7,movingSeconds:2580}],{now:NOW});
+  const w=s.workouts.find(x=>x.external?.providerId==='valid-import-001');
+  assert.equal(w.actual.needsReview,true);
+  assert.equal(w.actual.rpe,null);
+  assert.ok(S.validateState(s));
+});
+
 test('notification defaults enable upcoming and pending attention categories',()=>{const s=S.freshState();const n=S.notificationSettings(s);assert.equal(n.enabled,true);assert.equal(n.upcoming,true);assert.equal(n.pending,true);assert.equal(n.upcomingHours,4);});
 
 test('upcoming training becomes an attention item inside configured lead time',()=>{const s=fixture();s.notifications={...S.notificationDefaults,upcomingHours:4,pending:false};const items=S.attentionItems(s,new Date('2026-10-06T14:00:00Z'));const item=items.find(x=>x.category==='upcoming'&&x.workoutId!=='test-run');assert.ok(item);});
