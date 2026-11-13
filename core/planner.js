@@ -678,8 +678,8 @@
       const date=String(entry?.date||''),time=String(entry?.time||'');
       const km=Number(entry?.distanceKm),seconds=Number(entry?.movingSeconds);
       if(!['strava','garmin'].includes(provider)|| !/^[A-Za-z0-9_-]{1,100}$/.test(providerId) ||
-         !/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || date>today ||
-         !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(time) ||
+         !/^\d{4}-\d{2}-\d{2}$/.test(date) || date>today ||
+         !/^([01]\d|2[0-3]):[0-5]\d$/.test(time) ||
          !Number.isFinite(km)||km<=0||km>300 ||
          !Number.isFinite(seconds)||seconds<=0||seconds>86400)
         throw new Error('Controleer de gegevens van de geimporteerde activiteit.');
