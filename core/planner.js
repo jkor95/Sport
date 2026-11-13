@@ -92,7 +92,7 @@
     const fallbackInterval=clamp(Number(p.intervalBaseKm)||Math.max(3,fallbackShort),3,30);
     const auto=p.personalizeHistory!==false;
     const today=isoDay(),cutoff=addDays(today,-42);
-    const history=(Array.isArray(state?.workouts)?state.workouts:[]).filter(w=>w.sport==='run'&&w.status==='done'&&w.actual&&Number(w.actual.km)>0&&w.date>=cutoff&&w.date<=today);
+    const history=(Array.isArray(state?.workouts)?state.workouts:[]).filter(w=>w.sport==='run'&&w.status==='done'&&w.actual&&w.actual.needsReview!==true&&Number(w.actual.km)>0&&w.date>=cutoff&&w.date<=today);
     const byKind=kind=>history.filter(w=>normalizeKind(w.actual?.kind||w.kind)===kind).map(w=>({km:Number(w.actual.km),date:w.date}));
     const short=auto?robustRecentKm(byKind('short'),fallbackShort):{km:planKm(fallbackShort),count:0,fromHistory:false};
     const interval=auto?robustRecentKm(byKind('interval'),fallbackInterval):{km:planKm(fallbackInterval),count:0,fromHistory:false};
