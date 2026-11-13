@@ -735,21 +735,28 @@
     const runs=state.workouts.filter(w=>w.sport==='run'&&w.status==='done'&&w.actual&&w.actual.km>0&&w.actual.minutes>0);
     const records=targets.map(([label,target])=>{
       const tolerance=Math.max(.12,target*.03);
-      const candidates=runs
-        .filter(w=>w.actual.km>=target-tolerance)
-        .map(w=>{
-          const specific=Math.abs(w.actual.km-target)<=tolerance;
-          return {
-            seconds:Math.round((w.actual.minutes*60)*(target/w.actual.km)),
-            date:w.date,
-            workoutId:w.id,
-            recordType:specific?'distance':'average',
-            sourceKm:Number(w.actual.km),
-            source:'manual'
-          };
-        })
-        .sort((a,b)=>a.seconds-b.seconds);
-      return {label,distanceKm:target,...(candidates[0]||{seconds:null,date:null,workoutId:null,recordType:null,sourceKm:null,source:null})};
+      const candidates=[];
+      for(const w of runs) {
+        // Device-recorded efforts are measurements, never derived pace estimates.
+        for(const effort of w.external?.bestEfforts||[]) {
+          if(Math.abs(Number(effort.distanceKm)-target)>tolerance||
+             !Number.isFinite(Number(effort.seconds))||Number(effort.seconds)<=0) continue;
+          candidates.push({seconds:Math.round(Number(effort.seconds)),date:w.date,
+            workoutId:w.id,recordType:'distance',sourceKm:Number(effort.distanceKm),
+            source:w.external.provider,estimated:false});
+        }
+        if(w.actual.km<target-tolerance) continue;
+        const specific=Math.abs(w.actual.km-target)<=tolerance;
+        candidates.push({seconds:Math.round((w.actual.minutes*60)*(target/w.actual.km)),
+          date:w.date,workoutId:w.id,recordType:specific?'distance':'average',
+          sourceKm:Number(w.actual.km),source:w.external?.provider||'manual',
+          estimated:!specific});
+      }
+      // A measured best effort is more trustworthy than an extrapolated split.
+      candidates.sort((a,b)=>Number(a.estimated)-Number(b.estimated)||a.seconds-b.seconds);
+      return {label,distanceKm:target,...(candidates[0]||{
+        seconds:null,date:null,workoutId:null,recordType:null,sourceKm:null,source:null,estimated:null
+      })};
     });
     const longest=runs.slice().sort((a,b)=>b.actual.km-a.actual.km)[0]||null;
     const fastest=runs.filter(w=>w.actual.km>=3).map(w=>({workout:w,paceSeconds:(w.actual.minutes*60)/w.actual.km})).sort((a,b)=>a.paceSeconds-b.paceSeconds)[0]||null;
