@@ -31,7 +31,7 @@
     const h=[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('');
     return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
   }
-  function roundKm(n) { return Math.round(Math.max(0, n) * 10) / 10; }
+  function roundKm(n) { return Math.round(Math.max(0, n) * 100) / 100; }
   function clone(x) { return structuredClone(x); }
   const sports = { run:'Hardlopen', strength:'Krachttraining', cycle:'Fietsen', walk:'Wandelen', padel:'Padel', windsurf:'Windsurfen', other:'Overig' };
   const goals = { fit:'Fit blijven', '5k':'5 km opbouwen', '10k':'10 km opbouwen', half:'Halve marathon', marathon:'Marathon' };
